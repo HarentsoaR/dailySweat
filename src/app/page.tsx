@@ -142,11 +142,11 @@ export default function DailySweatPage() {
     setTimerKey(prev => prev + 1); // Reset timer to initial duration by changing key
   };
 
-  const handleTimerEnd = () => {
+  const handleTimerEnd = useCallback(() => {
     setIsTimerRunning(false);
     toast({ title: "Rest Over!", description: "Time to get back to it!" });
     // Optionally play a sound
-  };
+  }, [toast]);
 
   const handleLoadWorkoutFromHistory = (workout: WorkoutPlan) => {
     setCurrentWorkout(workout);

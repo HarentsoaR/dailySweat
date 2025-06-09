@@ -36,23 +36,31 @@ export function RestTimer({
     }
   }, []);
 
+  // Effect to reset timeLeft when initialDuration or timerKey (which implies new timer instance) changes
   useEffect(() => {
     setTimeLeft(initialDuration);
-    clearTimerInterval(); // Clear any existing interval when key or initialDuration changes
-    if (isRunning && initialDuration > 0) {
+  }, [initialDuration, timerKey]);
+
+  // Effect to run/clear the timer interval based on isRunning and timeLeft
+  useEffect(() => {
+    if (isRunning && timeLeft > 0) {
       intervalRef.current = setInterval(() => {
-        setTimeLeft((prevTime) => {
-          if (prevTime <= 1) {
-            clearTimerInterval();
-            onTimerEnd(); 
-            return 0;
-          }
-          return prevTime - 1;
-        });
+        setTimeLeft(prevTime => prevTime - 1); // Just decrement time
       }, 1000);
+    } else {
+      clearTimerInterval(); // Clear if not running or timeLeft is 0
     }
-    return clearTimerInterval;
-  }, [initialDuration, isRunning, timerKey, onTimerEnd, clearTimerInterval]);
+    return clearTimerInterval; // Cleanup when isRunning, timeLeft changes, or component unmounts
+  }, [isRunning, timeLeft, clearTimerInterval]);
+
+  // Effect to handle timer completion (when timeLeft hits 0)
+  useEffect(() => {
+    if (timeLeft === 0 && isRunning) {
+      // This condition ensures onTimerEnd is called only when the timer actively running hits zero.
+      onTimerEnd();
+    }
+  }, [timeLeft, isRunning, onTimerEnd]);
+
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -62,9 +70,9 @@ export function RestTimer({
 
   const progressPercentage = initialDuration > 0 ? (timeLeft / initialDuration) * 100 : 0;
 
-  if (initialDuration === 0) {
-    return null; // Don't render timer if no duration is set
-  }
+  // The parent component (DailySweatPage) ensures this component is only rendered
+  // if initialDuration (passed as timerDuration prop there) is > 0.
+  // So, no need for an explicit `if (initialDuration === 0) return null;` here.
 
   return (
     <Card className={cn("shadow-md sticky bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md z-50", className)}>
