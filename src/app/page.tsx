@@ -1,7 +1,9 @@
+
 "use client";
 
 import { adjustWorkoutDifficulty } from "@/ai/flows/adjust-workout-difficulty";
 import { generateWorkout } from "@/ai/flows/generate-workout";
+import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { DifficultyFeedback } from "@/components/daily-sweat/DifficultyFeedback";
 import { Header } from "@/components/daily-sweat/Header";
 import { RestTimer } from "@/components/daily-sweat/RestTimer";
@@ -15,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
 import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, GenerateWorkoutInput, WorkoutPlan } from "@/lib/types";
-import { AlertCircle, DumbbellIcon, History, Settings2 } from "lucide-react";
+import { AlertCircle, DumbbellIcon, History, Settings2, PlayCircle } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 export default function DailySweatPage() {
@@ -29,14 +31,18 @@ export default function DailySweatPage() {
 
   const [timerDuration, setTimerDuration] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [timerKey, setTimerKey] = useState(0); // Used to reset/re-initialize timer
+  const [timerKey, setTimerKey] = useState(0);
+
+  const [isWorkoutActive, setIsWorkoutActive] = useState(false);
+  const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
 
   const { toast } = useToast();
 
   const handleGenerateWorkout = async (data: GenerateWorkoutInput) => {
     setIsLoading(true);
     setError(null);
-    setCurrentWorkout(null); // Clear previous workout
+    setCurrentWorkout(null);
+    setIsWorkoutActive(false); 
     try {
       const result = await generateWorkout(data);
       let parsedPlan: AIParsedWorkoutOutput;
@@ -66,7 +72,7 @@ export default function DailySweatPage() {
         generatedAt: new Date().toISOString(),
       };
       setCurrentWorkout(newWorkout);
-      setCurrentWorkoutParams(data); // Store params for potential re-generation or adjustment
+      setCurrentWorkoutParams(data);
       addWorkoutToHistory(newWorkout);
       toast({ title: "Workout Generated!", description: "Your new workout plan is ready." });
     } catch (err) {
@@ -86,7 +92,6 @@ export default function DailySweatPage() {
     setIsAdjusting(true);
     setError(null);
     try {
-      // The AI expects the full workout plan as a JSON string.
       const workoutPlanString = JSON.stringify(currentWorkout);
       const result = await adjustWorkoutDifficulty({ workoutPlan: workoutPlanString, feedback });
       
@@ -100,18 +105,17 @@ export default function DailySweatPage() {
         return;
       }
 
-      // Ensure the adjusted plan retains necessary fields or re-populate them
       const adjustedWorkout: WorkoutPlan = {
-        ...currentWorkout, // Base on current to keep params
-        ...adjustedPlanParsed, // Override with AI's adjustments (especially exercises, name)
-        id: Date.now().toString(), // New ID for the adjusted plan
+        ...currentWorkout,
+        ...adjustedPlanParsed,
+        id: Date.now().toString(),
         originalPlanId: currentWorkout.id,
         feedbackGiven: feedback,
         generatedAt: new Date().toISOString(),
       };
 
       setCurrentWorkout(adjustedWorkout);
-      addWorkoutToHistory(adjustedWorkout); // Save adjusted plan to history
+      addWorkoutToHistory(adjustedWorkout);
       toast({ title: "Workout Adjusted!", description: `Difficulty set to: ${feedback}.` });
     } catch (err) {
       console.error("Error adjusting workout difficulty:", err);
@@ -125,8 +129,7 @@ export default function DailySweatPage() {
   const handleStartRestTimer = (duration: number) => {
     setTimerDuration(duration);
     setIsTimerRunning(true);
-    setTimerKey(prev => prev + 1); // Force re-mount or re-init of timer
-    // Scroll to timer or make it visible
+    setTimerKey(prev => prev + 1);
     const timerElement = document.getElementById('rest-timer-section');
     if (timerElement) {
       timerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -139,23 +142,23 @@ export default function DailySweatPage() {
   
   const handleTimerReset = () => {
     setIsTimerRunning(false);
-    setTimerKey(prev => prev + 1); // Reset timer to initial duration by changing key
+    setTimerKey(prev => prev + 1); 
   };
 
   const handleTimerEnd = useCallback(() => {
     setIsTimerRunning(false);
     toast({ title: "Rest Over!", description: "Time to get back to it!" });
-    // Optionally play a sound
   }, [toast]);
 
   const handleLoadWorkoutFromHistory = (workout: WorkoutPlan) => {
     setCurrentWorkout(workout);
-    setCurrentWorkoutParams({ // Restore params if available, or use workout's own
+    setCurrentWorkoutParams({
         muscleGroups: workout.muscleGroups,
         availableTime: workout.availableTime,
         equipment: workout.equipment,
         difficulty: workout.difficulty,
     });
+    setIsWorkoutActive(false); // Ensure workout is not active when loaded from history
     toast({ title: "Workout Loaded", description: `Loaded "${workout.name}" from history.`});
   };
 
@@ -166,12 +169,45 @@ export default function DailySweatPage() {
       difficulty: 'beginner' as const,
   };
   
-  // Effect to clear error when user starts a new action
   useEffect(() => {
     if (isLoading || isAdjusting) {
       setError(null);
     }
   }, [isLoading, isAdjusting]);
+
+  const handleStartWorkout = () => {
+    if (currentWorkout && currentWorkout.exercises.length > 0) {
+      setIsWorkoutActive(true);
+      setActiveExerciseIndex(0);
+      setError(null); // Clear any previous errors
+      toast({title: "Workout Started!", description: "Let's get to it!"});
+    } else {
+      setError("Cannot start an empty or non-existent workout. Please generate a workout first.");
+    }
+  };
+
+  const handleNextExercise = () => {
+    if (currentWorkout && activeExerciseIndex < currentWorkout.exercises.length - 1) {
+      setActiveExerciseIndex(prev => prev + 1);
+    } else if (currentWorkout && activeExerciseIndex === currentWorkout.exercises.length - 1) {
+      // Last exercise completed
+      toast({ title: "Workout Complete!", description: "Great job finishing your workout!" });
+      setIsWorkoutActive(false);
+      // Optionally, mark workout as completed or show a summary
+    }
+  };
+  
+  const handlePreviousExercise = () => {
+    if (activeExerciseIndex > 0) {
+      setActiveExerciseIndex(prev => prev - 1);
+    }
+  };
+
+  const handleEndWorkout = () => {
+    setIsWorkoutActive(false);
+    toast({ title: "Workout Ended", description: "Come back soon for another session!" });
+  };
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -203,13 +239,32 @@ export default function DailySweatPage() {
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
-                <WorkoutDisplay workoutPlan={currentWorkout} onStartRest={handleStartRestTimer} />
-                {currentWorkout && (
-                  <DifficultyFeedback 
-                    onFeedbackSubmit={handleAdjustDifficulty} 
-                    isLoading={isAdjusting}
-                    disabled={!currentWorkout}
+
+                {isWorkoutActive && currentWorkout ? (
+                  <ActiveWorkoutDisplay
+                    workoutPlan={currentWorkout}
+                    currentExerciseIndex={activeExerciseIndex}
+                    onNextExercise={handleNextExercise}
+                    onPreviousExercise={handlePreviousExercise}
+                    onEndWorkout={handleEndWorkout}
+                    onStartRest={handleStartRestTimer}
                   />
+                ) : (
+                  <>
+                    <WorkoutDisplay 
+                      workoutPlan={currentWorkout} 
+                      onStartRest={handleStartRestTimer}
+                      onStartWorkout={handleStartWorkout}
+                      isWorkoutActive={isWorkoutActive}
+                    />
+                    {currentWorkout && !isWorkoutActive && (
+                      <DifficultyFeedback 
+                        onFeedbackSubmit={handleAdjustDifficulty} 
+                        isLoading={isAdjusting}
+                        disabled={!currentWorkout}
+                      />
+                    )}
+                  </>
                 )}
               </section>
             </div>
@@ -233,7 +288,7 @@ export default function DailySweatPage() {
         </Tabs>
       </main>
 
-      {timerDuration > 0 && (
+      {timerDuration > 0 && ( // This timer is for manual rests on the main page or for active workout rests
         <div id="rest-timer-section" className="pb-4 px-4">
              <RestTimer
                 initialDuration={timerDuration}

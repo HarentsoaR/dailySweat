@@ -1,14 +1,17 @@
 
 import type { WorkoutPlan, Exercise } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock, Dumbbell } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock, Dumbbell, PlayCircle } from 'lucide-react';
 import { ExerciseCard } from './ExerciseCard';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from '@/components/ui/button';
 
 interface WorkoutDisplayProps {
   workoutPlan: WorkoutPlan | null;
   onStartRest: (duration: number) => void;
+  onStartWorkout: () => void;
+  isWorkoutActive: boolean;
 }
 
 const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] }) => {
@@ -24,7 +27,7 @@ const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] 
   }
 };
 
-export function WorkoutDisplay({ workoutPlan, onStartRest }: WorkoutDisplayProps) {
+export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWorkoutActive }: WorkoutDisplayProps) {
   if (!workoutPlan) {
     return (
       <Card className="shadow-lg">
@@ -43,7 +46,7 @@ export function WorkoutDisplay({ workoutPlan, onStartRest }: WorkoutDisplayProps
     );
   }
 
-  const planDescription = workoutPlan.name; // Assuming AI might put description in 'name' or a dedicated field
+  const planDescription = workoutPlan.name;
 
   return (
     <Card className="shadow-lg">
@@ -54,7 +57,7 @@ export function WorkoutDisplay({ workoutPlan, onStartRest }: WorkoutDisplayProps
               <ClipboardList className="mr-2 h-6 w-6 text-primary" />
               {workoutPlan.name || "Today's Workout"}
             </CardTitle>
-            {planDescription && planDescription !== workoutPlan.name && (
+            {planDescription && planDescription !== workoutPlan.name && ( // Only show if different from title
               <CardDescription className="mt-1 flex items-center">
                 <Info className="mr-1.5 h-4 w-4 text-muted-foreground" />
                 {planDescription}
@@ -87,6 +90,18 @@ export function WorkoutDisplay({ workoutPlan, onStartRest }: WorkoutDisplayProps
           <p className="text-muted-foreground">No exercises in this plan. Try generating a new one!</p>
         )}
       </CardContent>
+      {!isWorkoutActive && workoutPlan.exercises.length > 0 && (
+        <CardFooter>
+          <Button 
+            onClick={onStartWorkout} 
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            size="lg"
+          >
+            <PlayCircle className="mr-2 h-5 w-5" />
+            Start Workout
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }
