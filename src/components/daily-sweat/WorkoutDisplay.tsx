@@ -1,6 +1,7 @@
+
 import type { WorkoutPlan, Exercise } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock } from 'lucide-react';
+import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock, Dumbbell } from 'lucide-react';
 import { ExerciseCard } from './ExerciseCard';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -74,7 +75,7 @@ export function WorkoutDisplay({ workoutPlan, onStartRest }: WorkoutDisplayProps
         <div className="flex flex-wrap gap-2 pt-2">
           <Badge variant="secondary" className="flex items-center gap-1"><CalendarDays className="h-3 w-3" />{workoutPlan.muscleGroups}</Badge>
           <Badge variant="secondary" className="flex items-center gap-1"><Clock className="h-3 w-3" />{workoutPlan.availableTime} min</Badge>
-          <Badge variant="secondary" className="flex items-center gap-1"><BarbellIcon className="h-3 w-3" />{workoutPlan.equipment}</Badge>
+          <Badge variant="secondary" className="flex items-center gap-1"><Dumbbell className="h-3 w-3" />{workoutPlan.equipment}</Badge>
         </div>
       </CardHeader>
       <CardContent>
