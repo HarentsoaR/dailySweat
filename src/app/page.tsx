@@ -5,6 +5,7 @@ import { adjustWorkoutDifficulty } from "@/ai/flows/adjust-workout-difficulty";
 import { generateWorkout } from "@/ai/flows/generate-workout";
 import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { DifficultyFeedback } from "@/components/daily-sweat/DifficultyFeedback";
+import { FitnessChatbotDialog } from "@/components/daily-sweat/FitnessChatbotDialog";
 import { Header } from "@/components/daily-sweat/Header";
 import { RestTimer } from "@/components/daily-sweat/RestTimer";
 import { WorkoutDisplay } from "@/components/daily-sweat/WorkoutDisplay";
@@ -17,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
 import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, GenerateWorkoutInput, WorkoutPlan } from "@/lib/types";
-import { AlertCircle, DumbbellIcon, History, Settings2, PlayCircle } from "lucide-react";
+import { AlertCircle, DumbbellIcon, History, Settings2, PlayCircle, MessageSquare } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 export default function DailySweatPage() {
@@ -95,9 +96,9 @@ export default function DailySweatPage() {
       const workoutPlanString = JSON.stringify(currentWorkout);
       const result = await adjustWorkoutDifficulty({ workoutPlan: workoutPlanString, feedback });
       
-      let adjustedPlanParsed: WorkoutPlan;
+      let adjustedPlanParsed: WorkoutPlan; // Changed from AIParsedWorkoutOutput as adjust flow returns a full WorkoutPlan structure
       try {
-        adjustedPlanParsed = JSON.parse(result.adjustedWorkoutPlan) as WorkoutPlan;
+        adjustedPlanParsed = JSON.parse(result.adjustedWorkoutPlan) as WorkoutPlan; // Ensure this matches the output of adjustWorkoutDifficultyFlow
       } catch (e) {
         console.error("Failed to parse AI adjusted workout plan string:", e);
         setError("Received an invalid adjusted workout plan format from AI. Please try again.");
@@ -105,18 +106,27 @@ export default function DailySweatPage() {
         return;
       }
 
+      if (!adjustedPlanParsed.exercises || adjustedPlanParsed.exercises.length === 0) {
+        setError("The AI adjusted to an empty workout plan. Please try different feedback or generate a new plan.");
+        setIsAdjusting(false);
+        return;
+      }
+
       const adjustedWorkout: WorkoutPlan = {
-        ...currentWorkout,
-        ...adjustedPlanParsed,
+        ...currentWorkout, // Spread original params first
+        name: adjustedPlanParsed.name || currentWorkout.name, // Use adjusted name or fallback
+        description: adjustedPlanParsed.description, // Use adjusted description
+        exercises: adjustedPlanParsed.exercises, // Use adjusted exercises
         id: Date.now().toString(),
         originalPlanId: currentWorkout.id,
         feedbackGiven: feedback,
         generatedAt: new Date().toISOString(),
+        // Keep original difficulty, muscleGroups, etc. unless explicitly changed by AI, which is not the case here
       };
 
       setCurrentWorkout(adjustedWorkout);
       addWorkoutToHistory(adjustedWorkout);
-      toast({ title: "Workout Adjusted!", description: `Difficulty set to: ${feedback}.` });
+      toast({ title: "Workout Adjusted!", description: `Difficulty perception: ${feedback}. Plan updated.` });
     } catch (err) {
       console.error("Error adjusting workout difficulty:", err);
       setError("Failed to adjust workout difficulty. Please try again.");
@@ -158,7 +168,7 @@ export default function DailySweatPage() {
         equipment: workout.equipment,
         difficulty: workout.difficulty,
     });
-    setIsWorkoutActive(false); // Ensure workout is not active when loaded from history
+    setIsWorkoutActive(false); 
     toast({ title: "Workout Loaded", description: `Loaded "${workout.name}" from history.`});
   };
 
@@ -179,7 +189,7 @@ export default function DailySweatPage() {
     if (currentWorkout && currentWorkout.exercises.length > 0) {
       setIsWorkoutActive(true);
       setActiveExerciseIndex(0);
-      setError(null); // Clear any previous errors
+      setError(null); 
       toast({title: "Workout Started!", description: "Let's get to it!"});
     } else {
       setError("Cannot start an empty or non-existent workout. Please generate a workout first.");
@@ -190,10 +200,8 @@ export default function DailySweatPage() {
     if (currentWorkout && activeExerciseIndex < currentWorkout.exercises.length - 1) {
       setActiveExerciseIndex(prev => prev + 1);
     } else if (currentWorkout && activeExerciseIndex === currentWorkout.exercises.length - 1) {
-      // Last exercise completed
       toast({ title: "Workout Complete!", description: "Great job finishing your workout!" });
       setIsWorkoutActive(false);
-      // Optionally, mark workout as completed or show a summary
     }
   };
   
@@ -288,7 +296,7 @@ export default function DailySweatPage() {
         </Tabs>
       </main>
 
-      {timerDuration > 0 && ( // This timer is for manual rests on the main page or for active workout rests
+      {timerDuration > 0 && (
         <div id="rest-timer-section" className="pb-4 px-4">
              <RestTimer
                 initialDuration={timerDuration}
@@ -301,9 +309,21 @@ export default function DailySweatPage() {
         </div>
       )}
       
-      <footer className="text-center py-4 border-t text-sm text-muted-foreground">
+      <FitnessChatbotDialog>
+        <Button
+          variant="outline"
+          size="icon"
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-primary-foreground hover:scale-105 transition-transform"
+          aria-label="Open Fitness Chatbot"
+        >
+          <MessageSquare className="h-7 w-7" />
+        </Button>
+      </FitnessChatbotDialog>
+      
+      <footer className="text-center py-4 border-t text-sm text-muted-foreground mt-16">
         <p>&copy; {new Date().getFullYear()} Daily Sweat. Sweat Smarter, Not Harder.</p>
       </footer>
     </div>
   );
 }
+
