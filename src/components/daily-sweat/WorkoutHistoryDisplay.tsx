@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { WorkoutPlan } from '@/lib/types';
@@ -13,6 +14,16 @@ interface WorkoutHistoryDisplayProps {
   onLoadWorkout: (workout: WorkoutPlan) => void;
   onDeleteWorkout: (workoutId: string) => void;
   onClearHistory: () => void;
+  dict: { // Dictionary for this component
+    title: string;
+    description: string;
+    emptyState: string;
+    generatedOn: string; // "Generated on: {date}"
+    feedbackGiven: string; // "Feedback: {feedback}"
+    viewButton: string;
+    deleteButton: string;
+    clearAllButton: string;
+  };
 }
 
 export function WorkoutHistoryDisplay({
@@ -20,6 +31,7 @@ export function WorkoutHistoryDisplay({
   onLoadWorkout,
   onDeleteWorkout,
   onClearHistory,
+  dict,
 }: WorkoutHistoryDisplayProps) {
   if (history.length === 0) {
     return (
@@ -27,11 +39,11 @@ export function WorkoutHistoryDisplay({
         <CardHeader>
           <CardTitle className="flex items-center text-xl font-headline">
             <History className="mr-2 h-5 w-5 text-primary" />
-            Workout History
+            {dict.title}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">No past workouts found. Complete some workouts to see them here!</p>
+          <p className="text-muted-foreground">{dict.emptyState}</p>
         </CardContent>
       </Card>
     );
@@ -43,13 +55,13 @@ export function WorkoutHistoryDisplay({
         <div className="flex-grow">
           <CardTitle className="flex items-center text-xl font-headline">
             <History className="mr-2 h-5 w-5 text-primary" />
-            Workout History
+            {dict.title}
           </CardTitle>
-          <CardDescription>Review your past workout sessions.</CardDescription>
+          <CardDescription>{dict.description}</CardDescription>
         </div>
         {history.length > 0 && (
            <Button variant="destructive" size="sm" onClick={onClearHistory}>
-            <Trash2 className="mr-1 h-3 w-3" /> Clear All
+            <Trash2 className="mr-1 h-3 w-3" /> {dict.clearAllButton}
           </Button>
         )}
       </CardHeader>
@@ -63,7 +75,7 @@ export function WorkoutHistoryDisplay({
                    {workout.name || "Workout Plan"}
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Generated on: {format(parseISO(workout.generatedAt), "MMM d, yyyy 'at' h:mm a")}
+                  {dict.generatedOn.replace('{date}', format(parseISO(workout.generatedAt), "MMM d, yyyy 'at' h:mm a"))}
                 </CardDescription>
                  <div className="flex flex-wrap gap-1 pt-1">
                     <Badge variant="outline">{workout.muscleGroups}</Badge>
@@ -72,15 +84,18 @@ export function WorkoutHistoryDisplay({
               </CardHeader>
               {workout.feedbackGiven && (
                 <CardContent className="py-1 px-6">
-                    <p className="text-xs text-muted-foreground flex items-center"><Info className="mr-1 h-3 w-3"/>Feedback: {workout.feedbackGiven}</p>
+                    <p className="text-xs text-muted-foreground flex items-center">
+                        <Info className="mr-1 h-3 w-3"/>
+                        {dict.feedbackGiven.replace('{feedback}', workout.feedbackGiven)}
+                    </p>
                 </CardContent>
               )}
               <CardFooter className="flex justify-end gap-2 pt-2">
                 <Button variant="outline" size="sm" onClick={() => onLoadWorkout(workout)}>
-                  <Eye className="mr-1 h-3 w-3" /> View
+                  <Eye className="mr-1 h-3 w-3" /> {dict.viewButton}
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => onDeleteWorkout(workout.id)} className="text-destructive hover:bg-destructive/10">
-                  <Trash2 className="mr-1 h-3 w-3" /> Delete
+                  <Trash2 className="mr-1 h-3 w-3" /> {dict.deleteButton}
                 </Button>
               </CardFooter>
             </Card>

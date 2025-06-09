@@ -1,0 +1,109 @@
+{
+  "metadata": {
+    "title": "Sueur Quotidienne - Votre Planificateur d'Entraînement IA Personnel",
+    "description": "Obtenez des plans d'entraînement quotidiens personnalisés générés par IA. Suivez vos progrès et restez motivé avec Sueur Quotidienne."
+  },
+  "header": {
+    "title": "Sueur Quotidienne"
+  },
+  "footer": {
+    "tagline": "© {year} Sueur Quotidienne. Transpirez Plus Intelligemment, Pas Plus Durement."
+  },
+  "page": {
+    "tabs": {
+      "workout": "Entraînement",
+      "history": "Historique"
+    },
+     "workoutGenerator": {
+        "title": "Créez Votre Entraînement",
+        "description": "Indiquez-nous vos préférences, et nous générerons un plan d'entraînement personnalisé pour vous.",
+        "muscleGroupsLabel": "Groupes Musculaires",
+        "muscleGroupsPlaceholder": "Ex : Jambes, Abdos, Bras ou Corps Complet",
+        "availableTimeLabel": "Temps Disponible (minutes)",
+        "availableTimePlaceholder": "Ex : 30",
+        "equipmentLabel": "Équipement Disponible",
+        "equipmentPlaceholder": "Ex : Haltères, Bandes de résistance, Poids du corps",
+        "difficultyLabel": "Niveau de Difficulté",
+        "selectDifficulty": "Sélectionnez la difficulté",
+        "beginner": "Débutant",
+        "intermediate": "Intermédiaire",
+        "advanced": "Avancé",
+        "buttonGenerate": "Générer l'Entraînement",
+        "buttonGenerating": "Génération..."
+    },
+    "workoutDisplay": {
+        "title": "Votre Plan d'Entraînement",
+        "emptyState": "Générez un plan d'entraînement en utilisant le formulaire pour le voir ici.",
+        "startWorkoutButton": "Commencer l'Entraînement"
+    },
+    "activeWorkoutDisplay": {
+        "title": "Entraînement Actif",
+        "exerciseProgress": "Exercice {current} sur {total}: {exerciseName}",
+        "startRestButton": "Commencer {duration}s de Repos",
+        "previousButton": "Précédent",
+        "nextButton": "Exercice Suivant",
+        "finishButton": "Terminer l'Entraînement",
+        "endWorkoutEarlyButton": "Terminer l'Entraînement Plus Tôt"
+    },
+    "difficultyFeedback": {
+        "title": "Évaluez Votre Entraînement",
+        "description": "Aidez-nous à améliorer votre prochain entraînement en évaluant la difficulté de ce plan.",
+        "tooEasy": "Trop Facile",
+        "justRight": "Juste Bien",
+        "tooHard": "Trop Difficile",
+        "adjusting": "Ajustement de l'entraînement..."
+    },
+    "workoutHistory": {
+        "title": "Historique des Entraînements",
+        "description": "Revoyez vos sessions d'entraînement passées.",
+        "emptyState": "Aucun entraînement passé trouvé. Terminez des entraînements pour les voir ici !",
+        "generatedOn": "Généré le : {date}",
+        "feedbackGiven": "Feedback : {feedback}",
+        "viewButton": "Voir",
+        "deleteButton": "Supprimer",
+        "clearAllButton": "Tout Effacer",
+        "loading": "Chargement de l'historique..."
+    },
+    "restTimer": {
+        "title": "Minuteur de Repos",
+        "description": "Prenez une pause, puis revenez en force !"
+    },
+    "chatbot": {
+        "dialogTitle": "Chat IA Sueur Quotidienne",
+        "dialogDescription": "Posez toutes vos questions sur le fitness ou la nutrition.",
+        "inputPlaceholder": "Posez des questions sur les exercices, le régime, etc...",
+        "initialMessage": "Bonjour ! Je suis l'IA Sueur Quotidienne. Posez-moi toutes vos questions sur le fitness, la nutrition ou vos entraînements !",
+        "errorMessage": "Désolé, j'ai des difficultés à me connecter pour le moment. Veuillez réessayer plus tard."
+    },
+    "toasts": {
+        "workoutGeneratedTitle": "Entraînement Généré !",
+        "workoutGeneratedDescription": "Votre nouveau plan d'entraînement est prêt.",
+        "generationFailedTitle": "Échec de la Génération",
+        "generationFailedDescription": "Impossible de générer l'entraînement.",
+        "workoutAdjustedTitle": "Entraînement Ajusté !",
+        "workoutAdjustedDescription": "Perception de la difficulté : {feedback}. Plan mis à jour.",
+        "adjustmentFailedTitle": "Échec de l'Ajustement",
+        "adjustmentFailedDescription": "Impossible d'ajuster l'entraînement.",
+        "restOverTitle": "Repos Terminé !",
+        "restOverDescription": "Il est temps de reprendre !",
+        "workoutLoadedTitle": "Entraînement Chargé",
+        "workoutLoadedDescription": "\"{name}\" chargé depuis l'historique.",
+        "workoutStartedTitle": "Entraînement Commencé !",
+        "workoutStartedDescription": "C'est parti !",
+        "workoutCompleteTitle": "Entraînement Terminé !",
+        "workoutCompleteDescription": "Bravo pour avoir terminé votre entraînement !",
+        "workoutEndedTitle": "Entraînement Fini",
+        "workoutEndedDescription": "Revenez bientôt pour une autre session !"
+    },
+    "errors": {
+        "invalidAIPlan": "Format de plan d'entraînement invalide reçu de l'IA. Veuillez réessayer.",
+        "emptyAIPlan": "L'IA a généré un plan d'entraînement vide. Veuillez essayer avec des paramètres différents.",
+        "noWorkoutToAdjust": "Aucun entraînement actuel à ajuster.",
+        "invalidAdjustedAIPlan": "Format de plan d'entraînement ajusté invalide reçu de l'IA. Veuillez réessayer.",
+        "emptyAdjustedAIPlan": "L'IA a ajusté vers un plan d'entraînement vide. Essayez un feedback différent ou générez un nouveau plan.",
+        "failedToGenerate": "Échec de la génération de l'entraînement. Veuillez réessayer plus tard.",
+        "failedToAdjust": "Échec de l'ajustement de la difficulté de l'entraînement. Veuillez réessayer.",
+        "cannotStartEmptyWorkout": "Impossible de démarrer un entraînement vide ou inexistant. Veuillez d'abord générer un entraînement."
+    }
+  }
+}

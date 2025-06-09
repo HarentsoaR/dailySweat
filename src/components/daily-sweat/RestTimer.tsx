@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,10 @@ interface RestTimerProps {
   onTimerEnd: () => void;
   timerKey: number; // To force re-initialization
   className?: string;
+  dict: { // Dictionary for this component
+    title: string;
+    description: string;
+  };
 }
 
 export function RestTimer({
@@ -25,6 +30,7 @@ export function RestTimer({
   onTimerEnd,
   timerKey,
   className,
+  dict,
 }: RestTimerProps) {
   const [timeLeft, setTimeLeft] = useState(initialDuration);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -36,27 +42,23 @@ export function RestTimer({
     }
   }, []);
 
-  // Effect to reset timeLeft when initialDuration or timerKey (which implies new timer instance) changes
   useEffect(() => {
     setTimeLeft(initialDuration);
   }, [initialDuration, timerKey]);
 
-  // Effect to run/clear the timer interval based on isRunning and timeLeft
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       intervalRef.current = setInterval(() => {
-        setTimeLeft(prevTime => prevTime - 1); // Just decrement time
+        setTimeLeft(prevTime => prevTime - 1);
       }, 1000);
     } else {
-      clearTimerInterval(); // Clear if not running or timeLeft is 0
+      clearTimerInterval();
     }
-    return clearTimerInterval; // Cleanup when isRunning, timeLeft changes, or component unmounts
+    return clearTimerInterval;
   }, [isRunning, timeLeft, clearTimerInterval]);
 
-  // Effect to handle timer completion (when timeLeft hits 0)
   useEffect(() => {
     if (timeLeft === 0 && isRunning) {
-      // This condition ensures onTimerEnd is called only when the timer actively running hits zero.
       onTimerEnd();
     }
   }, [timeLeft, isRunning, onTimerEnd]);
@@ -70,18 +72,14 @@ export function RestTimer({
 
   const progressPercentage = initialDuration > 0 ? (timeLeft / initialDuration) * 100 : 0;
 
-  // The parent component (DailySweatPage) ensures this component is only rendered
-  // if initialDuration (passed as timerDuration prop there) is > 0.
-  // So, no need for an explicit `if (initialDuration === 0) return null;` here.
-
   return (
     <Card className={cn("shadow-md sticky bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md z-50", className)}>
       <CardHeader>
         <CardTitle className="flex items-center text-xl font-headline">
           <TimerLucideIcon className="mr-2 h-5 w-5 text-primary" />
-          Rest Timer
+          {dict.title}
         </CardTitle>
-        <CardDescription>Take a breather, then hit it hard!</CardDescription>
+        <CardDescription>{dict.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-center">

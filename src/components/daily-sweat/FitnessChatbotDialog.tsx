@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { Bot, Send, User, MessageSquare, Loader2 } from 'lucide-react';
+import { Bot, Send, User, Loader2 } from 'lucide-react'; // Removed MessageSquare as it's used for trigger
 import React, { useState, useRef, useEffect } from 'react';
 
 interface Message {
@@ -18,9 +18,16 @@ interface Message {
 
 interface FitnessChatbotDialogProps {
   children: React.ReactNode; // For the trigger button
+  dict: { // Dictionary for this component
+    dialogTitle: string;
+    dialogDescription: string;
+    inputPlaceholder: string;
+    initialMessage: string;
+    errorMessage: string;
+  };
 }
 
-export function FitnessChatbotDialog({ children }: FitnessChatbotDialogProps) {
+export function FitnessChatbotDialog({ children, dict }: FitnessChatbotDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentMessage, setCurrentMessage] = useState('');
@@ -52,7 +59,7 @@ export function FitnessChatbotDialog({ children }: FitnessChatbotDialogProps) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: "Sorry, I'm having trouble connecting right now. Please try again later.",
+        content: dict.errorMessage,
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -67,17 +74,16 @@ export function FitnessChatbotDialog({ children }: FitnessChatbotDialogProps) {
   }, [messages]);
   
   useEffect(() => {
-    // Add an initial welcome message from the bot when the dialog opens for the first time
     if (isOpen && messages.length === 0) {
       setMessages([
         {
           id: 'initial-bot-message',
           role: 'assistant',
-          content: "Hello! I'm Daily Sweat AI. Ask me anything about fitness, nutrition, or your workouts!",
+          content: dict.initialMessage,
         },
       ]);
     }
-  }, [isOpen, messages.length]);
+  }, [isOpen, messages.length, dict.initialMessage]);
 
 
   return (
@@ -87,10 +93,10 @@ export function FitnessChatbotDialog({ children }: FitnessChatbotDialogProps) {
         <SheetHeader className="p-4 border-b">
           <SheetTitle className="flex items-center">
             <Bot className="mr-2 h-6 w-6 text-primary" />
-            Daily Sweat AI Chat
+            {dict.dialogTitle}
           </SheetTitle>
           <SheetDescription>
-            Ask any fitness or nutrition related questions.
+            {dict.dialogDescription}
           </SheetDescription>
         </SheetHeader>
         <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
@@ -139,7 +145,7 @@ export function FitnessChatbotDialog({ children }: FitnessChatbotDialogProps) {
           >
             <Input
               type="text"
-              placeholder="Ask about exercises, diet, etc..."
+              placeholder={dict.inputPlaceholder}
               value={currentMessage}
               onChange={e => setCurrentMessage(e.target.value)}
               disabled={isLoading}
@@ -155,3 +161,4 @@ export function FitnessChatbotDialog({ children }: FitnessChatbotDialogProps) {
     </Sheet>
   );
 }
+

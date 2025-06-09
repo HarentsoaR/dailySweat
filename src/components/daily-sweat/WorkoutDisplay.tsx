@@ -1,5 +1,5 @@
 
-import type { WorkoutPlan, Exercise } from '@/lib/types';
+import type { WorkoutPlan } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock, Dumbbell, PlayCircle } from 'lucide-react';
 import { ExerciseCard } from './ExerciseCard';
@@ -12,6 +12,11 @@ interface WorkoutDisplayProps {
   onStartRest: (duration: number) => void;
   onStartWorkout: () => void;
   isWorkoutActive: boolean;
+  dict: { // Dictionary for this component
+    title: string;
+    emptyState: string;
+    startWorkoutButton: string;
+  };
 }
 
 const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] }) => {
@@ -27,19 +32,19 @@ const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] 
   }
 };
 
-export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWorkoutActive }: WorkoutDisplayProps) {
+export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWorkoutActive, dict }: WorkoutDisplayProps) {
   if (!workoutPlan) {
     return (
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center text-2xl font-headline">
             <ClipboardList className="mr-2 h-6 w-6 text-primary" />
-            Your Workout Plan
+            {dict.title}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Generate a workout plan using the form to see it here.
+            {dict.emptyState}
           </p>
         </CardContent>
       </Card>
@@ -55,9 +60,9 @@ export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWor
           <div>
             <CardTitle className="flex items-center text-2xl font-headline">
               <ClipboardList className="mr-2 h-6 w-6 text-primary" />
-              {workoutPlan.name || "Today's Workout"}
+              {workoutPlan.name || dict.title}
             </CardTitle>
-            {planDescription && planDescription !== workoutPlan.name && ( // Only show if different from title
+            {planDescription && planDescription !== workoutPlan.name && ( 
               <CardDescription className="mt-1 flex items-center">
                 <Info className="mr-1.5 h-4 w-4 text-muted-foreground" />
                 {planDescription}
@@ -98,7 +103,7 @@ export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWor
             size="lg"
           >
             <PlayCircle className="mr-2 h-5 w-5" />
-            Start Workout
+            {dict.startWorkoutButton}
           </Button>
         </CardFooter>
       )}
