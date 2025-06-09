@@ -1,8 +1,12 @@
+
 import { Dumbbell } from 'lucide-react';
 import { ThemeToggle } from '@/components/daily-sweat/ThemeToggle';
+import { LanguageSwitcher } from './LanguageSwitcher'; // Added import
 
 interface HeaderProps {
   title: string;
+  // We might pass a dictionary slice for the LanguageSwitcher if its internal labels need translation
+  // For now, LanguageSwitcher handles its own labels or they are hardcoded.
 }
 
 export function Header({ title }: HeaderProps) {
@@ -15,7 +19,10 @@ export function Header({ title }: HeaderProps) {
             {title}
           </h1>
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-2"> {/* Wrapper for toggles */}
+          <LanguageSwitcher /> {/* Added LanguageSwitcher */}
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

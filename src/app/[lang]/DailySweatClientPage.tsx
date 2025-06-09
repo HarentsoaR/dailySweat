@@ -166,7 +166,8 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     if (!dict?.page?.toasts) return;
     setIsTimerRunning(false);
     toast({ title: dict.page.toasts.restOverTitle, description: dict.page.toasts.restOverDescription });
-  }, [toast, dict]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast, dict?.page?.toasts?.restOverTitle, dict?.page?.toasts?.restOverDescription]);
 
   const handleLoadWorkoutFromHistory = (workout: WorkoutPlan) => {
     if (!dict?.page?.toasts) return;
