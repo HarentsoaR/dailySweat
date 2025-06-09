@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -12,11 +13,11 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const AdjustWorkoutDifficultyInputSchema = z.object({
-  workoutPlan: z.string().describe('The workout plan in JSON format.'),
+  workoutPlan: z.string().describe('The current workout plan in JSON string format.'),
   feedback: z
     .string()
     .describe(
-      'User feedback on the workout difficulty (e.g., too easy, too hard, just right).'n    ),
+      'User feedback on the workout difficulty (e.g., too easy, too hard, just right).',    ),
 });
 export type AdjustWorkoutDifficultyInput = z.infer<
   typeof AdjustWorkoutDifficultyInputSchema
@@ -25,7 +26,7 @@ export type AdjustWorkoutDifficultyInput = z.infer<
 const AdjustWorkoutDifficultyOutputSchema = z.object({
   adjustedWorkoutPlan: z
     .string()
-    .describe('The adjusted workout plan in JSON format.'),
+    .describe('The adjusted core workout (name, description, exercises) in JSON string format.'),
 });
 export type AdjustWorkoutDifficultyOutput = z.infer<
   typeof AdjustWorkoutDifficultyOutputSchema
@@ -43,15 +44,30 @@ const prompt = ai.definePrompt({
   output: {schema: AdjustWorkoutDifficultyOutputSchema},
   prompt: `You are a personal trainer AI, who adjusts workout plans based on user feedback.
 
-  The user has provided the following workout plan:
-  {{workoutPlan}}
+  The user has provided the following workout plan as a JSON string:
+  {{{workoutPlan}}}
 
   The user has provided the following feedback on the workout difficulty:
-  {{feedback}}
+  {{{feedback}}}
 
-  Based on this feedback, adjust the workout plan to be more appropriate for the user.
-  Ensure that the adjusted workout plan is valid JSON, and only return the JSON.
-  Do not return any other information.`,
+  Based on this feedback, adjust the workout plan.
+  Return strictly a JSON object string representing the core adjusted workout. The JSON object must conform to the following structure:
+  {
+    "name": "string (optional, the adjusted name of the workout, e.g., 'Intermediate Upper Body Focus')",
+    "description": "string (optional, a brief description of the adjusted workout focus)",
+    "exercises": [
+      {
+        "name": "string (e.g., 'Bench Press')",
+        "sets": "string or number (e.g., 4 or '4')",
+        "reps": "string (e.g., '8-10')",
+        "rest": "number (in seconds, e.g., 90)",
+        "description": "string (optional, e.g., 'Ensure full range of motion')"
+      }
+      // ... more adjusted exercises
+    ]
+  }
+  The 'exercises' array should contain the complete list of adjusted exercises and must not be empty.
+  Ensure the output is only the JSON string, with no other text before or after it. Do not include any fields from the original plan unless they are part of this specified structure (name, description, exercises).`,
 });
 
 const adjustWorkoutDifficultyFlow = ai.defineFlow(

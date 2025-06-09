@@ -2,7 +2,7 @@
 
 import type { GenerateWorkoutInput } from '@/lib/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Barbell, Clock3, Settings2, Users, Zap } from 'lucide-react';
+import {Clock3, Settings2, Users, Zap } from 'lucide-react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -87,7 +87,7 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading, defaultValues }: Wor
               name="equipment"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center"><Barbell className="mr-2 h-4 w-4" />Available Equipment</FormLabel>
+                  <FormLabel className="flex items-center">Available Equipment</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Dumbbells, Resistance Bands, Bodyweight" {...field} />
                   </FormControl>

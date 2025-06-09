@@ -1,6 +1,6 @@
 import type { WorkoutPlan, Exercise } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock, BarbellIcon } from 'lucide-react';
+import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock } from 'lucide-react';
 import { ExerciseCard } from './ExerciseCard';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";

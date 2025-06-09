@@ -1,3 +1,4 @@
+
 // src/ai/flows/generate-workout.ts
 'use server';
 /**
@@ -30,7 +31,7 @@ export type GenerateWorkoutInput = z.infer<typeof GenerateWorkoutInputSchema>;
 const GenerateWorkoutOutputSchema = z.object({
   workoutPlan: z
     .string()
-    .describe("A personalized daily workout plan based on the user's preferences."),
+    .describe("A personalized daily workout plan based on the user's preferences, as a JSON string."),
 });
 export type GenerateWorkoutOutput = z.infer<typeof GenerateWorkoutOutputSchema>;
 
@@ -51,7 +52,22 @@ const prompt = ai.definePrompt({
   Equipment: {{{equipment}}}
   Difficulty: {{{difficulty}}}
 
-  Return the workout plan in a clear and concise format.
+  Return the workout plan strictly as a JSON object string. The JSON object must conform to the following structure:
+  {
+    "name": "string (optional, e.g., 'Beginner Full Body Blast')",
+    "description": "string (optional, a brief description of the workout focus)",
+    "exercises": [
+      {
+        "name": "string (e.g., 'Push-ups')",
+        "sets": "string or number (e.g., 3 or '3')",
+        "reps": "string (e.g., '10-12' or 'As many as possible')",
+        "rest": "number (in seconds, e.g., 60)",
+        "description": "string (optional, e.g., 'Focus on form')"
+      }
+      // ... more exercises
+    ]
+  }
+  Ensure the output is only the JSON string, with no other text before or after it. The 'exercises' array must not be empty.
   `,
 });
 
