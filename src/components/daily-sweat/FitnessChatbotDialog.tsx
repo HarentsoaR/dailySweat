@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { Bot, Send, User, Loader2 } from 'lucide-react'; // Removed MessageSquare as it's used for trigger
+import { Bot, Send, User, Loader2 } from 'lucide-react'; 
 import React, { useState, useRef, useEffect } from 'react';
 
 interface Message {
@@ -17,13 +17,14 @@ interface Message {
 }
 
 interface FitnessChatbotDialogProps {
-  children: React.ReactNode; // For the trigger button
-  dict: { // Dictionary for this component
-    dialogTitle: string;
-    dialogDescription: string;
-    inputPlaceholder: string;
-    initialMessage: string;
-    errorMessage: string;
+  children: React.ReactNode; 
+  dict: { 
+    dialogTitle?: string;
+    dialogDescription?: string;
+    inputPlaceholder?: string;
+    initialMessage?: string;
+    errorMessage?: string;
+    sendButtonSR?: string;
   };
 }
 
@@ -59,7 +60,7 @@ export function FitnessChatbotDialog({ children, dict }: FitnessChatbotDialogPro
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: dict.errorMessage,
+        content: dict?.errorMessage || "Sorry, I'm having trouble connecting right now. Please try again later.",
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -79,11 +80,12 @@ export function FitnessChatbotDialog({ children, dict }: FitnessChatbotDialogPro
         {
           id: 'initial-bot-message',
           role: 'assistant',
-          content: dict.initialMessage,
+          content: dict?.initialMessage || "Hello! I'm Daily Sweat AI. Ask me anything about fitness, nutrition, or your workouts!",
         },
       ]);
     }
-  }, [isOpen, messages.length, dict.initialMessage]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, messages.length, dict?.initialMessage]);
 
 
   return (
@@ -93,10 +95,10 @@ export function FitnessChatbotDialog({ children, dict }: FitnessChatbotDialogPro
         <SheetHeader className="p-4 border-b">
           <SheetTitle className="flex items-center">
             <Bot className="mr-2 h-6 w-6 text-primary" />
-            {dict.dialogTitle}
+            {dict?.dialogTitle || "Daily Sweat AI Chat"}
           </SheetTitle>
           <SheetDescription>
-            {dict.dialogDescription}
+            {dict?.dialogDescription || "Ask any fitness or nutrition related questions."}
           </SheetDescription>
         </SheetHeader>
         <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
@@ -145,7 +147,7 @@ export function FitnessChatbotDialog({ children, dict }: FitnessChatbotDialogPro
           >
             <Input
               type="text"
-              placeholder={dict.inputPlaceholder}
+              placeholder={dict?.inputPlaceholder || "Ask about exercises, diet, etc..."}
               value={currentMessage}
               onChange={e => setCurrentMessage(e.target.value)}
               disabled={isLoading}
@@ -153,7 +155,7 @@ export function FitnessChatbotDialog({ children, dict }: FitnessChatbotDialogPro
             />
             <Button type="submit" disabled={isLoading || currentMessage.trim() === ''} size="icon">
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              <span className="sr-only">Send</span>
+              <span className="sr-only">{dict?.sendButtonSR || "Send message"}</span>
             </Button>
           </form>
         </SheetFooter>

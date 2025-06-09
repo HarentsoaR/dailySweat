@@ -19,11 +19,12 @@ import { useWorkoutHistory } from "@/hooks/use-workout-history";
 import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, GenerateWorkoutInput, WorkoutPlan } from "@/lib/types";
 import { AlertCircle, DumbbellIcon, History, MessageSquare } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { getDictionary } from "@/lib/dictionaries"; // Import getDictionary
+import { getDictionary } from "@/lib/dictionaries";
 
 type Lang = 'en' | 'fr' | 'es' | 'it' | 'zh';
 
 // Define a type for the dictionary content for better type safety
+// This should ideally be a more specific type based on your JSON structure
 type Dictionary = Awaited<ReturnType<typeof getDictionary>>;
 
 
@@ -57,7 +58,7 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
 
 
   const handleGenerateWorkout = async (data: GenerateWorkoutInput) => {
-    if (!dict) return;
+    if (!dict?.page?.errors || !dict?.page?.toasts) return; // Ensure dict is loaded
     setIsLoading(true);
     setError(null);
     setCurrentWorkout(null);
@@ -69,13 +70,13 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
         parsedPlan = JSON.parse(result.workoutPlan) as AIParsedWorkoutOutput;
       } catch (e) {
         console.error("Failed to parse AI workout plan string:", e);
-        setError(dict.page.errors.invalidAIPlan);
+        setError(dict.page.errors.invalidAIPlan || "Received an invalid workout plan format from AI.");
         setIsLoading(false);
         return;
       }
 
       if (!parsedPlan.exercises || parsedPlan.exercises.length === 0) {
-         setError(dict.page.errors.emptyAIPlan);
+         setError(dict.page.errors.emptyAIPlan || "The AI generated an empty workout plan.");
          setIsLoading(false);
          return;
       }
@@ -96,7 +97,7 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
       toast({ title: dict.page.toasts.workoutGeneratedTitle, description: dict.page.toasts.workoutGeneratedDescription });
     } catch (err) {
       console.error("Error generating workout:", err);
-      setError(dict.page.errors.failedToGenerate);
+      setError(dict.page.errors.failedToGenerate || "Failed to generate workout.");
       toast({ variant: "destructive", title: dict.page.toasts.generationFailedTitle, description: dict.page.toasts.generationFailedDescription });
     } finally {
       setIsLoading(false);
@@ -104,9 +105,9 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
   };
 
   const handleAdjustDifficulty = async (feedback: DifficultyFeedbackOption) => {
-    if (!dict) return;
+    if (!dict?.page?.errors || !dict?.page?.toasts) return;
     if (!currentWorkout) {
-      setError(dict.page.errors.noWorkoutToAdjust);
+      setError(dict.page.errors.noWorkoutToAdjust || "No current workout to adjust.");
       return;
     }
     setIsAdjusting(true);
@@ -120,13 +121,13 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
         adjustedPlanParsed = JSON.parse(result.adjustedWorkoutPlan) as WorkoutPlan;
       } catch (e) {
         console.error("Failed to parse AI adjusted workout plan string:", e);
-        setError(dict.page.errors.invalidAdjustedAIPlan);
+        setError(dict.page.errors.invalidAdjustedAIPlan || "Received an invalid adjusted workout plan format from AI.");
         setIsAdjusting(false);
         return;
       }
 
       if (!adjustedPlanParsed.exercises || adjustedPlanParsed.exercises.length === 0) {
-        setError(dict.page.errors.emptyAdjustedAIPlan);
+        setError(dict.page.errors.emptyAdjustedAIPlan || "The AI adjusted to an empty workout plan.");
         setIsAdjusting(false);
         return;
       }
@@ -144,10 +145,10 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
 
       setCurrentWorkout(adjustedWorkout);
       addWorkoutToHistory(adjustedWorkout);
-      toast({ title: dict.page.toasts.workoutAdjustedTitle, description: dict.page.toasts.workoutAdjustedDescription.replace('{feedback}', feedback) });
+      toast({ title: dict.page.toasts.workoutAdjustedTitle, description: (dict.page.toasts.workoutAdjustedDescription || "Difficulty perception: {feedback}. Plan updated.").replace('{feedback}', feedback) });
     } catch (err) {
       console.error("Error adjusting workout difficulty:", err);
-      setError(dict.page.errors.failedToAdjust);
+      setError(dict.page.errors.failedToAdjust || "Failed to adjust workout difficulty.");
       toast({ variant: "destructive", title: dict.page.toasts.adjustmentFailedTitle, description: dict.page.toasts.adjustmentFailedDescription });
     } finally {
       setIsAdjusting(false);
@@ -174,13 +175,13 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
   };
 
   const handleTimerEnd = useCallback(() => {
-    if (!dict) return;
+    if (!dict?.page?.toasts) return;
     setIsTimerRunning(false);
     toast({ title: dict.page.toasts.restOverTitle, description: dict.page.toasts.restOverDescription });
   }, [toast, dict]);
 
   const handleLoadWorkoutFromHistory = (workout: WorkoutPlan) => {
-    if (!dict) return;
+    if (!dict?.page?.toasts) return;
     setCurrentWorkout(workout);
     setCurrentWorkoutParams({
         muscleGroups: workout.muscleGroups,
@@ -189,7 +190,7 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
         difficulty: workout.difficulty,
     });
     setIsWorkoutActive(false); 
-    toast({ title: dict.page.toasts.workoutLoadedTitle, description: dict.page.toasts.workoutLoadedDescription.replace('{name}', workout.name)});
+    toast({ title: dict.page.toasts.workoutLoadedTitle, description: (dict.page.toasts.workoutLoadedDescription || "Loaded \"{name}\" from history.").replace('{name}', workout.name)});
   };
 
   const defaultGeneratorValues = currentWorkoutParams || {
@@ -206,19 +207,19 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
   }, [isLoading, isAdjusting]);
 
   const handleStartWorkout = () => {
-    if (!dict) return;
+    if (!dict?.page?.errors || !dict?.page?.toasts) return;
     if (currentWorkout && currentWorkout.exercises.length > 0) {
       setIsWorkoutActive(true);
       setActiveExerciseIndex(0);
       setError(null); 
       toast({title: dict.page.toasts.workoutStartedTitle, description: dict.page.toasts.workoutStartedDescription});
     } else {
-      setError(dict.page.errors.cannotStartEmptyWorkout);
+      setError(dict.page.errors.cannotStartEmptyWorkout || "Cannot start an empty workout.");
     }
   };
 
   const handleNextExercise = () => {
-    if (!dict) return;
+    if (!dict?.page?.toasts) return;
     if (currentWorkout && activeExerciseIndex < currentWorkout.exercises.length - 1) {
       setActiveExerciseIndex(prev => prev + 1);
     } else if (currentWorkout && activeExerciseIndex === currentWorkout.exercises.length - 1) {
@@ -234,43 +235,49 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
   };
 
   const handleEndWorkout = () => {
-    if (!dict) return;
+    if (!dict?.page?.toasts) return;
     setIsWorkoutActive(false);
     toast({ title: dict.page.toasts.workoutEndedTitle, description: dict.page.toasts.workoutEndedDescription });
   };
 
   if (!dict) {
-    return <div className="flex justify-center items-center min-h-screen">Loading translations...</div>;
+    return <div className="flex justify-center items-center min-h-screen">{dict?.page?.loadingText || "Loading translations..."}</div>;
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header title={dict.header.title} />
+      <Header title={dict.header?.title || "Daily Sweat"} />
       <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <Tabs defaultValue="workout" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6 md:w-1/2 mx-auto">
-            <TabsTrigger value="workout" className="font-headline text-base"><DumbbellIcon className="mr-2 h-4 w-4" />{dict.page.tabs.workout}</TabsTrigger>
-            <TabsTrigger value="history" className="font-headline text-base"><History className="mr-2 h-4 w-4" />{dict.page.tabs.history}</TabsTrigger>
+            <TabsTrigger value="workout" className="font-headline text-base">
+                <DumbbellIcon className="mr-2 h-4 w-4" />
+                {dict.page?.tabs?.workout || "Workout"}
+            </TabsTrigger>
+            <TabsTrigger value="history" className="font-headline text-base">
+                <History className="mr-2 h-4 w-4" />
+                {dict.page?.tabs?.history || "History"}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="workout">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <section aria-labelledby="workout-generator-heading">
-                <h2 id="workout-generator-heading" className="sr-only">{dict.page.workoutGenerator.title}</h2>
+                <h2 id="workout-generator-heading" className="sr-only">{dict.page?.workoutGenerator?.title || "Workout Generator"}</h2>
                 <WorkoutGeneratorForm 
                   onSubmit={handleGenerateWorkout} 
                   isLoading={isLoading}
                   defaultValues={defaultGeneratorValues}
-                  dict={dict.page.workoutGenerator}
+                  dict={dict.page?.workoutGenerator || {}}
                 />
               </section>
 
               <section aria-labelledby="current-workout-heading" className="space-y-6">
-                <h2 id="current-workout-heading" className="sr-only">{dict.page.workoutDisplay.title}</h2>
+                <h2 id="current-workout-heading" className="sr-only">{dict.page?.workoutDisplay?.title || "Current Workout"}</h2>
                 {error && (
                   <Alert variant="destructive" className="shadow-md">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
+                    <AlertTitle>{dict.page?.errors?.alertTitle || "Error"}</AlertTitle>
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
@@ -283,7 +290,7 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
                     onPreviousExercise={handlePreviousExercise}
                     onEndWorkout={handleEndWorkout}
                     onStartRest={handleStartRestTimer}
-                    dict={dict.page.activeWorkoutDisplay}
+                    dict={dict.page?.activeWorkoutDisplay || {}}
                   />
                 ) : (
                   <>
@@ -292,14 +299,15 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
                       onStartRest={handleStartRestTimer}
                       onStartWorkout={handleStartWorkout}
                       isWorkoutActive={isWorkoutActive}
-                      dict={dict.page.workoutDisplay}
+                      dict={dict.page?.workoutDisplay || {}}
+                      exerciseCardDict={dict.page?.exerciseCard || {}}
                     />
                     {currentWorkout && !isWorkoutActive && (
                       <DifficultyFeedback 
                         onFeedbackSubmit={handleAdjustDifficulty} 
                         isLoading={isAdjusting}
                         disabled={!currentWorkout}
-                        dict={dict.page.difficultyFeedback}
+                        dict={dict.page?.difficultyFeedback || {}}
                       />
                     )}
                   </>
@@ -310,17 +318,17 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
 
           <TabsContent value="history">
             <section aria-labelledby="workout-history-heading">
-              <h2 id="workout-history-heading" className="sr-only">{dict.page.workoutHistory.title}</h2>
+              <h2 id="workout-history-heading" className="sr-only">{dict.page?.workoutHistory?.title || "Workout History"}</h2>
               {historyLoaded ? (
                 <WorkoutHistoryDisplay
                   history={workoutHistory}
                   onLoadWorkout={handleLoadWorkoutFromHistory}
                   onDeleteWorkout={removeWorkoutFromHistory}
                   onClearHistory={clearHistory}
-                  dict={dict.page.workoutHistory}
+                  dict={dict.page?.workoutHistory || {}}
                 />
               ) : (
-                <p>{dict.page.workoutHistory.loading}</p>
+                <p>{dict.page?.workoutHistory?.loading || "Loading history..."}</p>
               )}
             </section>
           </TabsContent>
@@ -336,25 +344,26 @@ export default function DailySweatPage({ params }: { params: { lang: Lang }}) {
                 onReset={handleTimerReset}
                 onTimerEnd={handleTimerEnd}
                 timerKey={timerKey}
-                dict={dict.page.restTimer}
+                dict={dict.page?.restTimer || {}}
              />
         </div>
       )}
       
-      <FitnessChatbotDialog dict={dict.page.chatbot}>
+      <FitnessChatbotDialog dict={dict.page?.chatbot || {}}>
         <Button
           variant="outline"
           size="icon"
           className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-primary-foreground hover:scale-105 transition-transform"
-          aria-label="Open Fitness Chatbot"
+          aria-label={dict.page?.chatbot?.dialogTitle || "Open Fitness Chatbot"}
         >
           <MessageSquare className="h-7 w-7" />
         </Button>
       </FitnessChatbotDialog>
       
       <footer className="text-center py-4 border-t text-sm text-muted-foreground mt-16">
-        <p>{dict.footer.tagline.replace('{year}', new Date().getFullYear().toString())}</p>
+        <p>{(dict.footer?.tagline || "© {year} Daily Sweat. Sweat Smarter, Not Harder.").replace('{year}', new Date().getFullYear().toString())}</p>
       </footer>
     </div>
   );
 }
+

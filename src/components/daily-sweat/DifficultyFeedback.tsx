@@ -10,21 +10,21 @@ interface DifficultyFeedbackProps {
   onFeedbackSubmit: (feedback: DifficultyFeedbackOption) => Promise<void>;
   isLoading: boolean;
   disabled: boolean;
-  dict: { // Dictionary for this component
-    title: string;
-    description: string;
-    tooEasy: string;
-    justRight: string;
-    tooHard: string;
-    adjusting: string;
+  dict: { 
+    title?: string;
+    description?: string;
+    tooEasy?: string;
+    justRight?: string;
+    tooHard?: string;
+    adjusting?: string;
   };
 }
 
 export function DifficultyFeedback({ onFeedbackSubmit, isLoading, disabled, dict }: DifficultyFeedbackProps) {
   const feedbackOptions: { label: string; value: DifficultyFeedbackOption; icon: React.ElementType }[] = [
-    { label: dict.tooEasy, value: "too easy", icon: Frown },
-    { label: dict.justRight, value: "just right", icon: Smile },
-    { label: dict.tooHard, value: "too hard", icon: Meh },
+    { label: dict?.tooEasy || "Too Easy", value: "too easy", icon: Frown },
+    { label: dict?.justRight || "Just Right", value: "just right", icon: Smile },
+    { label: dict?.tooHard || "Too Hard", value: "too hard", icon: Meh },
   ];
 
   return (
@@ -32,10 +32,10 @@ export function DifficultyFeedback({ onFeedbackSubmit, isLoading, disabled, dict
       <CardHeader>
         <CardTitle className="flex items-center text-xl font-headline">
           <CheckCircle2 className="mr-2 h-5 w-5 text-primary" />
-          {dict.title}
+          {dict?.title || "Rate Your Workout"}
         </CardTitle>
         <CardDescription>
-          {dict.description}
+          {dict?.description || "Help us improve your next workout by rating the difficulty of this plan."}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -53,8 +53,9 @@ export function DifficultyFeedback({ onFeedbackSubmit, isLoading, disabled, dict
             </Button>
           ))}
         </div>
-        {isLoading && <p className="text-sm text-muted-foreground mt-2 text-center">{dict.adjusting}</p>}
+        {isLoading && <p className="text-sm text-muted-foreground mt-2 text-center">{dict?.adjusting || "Adjusting workout..."}</p>}
       </CardContent>
     </Card>
   );
 }
+

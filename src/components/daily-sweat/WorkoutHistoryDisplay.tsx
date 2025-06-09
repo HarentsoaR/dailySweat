@@ -14,15 +14,15 @@ interface WorkoutHistoryDisplayProps {
   onLoadWorkout: (workout: WorkoutPlan) => void;
   onDeleteWorkout: (workoutId: string) => void;
   onClearHistory: () => void;
-  dict: { // Dictionary for this component
-    title: string;
-    description: string;
-    emptyState: string;
-    generatedOn: string; // "Generated on: {date}"
-    feedbackGiven: string; // "Feedback: {feedback}"
-    viewButton: string;
-    deleteButton: string;
-    clearAllButton: string;
+  dict: { 
+    title?: string;
+    description?: string;
+    emptyState?: string;
+    generatedOn?: string; 
+    feedbackGiven?: string;
+    viewButton?: string;
+    deleteButton?: string;
+    clearAllButton?: string;
   };
 }
 
@@ -39,11 +39,11 @@ export function WorkoutHistoryDisplay({
         <CardHeader>
           <CardTitle className="flex items-center text-xl font-headline">
             <History className="mr-2 h-5 w-5 text-primary" />
-            {dict.title}
+            {dict?.title || "Workout History"}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">{dict.emptyState}</p>
+          <p className="text-muted-foreground">{dict?.emptyState || "No past workouts found. Complete some workouts to see them here!"}</p>
         </CardContent>
       </Card>
     );
@@ -55,13 +55,13 @@ export function WorkoutHistoryDisplay({
         <div className="flex-grow">
           <CardTitle className="flex items-center text-xl font-headline">
             <History className="mr-2 h-5 w-5 text-primary" />
-            {dict.title}
+            {dict?.title || "Workout History"}
           </CardTitle>
-          <CardDescription>{dict.description}</CardDescription>
+          <CardDescription>{dict?.description || "Review your past workout sessions."}</CardDescription>
         </div>
         {history.length > 0 && (
            <Button variant="destructive" size="sm" onClick={onClearHistory}>
-            <Trash2 className="mr-1 h-3 w-3" /> {dict.clearAllButton}
+            <Trash2 className="mr-1 h-3 w-3" /> {dict?.clearAllButton || "Clear All"}
           </Button>
         )}
       </CardHeader>
@@ -75,7 +75,7 @@ export function WorkoutHistoryDisplay({
                    {workout.name || "Workout Plan"}
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  {dict.generatedOn.replace('{date}', format(parseISO(workout.generatedAt), "MMM d, yyyy 'at' h:mm a"))}
+                  {(dict?.generatedOn || "Generated on: {date}").replace('{date}', format(parseISO(workout.generatedAt), "MMM d, yyyy 'at' h:mm a"))}
                 </CardDescription>
                  <div className="flex flex-wrap gap-1 pt-1">
                     <Badge variant="outline">{workout.muscleGroups}</Badge>
@@ -86,16 +86,16 @@ export function WorkoutHistoryDisplay({
                 <CardContent className="py-1 px-6">
                     <p className="text-xs text-muted-foreground flex items-center">
                         <Info className="mr-1 h-3 w-3"/>
-                        {dict.feedbackGiven.replace('{feedback}', workout.feedbackGiven)}
+                        {(dict?.feedbackGiven || "Feedback: {feedback}").replace('{feedback}', workout.feedbackGiven)}
                     </p>
                 </CardContent>
               )}
               <CardFooter className="flex justify-end gap-2 pt-2">
                 <Button variant="outline" size="sm" onClick={() => onLoadWorkout(workout)}>
-                  <Eye className="mr-1 h-3 w-3" /> {dict.viewButton}
+                  <Eye className="mr-1 h-3 w-3" /> {dict?.viewButton || "View"}
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => onDeleteWorkout(workout.id)} className="text-destructive hover:bg-destructive/10">
-                  <Trash2 className="mr-1 h-3 w-3" /> {dict.deleteButton}
+                  <Trash2 className="mr-1 h-3 w-3" /> {dict?.deleteButton || "Delete"}
                 </Button>
               </CardFooter>
             </Card>
@@ -105,3 +105,4 @@ export function WorkoutHistoryDisplay({
     </Card>
   );
 }
+

@@ -7,16 +7,26 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from '@/components/ui/button';
 
+interface ExerciseCardDict {
+  setsLabel?: string;
+  repsLabel?: string;
+  restLabel?: string;
+  startRestButton?: string;
+  exerciseInfoTooltip?: string;
+}
+
 interface WorkoutDisplayProps {
   workoutPlan: WorkoutPlan | null;
   onStartRest: (duration: number) => void;
   onStartWorkout: () => void;
   isWorkoutActive: boolean;
-  dict: { // Dictionary for this component
-    title: string;
-    emptyState: string;
-    startWorkoutButton: string;
+  dict: { 
+    title?: string;
+    emptyState?: string;
+    startWorkoutButton?: string;
+    noExercises?: string;
   };
+  exerciseCardDict: ExerciseCardDict;
 }
 
 const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] }) => {
@@ -32,26 +42,26 @@ const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] 
   }
 };
 
-export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWorkoutActive, dict }: WorkoutDisplayProps) {
+export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWorkoutActive, dict, exerciseCardDict }: WorkoutDisplayProps) {
   if (!workoutPlan) {
     return (
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center text-2xl font-headline">
             <ClipboardList className="mr-2 h-6 w-6 text-primary" />
-            {dict.title}
+            {dict?.title || "Your Workout Plan"}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            {dict.emptyState}
+            {dict?.emptyState || "Generate a workout plan using the form to see it here."}
           </p>
         </CardContent>
       </Card>
     );
   }
 
-  const planDescription = workoutPlan.name;
+  const planDescription = workoutPlan.description; // Assuming workoutPlan can have a description
 
   return (
     <Card className="shadow-lg">
@@ -60,9 +70,9 @@ export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWor
           <div>
             <CardTitle className="flex items-center text-2xl font-headline">
               <ClipboardList className="mr-2 h-6 w-6 text-primary" />
-              {workoutPlan.name || dict.title}
+              {workoutPlan.name || dict?.title || "Your Workout Plan"}
             </CardTitle>
-            {planDescription && planDescription !== workoutPlan.name && ( 
+            {planDescription && ( 
               <CardDescription className="mt-1 flex items-center">
                 <Info className="mr-1.5 h-4 w-4 text-muted-foreground" />
                 {planDescription}
@@ -89,10 +99,10 @@ export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWor
       <CardContent>
         {workoutPlan.exercises.length > 0 ? (
           workoutPlan.exercises.map((exercise, index) => (
-            <ExerciseCard key={index} exercise={exercise} onStartRest={onStartRest} />
+            <ExerciseCard key={index} exercise={exercise} onStartRest={onStartRest} dict={exerciseCardDict || {}} />
           ))
         ) : (
-          <p className="text-muted-foreground">No exercises in this plan. Try generating a new one!</p>
+          <p className="text-muted-foreground">{dict?.noExercises || "No exercises in this plan. Try generating a new one!"}</p>
         )}
       </CardContent>
       {!isWorkoutActive && workoutPlan.exercises.length > 0 && (
@@ -103,10 +113,11 @@ export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWor
             size="lg"
           >
             <PlayCircle className="mr-2 h-5 w-5" />
-            {dict.startWorkoutButton}
+            {dict?.startWorkoutButton || "Start Workout"}
           </Button>
         </CardFooter>
       )}
     </Card>
   );
 }
+

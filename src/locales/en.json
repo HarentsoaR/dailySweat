@@ -1,3 +1,4 @@
+
 {
   "metadata": {
     "title": "Daily Sweat - Your Personal AI Workout Planner",
@@ -10,6 +11,7 @@
     "tagline": "© {year} Daily Sweat. Sweat Smarter, Not Harder."
   },
   "page": {
+    "loadingText": "Loading translations...",
     "tabs": {
       "workout": "Workout",
       "history": "History"
@@ -34,7 +36,15 @@
     "workoutDisplay": {
         "title": "Your Workout Plan",
         "emptyState": "Generate a workout plan using the form to see it here.",
-        "startWorkoutButton": "Start Workout"
+        "startWorkoutButton": "Start Workout",
+        "noExercises": "No exercises in this plan. Try generating a new one!"
+    },
+    "exerciseCard": {
+        "setsLabel": "Sets:",
+        "repsLabel": "Reps:",
+        "restLabel": "Rest:",
+        "startRestButton": "Start Rest ({duration}s)",
+        "exerciseInfoTooltip": "Exercise Information"
     },
     "activeWorkoutDisplay": {
         "title": "Active Workout",
@@ -43,7 +53,8 @@
         "previousButton": "Previous",
         "nextButton": "Next Exercise",
         "finishButton": "Finish Workout",
-        "endWorkoutEarlyButton": "End Workout Early"
+        "endWorkoutEarlyButton": "End Workout Early",
+        "noCurrentExercise": "No current exercise. This shouldn't happen!"
     },
     "difficultyFeedback": {
         "title": "Rate Your Workout",
@@ -66,14 +77,18 @@
     },
     "restTimer": {
         "title": "Rest Timer",
-        "description": "Take a breather, then hit it hard!"
+        "description": "Take a breather, then hit it hard!",
+        "pauseButtonSR": "Pause",
+        "playButtonSR": "Play",
+        "resetButtonSR": "Reset"
     },
     "chatbot": {
         "dialogTitle": "Daily Sweat AI Chat",
         "dialogDescription": "Ask any fitness or nutrition related questions.",
         "inputPlaceholder": "Ask about exercises, diet, etc...",
         "initialMessage": "Hello! I'm Daily Sweat AI. Ask me anything about fitness, nutrition, or your workouts!",
-        "errorMessage": "Sorry, I'm having trouble connecting right now. Please try again later."
+        "errorMessage": "Sorry, I'm having trouble connecting right now. Please try again later.",
+        "sendButtonSR": "Send message"
     },
     "toasts": {
         "workoutGeneratedTitle": "Workout Generated!",
@@ -96,6 +111,7 @@
         "workoutEndedDescription": "Come back soon for another session!"
     },
     "errors": {
+        "alertTitle": "Error",
         "invalidAIPlan": "Received an invalid workout plan format from AI. Please try again.",
         "emptyAIPlan": "The AI generated an empty workout plan. Please try different parameters.",
         "noWorkoutToAdjust": "No current workout to adjust.",

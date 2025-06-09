@@ -1,3 +1,4 @@
+
 {
   "metadata": {
     "title": "Sueur Quotidienne - Votre Planificateur d'Entraînement IA Personnel",
@@ -10,11 +11,12 @@
     "tagline": "© {year} Sueur Quotidienne. Transpirez Plus Intelligemment, Pas Plus Durement."
   },
   "page": {
+    "loadingText": "Chargement des traductions...",
     "tabs": {
       "workout": "Entraînement",
       "history": "Historique"
     },
-     "workoutGenerator": {
+    "workoutGenerator": {
         "title": "Créez Votre Entraînement",
         "description": "Indiquez-nous vos préférences, et nous générerons un plan d'entraînement personnalisé pour vous.",
         "muscleGroupsLabel": "Groupes Musculaires",
@@ -34,7 +36,15 @@
     "workoutDisplay": {
         "title": "Votre Plan d'Entraînement",
         "emptyState": "Générez un plan d'entraînement en utilisant le formulaire pour le voir ici.",
-        "startWorkoutButton": "Commencer l'Entraînement"
+        "startWorkoutButton": "Commencer l'Entraînement",
+        "noExercises": "Aucun exercice dans ce plan. Essayez d'en générer un nouveau !"
+    },
+    "exerciseCard": {
+        "setsLabel": "Séries :",
+        "repsLabel": "Répétitions :",
+        "restLabel": "Repos :",
+        "startRestButton": "Commencer Repos ({duration}s)",
+        "exerciseInfoTooltip": "Informations sur l'exercice"
     },
     "activeWorkoutDisplay": {
         "title": "Entraînement Actif",
@@ -43,7 +53,8 @@
         "previousButton": "Précédent",
         "nextButton": "Exercice Suivant",
         "finishButton": "Terminer l'Entraînement",
-        "endWorkoutEarlyButton": "Terminer l'Entraînement Plus Tôt"
+        "endWorkoutEarlyButton": "Terminer l'Entraînement Plus Tôt",
+        "noCurrentExercise": "Aucun exercice en cours. Cela ne devrait pas arriver !"
     },
     "difficultyFeedback": {
         "title": "Évaluez Votre Entraînement",
@@ -66,14 +77,18 @@
     },
     "restTimer": {
         "title": "Minuteur de Repos",
-        "description": "Prenez une pause, puis revenez en force !"
+        "description": "Prenez une pause, puis revenez en force !",
+        "pauseButtonSR": "Pause",
+        "playButtonSR": "Jouer",
+        "resetButtonSR": "Réinitialiser"
     },
     "chatbot": {
         "dialogTitle": "Chat IA Sueur Quotidienne",
         "dialogDescription": "Posez toutes vos questions sur le fitness ou la nutrition.",
         "inputPlaceholder": "Posez des questions sur les exercices, le régime, etc...",
         "initialMessage": "Bonjour ! Je suis l'IA Sueur Quotidienne. Posez-moi toutes vos questions sur le fitness, la nutrition ou vos entraînements !",
-        "errorMessage": "Désolé, j'ai des difficultés à me connecter pour le moment. Veuillez réessayer plus tard."
+        "errorMessage": "Désolé, j'ai des difficultés à me connecter pour le moment. Veuillez réessayer plus tard.",
+        "sendButtonSR": "Envoyer le message"
     },
     "toasts": {
         "workoutGeneratedTitle": "Entraînement Généré !",
@@ -96,6 +111,7 @@
         "workoutEndedDescription": "Revenez bientôt pour une autre session !"
     },
     "errors": {
+        "alertTitle": "Erreur",
         "invalidAIPlan": "Format de plan d'entraînement invalide reçu de l'IA. Veuillez réessayer.",
         "emptyAIPlan": "L'IA a généré un plan d'entraînement vide. Veuillez essayer avec des paramètres différents.",
         "noWorkoutToAdjust": "Aucun entraînement actuel à ajuster.",

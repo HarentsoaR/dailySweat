@@ -16,9 +16,12 @@ interface RestTimerProps {
   onTimerEnd: () => void;
   timerKey: number; // To force re-initialization
   className?: string;
-  dict: { // Dictionary for this component
-    title: string;
-    description: string;
+  dict: { 
+    title?: string;
+    description?: string;
+    pauseButtonSR?: string;
+    playButtonSR?: string;
+    resetButtonSR?: string;
   };
 }
 
@@ -77,9 +80,9 @@ export function RestTimer({
       <CardHeader>
         <CardTitle className="flex items-center text-xl font-headline">
           <TimerLucideIcon className="mr-2 h-5 w-5 text-primary" />
-          {dict.title}
+          {dict?.title || "Rest Timer"}
         </CardTitle>
-        <CardDescription>{dict.description}</CardDescription>
+        <CardDescription>{dict?.description || "Take a breather, then hit it hard!"}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-center">
@@ -91,14 +94,15 @@ export function RestTimer({
         <div className="flex justify-center gap-3">
           <Button variant="outline" size="icon" onClick={onToggle} className="border-accent text-accent hover:bg-accent hover:text-accent-foreground">
             {isRunning ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-            <span className="sr-only">{isRunning ? 'Pause' : 'Play'}</span>
+            <span className="sr-only">{isRunning ? (dict?.pauseButtonSR || 'Pause') : (dict?.playButtonSR || 'Play')}</span>
           </Button>
           <Button variant="outline" size="icon" onClick={onReset} className="border-muted-foreground text-muted-foreground hover:bg-muted hover:text-muted-foreground">
             <RotateCcw className="h-5 w-5" />
-            <span className="sr-only">Reset</span>
+            <span className="sr-only">{dict?.resetButtonSR || "Reset"}</span>
           </Button>
         </div>
       </CardContent>
     </Card>
   );
 }
+
