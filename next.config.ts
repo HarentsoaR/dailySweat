@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -18,10 +19,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  i18n: {
-    locales: ['en', 'fr', 'es', 'it', 'zh'],
-    defaultLocale: 'en',
-  },
+  // Removed i18n configuration as it's for Pages Router.
+  // App Router i18n is handled via [lang] segments and middleware.
 };
 
 export default nextConfig;

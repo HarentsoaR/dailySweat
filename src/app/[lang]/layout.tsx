@@ -1,15 +1,16 @@
-import type { Metadata, Viewport } from 'next';
-import '../globals.css'; // Ensure global styles are imported
-import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/components/theme-provider";
-import { getDictionary } from '@/lib/dictionaries';
 
-interface RootLayoutProps {
-  children: React.ReactNode;
+// This layout no longer defines <html>, <body>, ThemeProvider, Toaster, global fonts, or imports global.css.
+// These are now handled by the root src/app/layout.tsx.
+import type { Metadata } from 'next';
+import { getDictionary } from '@/lib/dictionaries';
+import { SetLangAttribute } from './SetLangAttributeClient';
+
+interface LangLayoutProps {
+  children: React.ReactNode; // This is the page component
   params: { lang: 'en' | 'fr' | 'es' | 'it' | 'zh' };
 }
 
-export async function generateMetadata({ params }: RootLayoutProps): Promise<Metadata> {
+export async function generateMetadata({ params }: LangLayoutProps): Promise<Metadata> {
   const dict = await getDictionary(params.lang);
   return {
     title: dict.metadata.title,
@@ -17,35 +18,17 @@ export async function generateMetadata({ params }: RootLayoutProps): Promise<Met
   };
 }
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
-  ],
-};
+// Viewport is defined in the root layout (src/app/layout.tsx).
+// If it needed to be language-specific, it could be defined here too.
 
 export default function LangLayout({
   children,
   params,
-}: RootLayoutProps) {
+}: LangLayoutProps) {
   return (
-    <html lang={params.lang} suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased min-h-screen flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster />
-        </ThemeProvider>
-      </body>
-    </html>
+    <>
+      <SetLangAttribute lang={params.lang} />
+      {children} {/* This renders the page component */}
+    </>
   );
 }

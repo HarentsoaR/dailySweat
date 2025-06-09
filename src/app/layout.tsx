@@ -1,7 +1,21 @@
-// This is the new ROOT layout, it does not handle lang parameter
-// It simply passes children through. The [lang]/layout.tsx will handle lang-specific setup.
 
-import './globals.css'; // Keep global styles here
+import './globals.css';
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import type { Metadata, Viewport } from 'next';
+
+// Default metadata for the root layout
+export const metadata: Metadata = {
+  title: 'Daily Sweat', // This can be overridden by [lang]/layout.tsx
+  description: 'Your Personal AI Workout Planner', // Also overridable
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
+};
 
 export default function RootLayout({
   children,
@@ -9,7 +23,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // The <html> and <body> tags are now managed by [lang]/layout.tsx
-    children
+    // Default lang to "en", will be updated client-side by SetLangAttributeClient
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-body antialiased min-h-screen flex flex-col">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children} {/* Children from [lang]/layout.tsx will be rendered here */}
+          <Toaster />
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }
