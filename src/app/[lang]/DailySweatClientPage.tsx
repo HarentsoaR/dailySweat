@@ -45,15 +45,21 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
   const { toast } = useToast();
 
-  const handleGenerateWorkout = async (data: Omit<FlowGenerateWorkoutInput, 'language'>) => {
+  const handleGenerateWorkout = async (formValues: Omit<FlowGenerateWorkoutInput, 'language'>) => {
     if (!dict?.page?.errors || !dict?.page?.toasts) return;
     setIsLoading(true);
     setError(null);
     setCurrentWorkout(null);
     setIsWorkoutActive(false);
     try {
-      const fullData: FlowGenerateWorkoutInput = { ...data, language: params.lang };
-      const result = await generateWorkout(fullData);
+      const payloadForAI: FlowGenerateWorkoutInput = {
+        muscleGroups: formValues.muscleGroups,
+        availableTime: formValues.availableTime,
+        equipment: formValues.equipment,
+        difficulty: formValues.difficulty,
+        language: params.lang, // Explicitly include language from page params
+      };
+      const result = await generateWorkout(payloadForAI);
       let parsedPlan: AIParsedWorkoutOutput;
       try {
         parsedPlan = JSON.parse(result.workoutPlan) as AIParsedWorkoutOutput;
@@ -72,11 +78,11 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
       const newWorkout: WorkoutPlan = {
         id: Date.now().toString(),
-        name: parsedPlan.name || `${data.difficulty} ${data.muscleGroups} Workout`, // Name should come from AI in target language
-        muscleGroups: data.muscleGroups,
-        availableTime: data.availableTime,
-        equipment: data.equipment,
-        difficulty: data.difficulty,
+        name: parsedPlan.name || `${formValues.difficulty} ${formValues.muscleGroups} Workout`, // Name should come from AI in target language
+        muscleGroups: formValues.muscleGroups,
+        availableTime: formValues.availableTime,
+        equipment: formValues.equipment,
+        difficulty: formValues.difficulty,
         exercises: parsedPlan.exercises, // Exercises should be in target language from AI
         generatedAt: new Date().toISOString(),
         description: parsedPlan.description, // Description from AI
@@ -84,10 +90,10 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       setCurrentWorkout(newWorkout);
       // Store params without language, as language is context-dependent (current page lang)
       const storeParams: GenerateWorkoutInput = {
-        muscleGroups: data.muscleGroups,
-        availableTime: data.availableTime,
-        equipment: data.equipment,
-        difficulty: data.difficulty,
+        muscleGroups: formValues.muscleGroups,
+        availableTime: formValues.availableTime,
+        equipment: formValues.equipment,
+        difficulty: formValues.difficulty,
       };
       setCurrentWorkoutParams(storeParams);
       addWorkoutToHistory(newWorkout);
