@@ -13,13 +13,15 @@ import { WorkoutGeneratorForm } from "@/components/daily-sweat/WorkoutGeneratorF
 import { WorkoutHistoryDisplay } from "@/components/daily-sweat/WorkoutHistoryDisplay";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
 import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, GenerateWorkoutInput, WorkoutPlan } from "@/lib/types";
-import { AlertCircle, DumbbellIcon, History, Settings2, PlayCircle, MessageSquare } from "lucide-react";
+import { AlertCircle, DumbbellIcon, History, MessageSquare } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+
+// For this non-localized page, we'll default to 'en' for AI interactions.
+const DEFAULT_LANGUAGE = 'en';
 
 export default function DailySweatPage() {
   const [currentWorkoutParams, setCurrentWorkoutParams] = useState<GenerateWorkoutInput | null>(null);
@@ -45,7 +47,7 @@ export default function DailySweatPage() {
     setCurrentWorkout(null);
     setIsWorkoutActive(false); 
     try {
-      const result = await generateWorkout(data);
+      const result = await generateWorkout({ ...data, language: DEFAULT_LANGUAGE });
       let parsedPlan: AIParsedWorkoutOutput;
       try {
         parsedPlan = JSON.parse(result.workoutPlan) as AIParsedWorkoutOutput;
@@ -71,6 +73,7 @@ export default function DailySweatPage() {
         difficulty: data.difficulty,
         exercises: parsedPlan.exercises,
         generatedAt: new Date().toISOString(),
+        description: parsedPlan.description,
       };
       setCurrentWorkout(newWorkout);
       setCurrentWorkoutParams(data);
@@ -94,11 +97,11 @@ export default function DailySweatPage() {
     setError(null);
     try {
       const workoutPlanString = JSON.stringify(currentWorkout);
-      const result = await adjustWorkoutDifficulty({ workoutPlan: workoutPlanString, feedback });
+      const result = await adjustWorkoutDifficulty({ workoutPlan: workoutPlanString, feedback, language: DEFAULT_LANGUAGE });
       
-      let adjustedPlanParsed: WorkoutPlan; // Changed from AIParsedWorkoutOutput as adjust flow returns a full WorkoutPlan structure
+      let adjustedPlanParsed: AIParsedWorkoutOutput; 
       try {
-        adjustedPlanParsed = JSON.parse(result.adjustedWorkoutPlan) as WorkoutPlan; // Ensure this matches the output of adjustWorkoutDifficultyFlow
+        adjustedPlanParsed = JSON.parse(result.adjustedWorkoutPlan) as AIParsedWorkoutOutput; 
       } catch (e) {
         console.error("Failed to parse AI adjusted workout plan string:", e);
         setError("Received an invalid adjusted workout plan format from AI. Please try again.");
@@ -113,15 +116,14 @@ export default function DailySweatPage() {
       }
 
       const adjustedWorkout: WorkoutPlan = {
-        ...currentWorkout, // Spread original params first
-        name: adjustedPlanParsed.name || currentWorkout.name, // Use adjusted name or fallback
-        description: adjustedPlanParsed.description, // Use adjusted description
-        exercises: adjustedPlanParsed.exercises, // Use adjusted exercises
+        ...currentWorkout, 
+        name: adjustedPlanParsed.name || currentWorkout.name, 
+        description: adjustedPlanParsed.description || currentWorkout.description, 
+        exercises: adjustedPlanParsed.exercises, 
         id: Date.now().toString(),
         originalPlanId: currentWorkout.id,
         feedbackGiven: feedback,
         generatedAt: new Date().toISOString(),
-        // Keep original difficulty, muscleGroups, etc. unless explicitly changed by AI, which is not the case here
       };
 
       setCurrentWorkout(adjustedWorkout);
@@ -219,7 +221,7 @@ export default function DailySweatPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
+      <Header title="Daily Sweat" />
       <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <Tabs defaultValue="workout" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6 md:w-1/2 mx-auto">
@@ -235,6 +237,7 @@ export default function DailySweatPage() {
                   onSubmit={handleGenerateWorkout} 
                   isLoading={isLoading}
                   defaultValues={defaultGeneratorValues}
+                  dict={{}} // Provide empty dict as this page is not localized
                 />
               </section>
 
@@ -256,6 +259,7 @@ export default function DailySweatPage() {
                     onPreviousExercise={handlePreviousExercise}
                     onEndWorkout={handleEndWorkout}
                     onStartRest={handleStartRestTimer}
+                    dict={{}} // Provide empty dict
                   />
                 ) : (
                   <>
@@ -264,12 +268,15 @@ export default function DailySweatPage() {
                       onStartRest={handleStartRestTimer}
                       onStartWorkout={handleStartWorkout}
                       isWorkoutActive={isWorkoutActive}
+                      dict={{}} // Provide empty dict
+                      exerciseCardDict={{}} // Provide empty dict
                     />
                     {currentWorkout && !isWorkoutActive && (
                       <DifficultyFeedback 
                         onFeedbackSubmit={handleAdjustDifficulty} 
                         isLoading={isAdjusting}
                         disabled={!currentWorkout}
+                        dict={{}} // Provide empty dict
                       />
                     )}
                   </>
@@ -287,6 +294,7 @@ export default function DailySweatPage() {
                   onLoadWorkout={handleLoadWorkoutFromHistory}
                   onDeleteWorkout={removeWorkoutFromHistory}
                   onClearHistory={clearHistory}
+                  dict={{}} // Provide empty dict
                 />
               ) : (
                 <p>Loading history...</p>
@@ -305,11 +313,12 @@ export default function DailySweatPage() {
                 onReset={handleTimerReset}
                 onTimerEnd={handleTimerEnd}
                 timerKey={timerKey}
+                dict={{}} // Provide empty dict
              />
         </div>
       )}
       
-      <FitnessChatbotDialog>
+      <FitnessChatbotDialog dict={{}}>
         <Button
           variant="outline"
           size="icon"
