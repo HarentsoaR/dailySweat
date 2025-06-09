@@ -1,5 +1,6 @@
 
-import type { GenerateWorkoutInput as AIWorkoutInput } from '@/ai/flows/generate-workout';
+// No direct import from AI flow needed here for GenerateWorkoutInput if client page defines its own
+// However, ensure its structure (excluding language) is compatible with what WorkoutGeneratorForm provides.
 
 export interface Exercise {
   name: string;
@@ -12,6 +13,7 @@ export interface Exercise {
 export interface WorkoutPlan {
   id: string; // unique id, e.g., timestamp string
   name: string;
+  description?: string; // General description, potentially from AI
   // Parameters used to generate this plan
   muscleGroups: string;
   availableTime: number;
@@ -25,14 +27,23 @@ export interface WorkoutPlan {
   feedbackGiven?: string; // e.g., "too easy", "too hard"
 }
 
-// What AI is expected to return in its 'workoutPlan' string (parsed)
+// This type represents the data structure used by WorkoutGeneratorForm
+// and what DailySweatClientPage's currentWorkoutParams holds.
+// It does NOT include the 'language' field, which is added dynamically before calling the AI flow.
+export interface GenerateWorkoutInput {
+  muscleGroups: string;
+  availableTime: number;
+  equipment: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+}
+
+
+// What AI is expected to return in its 'workoutPlan' string (parsed) for BOTH generation and adjustment
 export interface AIParsedWorkoutOutput {
   name?: string;
   description?: string; // General description of the workout
   exercises: Exercise[];
 }
-
-export type GenerateWorkoutInput = AIWorkoutInput;
 
 export type DifficultyFeedbackOption = "too easy" | "just right" | "too hard";
 
@@ -161,3 +172,4 @@ export interface DictionaryType {
     };
   };
 }
+

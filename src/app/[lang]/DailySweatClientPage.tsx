@@ -2,7 +2,7 @@
 "use client";
 
 import { adjustWorkoutDifficulty } from "@/ai/flows/adjust-workout-difficulty";
-import { generateWorkout } from "@/ai/flows/generate-workout";
+import { generateWorkout, type GenerateWorkoutInput as FlowGenerateWorkoutInput } from "@/ai/flows/generate-workout"; // Ensure GenerateWorkoutInput from flow is imported
 import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { DifficultyFeedback } from "@/components/daily-sweat/DifficultyFeedback";
 import { FitnessChatbotDialog } from "@/components/daily-sweat/FitnessChatbotDialog";
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
-import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, GenerateWorkoutInput, WorkoutPlan, DictionaryType } from "@/lib/types";
+import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, DictionaryType, GenerateWorkoutInput } from "@/lib/types"; // Use local GenerateWorkoutInput
 import { AlertCircle, DumbbellIcon, History, MessageSquare } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -45,14 +45,15 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
   const { toast } = useToast();
 
-  const handleGenerateWorkout = async (data: GenerateWorkoutInput) => {
+  const handleGenerateWorkout = async (data: Omit<FlowGenerateWorkoutInput, 'language'>) => {
     if (!dict?.page?.errors || !dict?.page?.toasts) return;
     setIsLoading(true);
     setError(null);
     setCurrentWorkout(null);
     setIsWorkoutActive(false);
     try {
-      const result = await generateWorkout(data);
+      const fullData: FlowGenerateWorkoutInput = { ...data, language: params.lang };
+      const result = await generateWorkout(fullData);
       let parsedPlan: AIParsedWorkoutOutput;
       try {
         parsedPlan = JSON.parse(result.workoutPlan) as AIParsedWorkoutOutput;
@@ -71,16 +72,24 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
       const newWorkout: WorkoutPlan = {
         id: Date.now().toString(),
-        name: parsedPlan.name || `${data.difficulty} ${data.muscleGroups} Workout`,
+        name: parsedPlan.name || `${data.difficulty} ${data.muscleGroups} Workout`, // Name should come from AI in target language
         muscleGroups: data.muscleGroups,
         availableTime: data.availableTime,
         equipment: data.equipment,
         difficulty: data.difficulty,
-        exercises: parsedPlan.exercises,
+        exercises: parsedPlan.exercises, // Exercises should be in target language from AI
         generatedAt: new Date().toISOString(),
+        description: parsedPlan.description, // Description from AI
       };
       setCurrentWorkout(newWorkout);
-      setCurrentWorkoutParams(data);
+      // Store params without language, as language is context-dependent (current page lang)
+      const storeParams: GenerateWorkoutInput = {
+        muscleGroups: data.muscleGroups,
+        availableTime: data.availableTime,
+        equipment: data.equipment,
+        difficulty: data.difficulty,
+      };
+      setCurrentWorkoutParams(storeParams);
       addWorkoutToHistory(newWorkout);
       toast({ title: dict.page.toasts.workoutGeneratedTitle, description: dict.page.toasts.workoutGeneratedDescription });
     } catch (err) {
@@ -101,12 +110,12 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setIsAdjusting(true);
     setError(null);
     try {
-      const workoutPlanString = JSON.stringify(currentWorkout);
-      const result = await adjustWorkoutDifficulty({ workoutPlan: workoutPlanString, feedback });
+      const workoutPlanString = JSON.stringify(currentWorkout); // Send the current workout as is
+      const result = await adjustWorkoutDifficulty({ workoutPlan: workoutPlanString, feedback, language: params.lang });
 
-      let adjustedPlanParsed: WorkoutPlan;
+      let adjustedPlanParsed: AIParsedWorkoutOutput; // AI returns structure with name, description, exercises
       try {
-        adjustedPlanParsed = JSON.parse(result.adjustedWorkoutPlan) as WorkoutPlan;
+        adjustedPlanParsed = JSON.parse(result.adjustedWorkoutPlan) as AIParsedWorkoutOutput;
       } catch (e) {
         console.error("Failed to parse AI adjusted workout plan string:", e);
         setError(dict.page.errors.invalidAdjustedAIPlan || "Received an invalid adjusted workout plan format from AI.");
@@ -121,11 +130,11 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       }
 
       const adjustedWorkout: WorkoutPlan = {
-        ...currentWorkout,
-        name: adjustedPlanParsed.name || currentWorkout.name,
-        description: adjustedPlanParsed.description,
-        exercises: adjustedPlanParsed.exercises,
-        id: Date.now().toString(),
+        ...currentWorkout, // Retain original generation parameters like muscleGroups, time, equipment, difficulty
+        id: Date.now().toString(), // New ID for the adjusted plan
+        name: adjustedPlanParsed.name || currentWorkout.name, // Use new name from AI, or fallback
+        description: adjustedPlanParsed.description || currentWorkout.description, // Use new description from AI
+        exercises: adjustedPlanParsed.exercises, // Use new exercises from AI
         originalPlanId: currentWorkout.id,
         feedbackGiven: feedback,
         generatedAt: new Date().toISOString(),
@@ -163,26 +172,27 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
   };
 
   const handleTimerEnd = useCallback(() => {
-    if (!dict?.page?.toasts) return;
+    if (!dict?.page?.toasts?.restOverTitle || !dict?.page?.toasts?.restOverDescription) return;
     setIsTimerRunning(false);
     toast({ title: dict.page.toasts.restOverTitle, description: dict.page.toasts.restOverDescription });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toast, dict?.page?.toasts?.restOverTitle, dict?.page?.toasts?.restOverDescription]);
+
 
   const handleLoadWorkoutFromHistory = (workout: WorkoutPlan) => {
     if (!dict?.page?.toasts) return;
     setCurrentWorkout(workout);
-    setCurrentWorkoutParams({
+    const loadedParams: GenerateWorkoutInput = { // Explicitly type for clarity
         muscleGroups: workout.muscleGroups,
         availableTime: workout.availableTime,
         equipment: workout.equipment,
         difficulty: workout.difficulty,
-    });
+    };
+    setCurrentWorkoutParams(loadedParams);
     setIsWorkoutActive(false);
     toast({ title: dict.page.toasts.workoutLoadedTitle, description: (dict.page.toasts.workoutLoadedDescription || "Loaded \"{name}\" from history.").replace('{name}', workout.name)});
   };
 
-  const defaultGeneratorValues = currentWorkoutParams || {
+  const defaultGeneratorValues: GenerateWorkoutInput = currentWorkoutParams || {
       muscleGroups: 'Full Body',
       availableTime: 30,
       equipment: 'Bodyweight',
@@ -229,10 +239,8 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     toast({ title: dict.page.toasts.workoutEndedTitle, description: dict.page.toasts.workoutEndedDescription });
   };
 
-  // This check should ideally not be needed if dictionary is always passed,
-  // but kept for safety during transition or if server fails to provide dict.
   if (!dict) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center min-h-screen">{dict?.page?.loadingText || "Loading..."}</div>;
   }
 
 
@@ -358,3 +366,4 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     </div>
   );
 }
+
