@@ -25,16 +25,13 @@ const GenerateWorkoutInputSchema = z.object({
   difficulty: z
     .enum(['beginner', 'intermediate', 'advanced'])
     .describe('The difficulty level of the workout plan.'),
-  language: z
-    .string()
-    .describe('The target language for the workout plan content (e.g., "en", "fr").'),
 });
 export type GenerateWorkoutInput = z.infer<typeof GenerateWorkoutInputSchema>;
 
 const GenerateWorkoutOutputSchema = z.object({
   workoutPlan: z
     .string()
-    .describe("A personalized daily workout plan based on the user's preferences, as a JSON string, with content in the specified language."),
+    .describe("A personalized daily workout plan based on the user's preferences, as a JSON string."),
 });
 export type GenerateWorkoutOutput = z.infer<typeof GenerateWorkoutOutputSchema>;
 
@@ -54,27 +51,23 @@ const prompt = ai.definePrompt({
   Available Time: {{{availableTime}}} minutes
   Equipment: {{{equipment}}}
   Difficulty: {{{difficulty}}}
-  Language for content: {{{language}}}
-
-  Generate all textual content for the workout plan (including the plan name, plan description, all exercise names, and all exercise descriptions) in the specified language: {{{language}}}.
 
   Return the workout plan strictly as a JSON object string. The JSON object must conform to the following structure:
   {
-    "name": "string (optional, e.g., 'Beginner Full Body Blast' - IN SPECIFIED LANGUAGE)",
-    "description": "string (optional, a brief description of the workout focus - IN SPECIFIED LANGUAGE)",
+    "name": "string (optional, e.g., 'Beginner Full Body Blast')",
+    "description": "string (optional, a brief description of the workout focus)",
     "exercises": [
       {
-        "name": "string (e.g., 'Push-ups' - IN SPECIFIED LANGUAGE)",
+        "name": "string (e.g., 'Push-ups')",
         "sets": "string or number (e.g., 3 or '3')",
         "reps": "string (e.g., '10-12' or 'As many as possible')",
         "rest": "number (in seconds, e.g., 60)",
-        "description": "string (optional, e.g., 'Focus on form' - IN SPECIFIED LANGUAGE)"
+        "description": "string (optional, e.g., 'Focus on form')"
       }
       // ... more exercises
     ]
   }
   Ensure the output is only the JSON string, with no other text before or after it. The 'exercises' array must not be empty.
-  All translatable text fields (name, description, exercises.name, exercises.description) MUST be in the language specified by the 'language' input parameter.
   `,
 });
 
@@ -89,4 +82,3 @@ const generateWorkoutFlow = ai.defineFlow(
     return output!;
   }
 );
-
