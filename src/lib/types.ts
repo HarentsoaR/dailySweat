@@ -65,6 +65,13 @@ export interface DictionaryType {
       workout?: string;
       history?: string;
     };
+    workoutModal?: { // New section for modal specific text
+      activeWorkoutModalTitle?: string;
+      workoutCompleteTitle?: string;
+      workoutCompleteCongrats?: string;
+      kcalBurnedPlaceholder?: string;
+      closeButton?: string;
+    };
     workoutGenerator?: {
       title?: string;
       description?: string;
@@ -173,3 +180,4 @@ export interface DictionaryType {
   };
 }
 
+    

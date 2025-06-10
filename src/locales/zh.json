@@ -16,6 +16,13 @@
       "workout": "锻炼",
       "history": "历史记录"
     },
+    "workoutModal": {
+      "activeWorkoutModalTitle": "进行中锻炼",
+      "workoutCompleteTitle": "锻炼完成！",
+      "workoutCompleteCongrats": "恭喜！您已完成本次锻炼。",
+      "kcalBurnedPlaceholder": "预计消耗卡路里：计算中，敬请期待。",
+      "closeButton": "关闭"
+    },
     "workoutGenerator": {
         "title": "创建您的锻炼计划",
         "description": "告诉我们您的偏好，我们将为您生成个性化的锻炼计划。",
@@ -100,7 +107,7 @@
         "adjustmentFailedTitle": "调整失败",
         "adjustmentFailedDescription": "无法调整锻炼计划。",
         "restOverTitle": "休息结束！",
-        "restOverDescription": "是时候 возвращаться к этому了！",
+        "restOverDescription": "是时候返回锻炼了！",
         "workoutLoadedTitle": "锻炼计划已加载",
         "workoutLoadedDescription": "已从历史记录加载“{name}”。",
         "workoutStartedTitle": "锻炼开始！",
@@ -123,3 +130,5 @@
     }
   }
 }
+
+    

@@ -16,6 +16,13 @@
       "workout": "Allenamento",
       "history": "Cronologia"
     },
+    "workoutModal": {
+      "activeWorkoutModalTitle": "Sessione di Allenamento Attiva",
+      "workoutCompleteTitle": "Allenamento Terminato!",
+      "workoutCompleteCongrats": "Congratulazioni! Hai completato l'allenamento.",
+      "kcalBurnedPlaceholder": "Kcal Bruciate Stimate: Calcolo in arrivo.",
+      "closeButton": "Chiudi"
+    },
     "workoutGenerator": {
         "title": "Crea il Tuo Allenamento",
         "description": "Dicci le tue preferenze e genereremo un piano di allenamento personalizzato per te.",
@@ -123,3 +130,5 @@
     }
   }
 }
+
+    

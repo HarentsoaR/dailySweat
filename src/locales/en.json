@@ -16,6 +16,13 @@
       "workout": "Workout",
       "history": "History"
     },
+    "workoutModal": {
+      "activeWorkoutModalTitle": "Active Workout Session",
+      "workoutCompleteTitle": "Workout Finished!",
+      "workoutCompleteCongrats": "Congratulations! You've completed the workout.",
+      "kcalBurnedPlaceholder": "Estimated Kcal Burned: Calculation coming soon.",
+      "closeButton": "Close"
+    },
     "workoutGenerator": {
         "title": "Create Your Workout",
         "description": "Tell us your preferences, and we'll generate a personalized workout plan for you.",
@@ -123,3 +130,5 @@
     }
   }
 }
+
+    
