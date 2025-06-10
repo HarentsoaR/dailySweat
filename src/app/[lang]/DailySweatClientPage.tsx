@@ -2,7 +2,7 @@
 "use client";
 
 import { adjustWorkoutDifficulty } from "@/ai/flows/adjust-workout-difficulty";
-import { generateWorkout, type GenerateWorkoutInput as FlowGenerateWorkoutInput } from "@/ai/flows/generate-workout"; // Ensure GenerateWorkoutInput from flow is imported
+import { generateWorkout, type GenerateWorkoutInput as FlowGenerateWorkoutInput } from "@/ai/flows/generate-workout";
 import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { DifficultyFeedback } from "@/components/daily-sweat/DifficultyFeedback";
 import { FitnessChatbotDialog } from "@/components/daily-sweat/FitnessChatbotDialog";
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
-import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, DictionaryType, GenerateWorkoutInput } from "@/lib/types"; // Use local GenerateWorkoutInput
+import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, DictionaryType, GenerateWorkoutInput } from "@/lib/types"; // GenerateWorkoutInput here is from lib/types (for form data)
 import { AlertCircle, DumbbellIcon, History, MessageSquare } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -28,7 +28,7 @@ interface DailySweatClientPageProps {
 }
 
 export default function DailySweatClientPage({ params, dictionary: dict }: DailySweatClientPageProps) {
-  const [currentWorkoutParams, setCurrentWorkoutParams] = useState<GenerateWorkoutInput | null>(null);
+  const [currentWorkoutParams, setCurrentWorkoutParams] = useState<GenerateWorkoutInput | null>(null); // This uses GenerateWorkoutInput from lib/types
   const [currentWorkout, setCurrentWorkout] = useState<WorkoutPlan | null>(null);
   const { history: workoutHistory, addWorkoutToHistory, clearHistory, removeWorkoutFromHistory, isLoaded: historyLoaded } = useWorkoutHistory();
 
@@ -45,13 +45,15 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
   const { toast } = useToast();
 
-  const handleGenerateWorkout = async (formValues: Omit<FlowGenerateWorkoutInput, 'language'>) => {
+  // formValues is of type GenerateWorkoutInput (from lib/types), which doesn't have 'language'
+  const handleGenerateWorkout = async (formValues: GenerateWorkoutInput) => {
     if (!dict?.page?.errors || !dict?.page?.toasts) return;
     setIsLoading(true);
     setError(null);
     setCurrentWorkout(null);
     setIsWorkoutActive(false);
     try {
+      // Construct payloadForAI to be of type FlowGenerateWorkoutInput (which includes 'language')
       const payloadForAI: FlowGenerateWorkoutInput = {
         muscleGroups: formValues.muscleGroups,
         availableTime: formValues.availableTime,
@@ -78,24 +80,19 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
       const newWorkout: WorkoutPlan = {
         id: Date.now().toString(),
-        name: parsedPlan.name || `${formValues.difficulty} ${formValues.muscleGroups} Workout`, // Name should come from AI in target language
+        name: parsedPlan.name || `${formValues.difficulty} ${formValues.muscleGroups} Workout`,
         muscleGroups: formValues.muscleGroups,
         availableTime: formValues.availableTime,
         equipment: formValues.equipment,
         difficulty: formValues.difficulty,
-        exercises: parsedPlan.exercises, // Exercises should be in target language from AI
+        exercises: parsedPlan.exercises,
         generatedAt: new Date().toISOString(),
-        description: parsedPlan.description, // Description from AI
+        description: parsedPlan.description,
       };
       setCurrentWorkout(newWorkout);
       // Store params without language, as language is context-dependent (current page lang)
-      const storeParams: GenerateWorkoutInput = {
-        muscleGroups: formValues.muscleGroups,
-        availableTime: formValues.availableTime,
-        equipment: formValues.equipment,
-        difficulty: formValues.difficulty,
-      };
-      setCurrentWorkoutParams(storeParams);
+      // currentWorkoutParams is of type GenerateWorkoutInput (from lib/types)
+      setCurrentWorkoutParams(formValues);
       addWorkoutToHistory(newWorkout);
       toast({ title: dict.page.toasts.workoutGeneratedTitle, description: dict.page.toasts.workoutGeneratedDescription });
     } catch (err) {
@@ -116,10 +113,10 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setIsAdjusting(true);
     setError(null);
     try {
-      const workoutPlanString = JSON.stringify(currentWorkout); // Send the current workout as is
+      const workoutPlanString = JSON.stringify(currentWorkout);
       const result = await adjustWorkoutDifficulty({ workoutPlan: workoutPlanString, feedback, language: params.lang });
 
-      let adjustedPlanParsed: AIParsedWorkoutOutput; // AI returns structure with name, description, exercises
+      let adjustedPlanParsed: AIParsedWorkoutOutput;
       try {
         adjustedPlanParsed = JSON.parse(result.adjustedWorkoutPlan) as AIParsedWorkoutOutput;
       } catch (e) {
@@ -136,11 +133,11 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       }
 
       const adjustedWorkout: WorkoutPlan = {
-        ...currentWorkout, // Retain original generation parameters like muscleGroups, time, equipment, difficulty
-        id: Date.now().toString(), // New ID for the adjusted plan
-        name: adjustedPlanParsed.name || currentWorkout.name, // Use new name from AI, or fallback
-        description: adjustedPlanParsed.description || currentWorkout.description, // Use new description from AI
-        exercises: adjustedPlanParsed.exercises, // Use new exercises from AI
+        ...currentWorkout,
+        id: Date.now().toString(),
+        name: adjustedPlanParsed.name || currentWorkout.name,
+        description: adjustedPlanParsed.description || currentWorkout.description,
+        exercises: adjustedPlanParsed.exercises,
         originalPlanId: currentWorkout.id,
         feedbackGiven: feedback,
         generatedAt: new Date().toISOString(),
@@ -187,7 +184,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
   const handleLoadWorkoutFromHistory = (workout: WorkoutPlan) => {
     if (!dict?.page?.toasts) return;
     setCurrentWorkout(workout);
-    const loadedParams: GenerateWorkoutInput = { // Explicitly type for clarity
+    const loadedParams: GenerateWorkoutInput = { // GenerateWorkoutInput from lib/types
         muscleGroups: workout.muscleGroups,
         availableTime: workout.availableTime,
         equipment: workout.equipment,
@@ -198,6 +195,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     toast({ title: dict.page.toasts.workoutLoadedTitle, description: (dict.page.toasts.workoutLoadedDescription || "Loaded \"{name}\" from history.").replace('{name}', workout.name)});
   };
 
+  // defaultGeneratorValues is of type GenerateWorkoutInput (from lib/types)
   const defaultGeneratorValues: GenerateWorkoutInput = currentWorkoutParams || {
       muscleGroups: 'Full Body',
       availableTime: 30,
@@ -273,7 +271,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
                 <WorkoutGeneratorForm
                   onSubmit={handleGenerateWorkout}
                   isLoading={isLoading}
-                  defaultValues={defaultGeneratorValues}
+                  defaultValues={defaultGeneratorValues} // This is of type GenerateWorkoutInput (from lib/types)
                   dict={dict.page?.workoutGenerator || {}}
                 />
               </section>
@@ -373,3 +371,5 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
   );
 }
 
+
+    
