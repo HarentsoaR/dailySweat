@@ -178,7 +178,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       setCurrentExerciseDetails(exercise);
       setExerciseTimeLeft(exercise.duration);
       setIsCurrentExerciseTimed(true);
-      setIsExerciseTimerRunning(true); // Auto-start timer for timed exercise
+      setIsExerciseTimerRunning(true); 
       setIsExerciseTimerPaused(false);
       setCanStartRest(false);
     } else {
@@ -187,7 +187,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       setIsCurrentExerciseTimed(false);
       setIsExerciseTimerRunning(false);
       setIsExerciseTimerPaused(false);
-      setCanStartRest(true); // Can rest immediately for non-timed exercises
+      setCanStartRest(true); 
     }
   };
 
@@ -241,37 +241,46 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
   const handleToggleExerciseTimerPause = () => {
     setIsExerciseTimerPaused(prev => !prev);
-    setIsExerciseTimerRunning(prev => !prev); // Also toggle running state
+    setIsExerciseTimerRunning(prev => !prev); 
   };
 
   const handleExerciseTimerEnd = useCallback(() => {
-    if (!dict?.page?.toasts?.exerciseTimeUpTitle || !dict?.page?.toasts?.exerciseTimeUpDescription) return;
+    const canToast = dict?.page?.toasts?.exerciseTimeUpTitle && dict?.page?.toasts?.exerciseTimeUpDescription;
+
     setIsExerciseTimerRunning(false);
     setIsExerciseTimerPaused(false);
     setCanStartRest(true);
-    if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
-    toast({ title: dict.page.toasts.exerciseTimeUpTitle, description: dict.page.toasts.exerciseTimeUpDescription });
+    // The interval is cleared by the main useEffect when isExerciseTimerRunning becomes false.
+
+    if (canToast) {
+      toast({ title: dict.page.toasts.exerciseTimeUpTitle!, description: dict.page.toasts.exerciseTimeUpDescription! });
+    }
   }, [toast, dict?.page?.toasts?.exerciseTimeUpTitle, dict?.page?.toasts?.exerciseTimeUpDescription]);
 
+  // Effect for running the timer interval
   useEffect(() => {
     if (isExerciseTimerRunning && !isExerciseTimerPaused && exerciseTimeLeft !== null && exerciseTimeLeft > 0) {
       exerciseIntervalRef.current = setInterval(() => {
-        setExerciseTimeLeft(prevTime => {
-          if (prevTime === null || prevTime <= 1) {
-            if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
-            handleExerciseTimerEnd();
-            return 0;
-          }
-          return prevTime - 1;
-        });
+        setExerciseTimeLeft(prevTime => (prevTime !== null && prevTime > 0 ? prevTime - 1 : 0));
       }, 1000);
-    } else if (exerciseIntervalRef.current) {
-      clearInterval(exerciseIntervalRef.current);
+    } else {
+      if (exerciseIntervalRef.current) {
+        clearInterval(exerciseIntervalRef.current);
+      }
     }
     return () => {
-      if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+      if (exerciseIntervalRef.current) {
+        clearInterval(exerciseIntervalRef.current);
+      }
     };
-  }, [isExerciseTimerRunning, isExerciseTimerPaused, exerciseTimeLeft, handleExerciseTimerEnd]);
+  }, [isExerciseTimerRunning, isExerciseTimerPaused, exerciseTimeLeft]);
+
+  // Effect for handling the timer completion
+  useEffect(() => {
+    if (exerciseTimeLeft === 0 && isExerciseTimerRunning && isCurrentExerciseTimed && !workoutCompletionMessage) {
+      handleExerciseTimerEnd();
+    }
+  }, [exerciseTimeLeft, isExerciseTimerRunning, isCurrentExerciseTimed, workoutCompletionMessage, handleExerciseTimerEnd]);
 
 
   const handleStartRestTimer = (duration: number) => {
@@ -504,3 +513,4 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     </div>
   );
 }
+
