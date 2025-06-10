@@ -62,12 +62,14 @@ const prompt = ai.definePrompt({
         "sets": "string or number (e.g., 3 or '3')",
         "reps": "string (e.g., '10-12' or 'As many as possible')",
         "rest": "number (in seconds, e.g., 60)",
-        "description": "string (optional, e.g., 'Focus on form')"
+        "description": "string (optional, e.g., 'Focus on form')",
+        "duration": "number (optional, in seconds, e.g., 60 for a plank. Omit if exercise is purely rep-based)"
       }
       // ... more exercises
     ]
   }
   Ensure the output is only the JSON string, with no other text before or after it. The 'exercises' array must not be empty.
+  If an exercise is time-based (e.g., plank, wall sit, timed run), include a 'duration' field in seconds. For rep-based exercises, 'duration' can be omitted.
   `,
 });
 

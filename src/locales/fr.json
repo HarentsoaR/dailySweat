@@ -21,7 +21,11 @@
       "workoutCompleteTitle": "Entraînement Terminé !",
       "workoutCompleteCongrats": "Félicitations ! Vous avez terminé l'entraînement.",
       "kcalBurnedPlaceholder": "Kcal Brûlées Estimées : Calcul à venir.",
-      "closeButton": "Fermer"
+      "closeButton": "Fermer",
+      "exerciseTimerTitle": "Temps d'Exercice",
+      "pauseExerciseButton": "Pause Exercice",
+      "resumeExerciseButton": "Reprendre Exercice",
+      "exerciseLabel": "Exercice"
     },
     "workoutGenerator": {
         "title": "Créez Votre Entraînement",
@@ -50,18 +54,27 @@
         "setsLabel": "Séries :",
         "repsLabel": "Répétitions :",
         "restLabel": "Repos :",
+        "durationLabel": "Durée :",
         "startRestButton": "Commencer Repos ({duration}s)",
         "exerciseInfoTooltip": "Informations sur l'exercice"
     },
     "activeWorkoutDisplay": {
         "title": "Entraînement Actif",
-        "exerciseProgress": "Exercice {current} sur {total}: {exerciseName}",
+        "exerciseProgress": "Exercice {current} sur {total}",
         "startRestButton": "Commencer {duration}s de Repos",
         "previousButton": "Précédent",
         "nextButton": "Exercice Suivant",
         "finishButton": "Terminer l'Entraînement",
         "endWorkoutEarlyButton": "Terminer l'Entraînement Plus Tôt",
-        "noCurrentExercise": "Aucun exercice en cours. Cela ne devrait pas arriver !"
+        "noCurrentExercise": "Aucun exercice en cours. Cela ne devrait pas arriver !",
+        "exerciseLabel": "Exercice",
+        "setsLabel": "Séries",
+        "repsLabel": "Reps",
+        "restLabel": "Repos",
+        "durationLabel": "Temps",
+        "pauseExercise": "Pause",
+        "resumeExercise": "Reprendre",
+        "exerciseCompleteMessage": "Terminez le minuteur de l'exercice pour activer le repos."
     },
     "difficultyFeedback": {
         "title": "Évaluez Votre Entraînement",
@@ -115,7 +128,9 @@
         "workoutCompleteTitle": "Entraînement Terminé !",
         "workoutCompleteDescription": "Bravo pour avoir terminé votre entraînement !",
         "workoutEndedTitle": "Entraînement Fini",
-        "workoutEndedDescription": "Revenez bientôt pour une autre session !"
+        "workoutEndedDescription": "Revenez bientôt pour une autre session !",
+        "exerciseTimeUpTitle": "Temps d'exercice écoulé !",
+        "exerciseTimeUpDescription": "Bravo ! Prêt pour votre repos ?"
     },
     "errors": {
         "alertTitle": "Erreur",
@@ -130,5 +145,3 @@
     }
   }
 }
-
-    

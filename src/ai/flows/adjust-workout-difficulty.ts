@@ -62,13 +62,15 @@ const prompt = ai.definePrompt({
         "sets": "string or number (e.g., 4 or '4')",
         "reps": "string (e.g., '8-10')",
         "rest": "number (in seconds, e.g., 90)",
-        "description": "string (optional, e.g., 'Ensure full range of motion')"
+        "description": "string (optional, e.g., 'Ensure full range of motion')",
+        "duration": "number (optional, in seconds, e.g., 60 for a plank. Omit if exercise is purely rep-based. If the original exercise had a duration, try to maintain or adjust it logically.)"
       }
       // ... more adjusted exercises
     ]
   }
   The 'exercises' array should contain the complete list of adjusted exercises and must not be empty.
   Ensure the output is only the JSON string, with no other text before or after it. Do not include any fields from the original plan unless they are part of this specified structure (name, description, exercises).
+  If an exercise is time-based (e.g., plank, wall sit, timed run), include a 'duration' field in seconds. For rep-based exercises, 'duration' can be omitted. If adjusting an exercise that originally had a duration, try to maintain or adjust it logically based on the feedback.
   `,
 });
 

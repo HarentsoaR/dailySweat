@@ -21,7 +21,11 @@
       "workoutCompleteTitle": "¡Entrenamiento Terminado!",
       "workoutCompleteCongrats": "¡Felicidades! Has completado el entrenamiento.",
       "kcalBurnedPlaceholder": "Kcal Quemadas Estimadas: Cálculo próximamente.",
-      "closeButton": "Cerrar"
+      "closeButton": "Cerrar",
+      "exerciseTimerTitle": "Tiempo de Ejercicio",
+      "pauseExerciseButton": "Pausar Ejercicio",
+      "resumeExerciseButton": "Reanudar Ejercicio",
+      "exerciseLabel": "Ejercicio"
     },
     "workoutGenerator": {
         "title": "Crea Tu Entrenamiento",
@@ -50,18 +54,27 @@
         "setsLabel": "Series:",
         "repsLabel": "Repeticiones:",
         "restLabel": "Descanso:",
+        "durationLabel": "Duración:",
         "startRestButton": "Comenzar Descanso ({duration}s)",
         "exerciseInfoTooltip": "Información del Ejercicio"
     },
     "activeWorkoutDisplay": {
         "title": "Entrenamiento Activo",
-        "exerciseProgress": "Ejercicio {current} de {total}: {exerciseName}",
+        "exerciseProgress": "Ejercicio {current} de {total}",
         "startRestButton": "Comenzar {duration}s de Descanso",
         "previousButton": "Anterior",
         "nextButton": "Siguiente Ejercicio",
         "finishButton": "Finalizar Entrenamiento",
         "endWorkoutEarlyButton": "Terminar Entrenamiento Antes",
-        "noCurrentExercise": "No hay ejercicio actual. ¡Esto no debería suceder!"
+        "noCurrentExercise": "No hay ejercicio actual. ¡Esto no debería suceder!",
+        "exerciseLabel": "Ejercicio",
+        "setsLabel": "Series",
+        "repsLabel": "Reps",
+        "restLabel": "Descanso",
+        "durationLabel": "Tiempo",
+        "pauseExercise": "Pausa",
+        "resumeExercise": "Reanudar",
+        "exerciseCompleteMessage": "Completa el temporizador del ejercicio para activar el descanso."
     },
     "difficultyFeedback": {
         "title": "Valora Tu Entrenamiento",
@@ -115,7 +128,9 @@
         "workoutCompleteTitle": "¡Entrenamiento Completado!",
         "workoutCompleteDescription": "¡Buen trabajo terminando tu entrenamiento!",
         "workoutEndedTitle": "Entrenamiento Terminado",
-        "workoutEndedDescription": "¡Vuelve pronto para otra sesión!"
+        "workoutEndedDescription": "¡Vuelve pronto para otra sesión!",
+        "exerciseTimeUpTitle": "¡Tiempo de ejercicio terminado!",
+        "exerciseTimeUpDescription": "¡Buen trabajo! ¿Listo para tu descanso?"
     },
     "errors": {
         "alertTitle": "Error",
@@ -130,5 +145,3 @@
     }
   }
 }
-
-    

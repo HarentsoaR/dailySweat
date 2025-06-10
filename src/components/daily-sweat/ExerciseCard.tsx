@@ -2,7 +2,7 @@
 import type { Exercise } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dumbbell, Repeat, Target, TimerIcon, Info } from 'lucide-react';
+import { Dumbbell, Repeat, Target, TimerIcon, Info, Clock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ExerciseCardProps {
@@ -12,6 +12,7 @@ interface ExerciseCardProps {
     setsLabel?: string;
     repsLabel?: string;
     restLabel?: string;
+    durationLabel?: string; // New
     startRestButton?: string;
     exerciseInfoTooltip?: string;
   };
@@ -51,6 +52,13 @@ export function ExerciseCard({ exercise, onStartRest, dict }: ExerciseCardProps)
           <span className="font-semibold">{dict?.repsLabel || "Reps:"}</span>
           <span className="ml-1">{exercise.reps}</span>
         </div>
+        {exercise.duration && (
+          <div className="flex items-center text-sm">
+            <Clock className="mr-2 h-4 w-4 text-accent" />
+            <span className="font-semibold">{dict?.durationLabel || "Duration:"}</span>
+            <span className="ml-1">{exercise.duration} seconds</span>
+          </div>
+        )}
         <div className="flex items-center text-sm">
           <TimerIcon className="mr-2 h-4 w-4 text-accent" />
           <span className="font-semibold">{dict?.restLabel || "Rest:"}</span>
@@ -71,4 +79,3 @@ export function ExerciseCard({ exercise, onStartRest, dict }: ExerciseCardProps)
     </Card>
   );
 }
-

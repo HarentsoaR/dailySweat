@@ -8,6 +8,7 @@ export interface Exercise {
   reps: string;
   rest: number; // in seconds
   description?: string;
+  duration?: number; // Optional: duration of the exercise itself in seconds (for timed exercises)
 }
 
 export interface WorkoutPlan {
@@ -29,7 +30,6 @@ export interface WorkoutPlan {
 
 // This type represents the data structure used by WorkoutGeneratorForm
 // and what DailySweatClientPage's currentWorkoutParams holds.
-// It does NOT include the 'language' field, which is added dynamically before calling the AI flow.
 export interface GenerateWorkoutInput {
   muscleGroups: string;
   availableTime: number;
@@ -65,12 +65,16 @@ export interface DictionaryType {
       workout?: string;
       history?: string;
     };
-    workoutModal?: { // New section for modal specific text
+    workoutModal?: {
       activeWorkoutModalTitle?: string;
       workoutCompleteTitle?: string;
       workoutCompleteCongrats?: string;
       kcalBurnedPlaceholder?: string;
       closeButton?: string;
+      exerciseTimerTitle?: string;
+      pauseExerciseButton?: string;
+      resumeExerciseButton?: string;
+      exerciseLabel?: string;
     };
     workoutGenerator?: {
       title?: string;
@@ -101,6 +105,7 @@ export interface DictionaryType {
       restLabel?: string;
       startRestButton?: string;
       exerciseInfoTooltip?: string;
+      durationLabel?: string;
     };
     activeWorkoutDisplay?: {
       title?: string;
@@ -111,6 +116,14 @@ export interface DictionaryType {
       finishButton?: string;
       endWorkoutEarlyButton?: string;
       noCurrentExercise?: string;
+      exerciseLabel?: string;
+      setsLabel?: string;
+      repsLabel?: string;
+      restLabel?: string;
+      durationLabel?: string;
+      pauseExercise?: string;
+      resumeExercise?: string;
+      exerciseCompleteMessage?: string;
     };
     difficultyFeedback?: {
       title?: string;
@@ -165,6 +178,8 @@ export interface DictionaryType {
       workoutCompleteDescription?: string;
       workoutEndedTitle?: string;
       workoutEndedDescription?: string;
+      exerciseTimeUpTitle?: string;
+      exerciseTimeUpDescription?: string;
     };
     errors?: {
       alertTitle?: string;
@@ -179,5 +194,3 @@ export interface DictionaryType {
     };
   };
 }
-
-    

@@ -21,7 +21,11 @@
       "workoutCompleteTitle": "Workout Finished!",
       "workoutCompleteCongrats": "Congratulations! You've completed the workout.",
       "kcalBurnedPlaceholder": "Estimated Kcal Burned: Calculation coming soon.",
-      "closeButton": "Close"
+      "closeButton": "Close",
+      "exerciseTimerTitle": "Exercise Time",
+      "pauseExerciseButton": "Pause Exercise",
+      "resumeExerciseButton": "Resume Exercise",
+      "exerciseLabel": "Exercise"
     },
     "workoutGenerator": {
         "title": "Create Your Workout",
@@ -50,18 +54,27 @@
         "setsLabel": "Sets:",
         "repsLabel": "Reps:",
         "restLabel": "Rest:",
+        "durationLabel": "Duration:",
         "startRestButton": "Start Rest ({duration}s)",
         "exerciseInfoTooltip": "Exercise Information"
     },
     "activeWorkoutDisplay": {
         "title": "Active Workout",
-        "exerciseProgress": "Exercise {current} of {total}: {exerciseName}",
+        "exerciseProgress": "Exercise {current} of {total}",
         "startRestButton": "Start {duration}s Rest",
         "previousButton": "Previous",
         "nextButton": "Next Exercise",
         "finishButton": "Finish Workout",
         "endWorkoutEarlyButton": "End Workout Early",
-        "noCurrentExercise": "No current exercise. This shouldn't happen!"
+        "noCurrentExercise": "No current exercise. This shouldn't happen!",
+        "exerciseLabel": "Exercise",
+        "setsLabel": "Sets",
+        "repsLabel": "Reps",
+        "restLabel": "Rest",
+        "durationLabel": "Time",
+        "pauseExercise": "Pause",
+        "resumeExercise": "Resume",
+        "exerciseCompleteMessage": "Complete the exercise timer to enable rest."
     },
     "difficultyFeedback": {
         "title": "Rate Your Workout",
@@ -115,7 +128,9 @@
         "workoutCompleteTitle": "Workout Complete!",
         "workoutCompleteDescription": "Great job finishing your workout!",
         "workoutEndedTitle": "Workout Ended",
-        "workoutEndedDescription": "Come back soon for another session!"
+        "workoutEndedDescription": "Come back soon for another session!",
+        "exerciseTimeUpTitle": "Exercise Time Up!",
+        "exerciseTimeUpDescription": "Great job! Ready for your rest?"
     },
     "errors": {
         "alertTitle": "Error",
@@ -130,5 +145,3 @@
     }
   }
 }
-
-    

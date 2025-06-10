@@ -2,7 +2,8 @@
 "use client";
 
 import { adjustWorkoutDifficulty, type AdjustWorkoutDifficultyInput as FlowAdjustWorkoutDifficultyInput } from "@/ai/flows/adjust-workout-difficulty";
-import { generateWorkout, type GenerateWorkoutInput as FlowGenerateWorkoutInput } from "@/ai/flows/generate-workout";
+import { generateWorkout } from "@/ai/flows/generate-workout";
+import { type GenerateWorkoutInput as FlowGenerateWorkoutInput } from "@/ai/flows/generate-workout"; // Alias for flow input
 import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { DifficultyFeedback } from "@/components/daily-sweat/DifficultyFeedback";
 import { FitnessChatbotDialog } from "@/components/daily-sweat/FitnessChatbotDialog";
@@ -13,13 +14,13 @@ import { WorkoutGeneratorForm } from "@/components/daily-sweat/WorkoutGeneratorF
 import { WorkoutHistoryDisplay } from "@/components/daily-sweat/WorkoutHistoryDisplay";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
-import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, DictionaryType, GenerateWorkoutInput } from "@/lib/types";
+import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, DictionaryType, GenerateWorkoutInput, Exercise } from "@/lib/types"; // GenerateWorkoutInput from lib/types
 import { AlertCircle, DumbbellIcon, History, MessageSquare, PartyPopper } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 
 type Lang = 'en' | 'fr' | 'es' | 'it' | 'zh';
 
@@ -37,18 +38,30 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Rest Timer State
   const [timerDuration, setTimerDuration] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
 
+  // Workout Session State
   const [isWorkoutSessionActive, setIsWorkoutSessionActive] = useState(false);
   const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
   const [workoutCompletionMessage, setWorkoutCompletionMessage] = useState<string | null>(null);
 
+  // Exercise Timer State
+  const [currentExerciseDetails, setCurrentExerciseDetails] = useState<Exercise | null>(null);
+  const [exerciseTimeLeft, setExerciseTimeLeft] = useState<number | null>(null);
+  const [isExerciseTimerRunning, setIsExerciseTimerRunning] = useState(false);
+  const [isExerciseTimerPaused, setIsExerciseTimerPaused] = useState(false);
+  const [isCurrentExerciseTimed, setIsCurrentExerciseTimed] = useState(false);
+  const [canStartRest, setCanStartRest] = useState(false);
+  
+  const exerciseIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
 
   const { toast } = useToast();
 
-  const handleGenerateWorkout = async (formValues: GenerateWorkoutInput) => {
+  const handleGenerateWorkout = async (formValues: GenerateWorkoutInput) => { // formValues is GenerateWorkoutInput from lib/types
     if (!dict?.page?.errors || !dict?.page?.toasts) return;
     setIsLoading(true);
     setError(null);
@@ -56,6 +69,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setIsWorkoutSessionActive(false);
     setWorkoutCompletionMessage(null);
     try {
+      // Use FlowGenerateWorkoutInput for the AI payload, which doesn't include language
       const payloadForAI: FlowGenerateWorkoutInput = {
         muscleGroups: formValues.muscleGroups,
         availableTime: formValues.availableTime,
@@ -91,7 +105,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
         description: parsedPlan.description,
       };
       setCurrentWorkout(newWorkout);
-      setCurrentWorkoutParams(formValues);
+      setCurrentWorkoutParams(formValues); // Store form values (without language)
       addWorkoutToHistory(newWorkout);
       toast({ title: dict.page.toasts.workoutGeneratedTitle, description: dict.page.toasts.workoutGeneratedDescription });
     } catch (err) {
@@ -113,6 +127,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setError(null);
     try {
       const workoutPlanString = JSON.stringify(currentWorkout);
+      // Use FlowAdjustWorkoutDifficultyInput which doesn't include language
       const payloadForAI: FlowAdjustWorkoutDifficultyInput = { workoutPlan: workoutPlanString, feedback };
       const result = await adjustWorkoutDifficulty(payloadForAI);
 
@@ -155,12 +170,114 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     }
   };
 
+  const setupExerciseTimer = (exercise: Exercise | null) => {
+    if (exerciseIntervalRef.current) {
+      clearInterval(exerciseIntervalRef.current);
+    }
+    if (exercise && typeof exercise.duration === 'number' && exercise.duration > 0) {
+      setCurrentExerciseDetails(exercise);
+      setExerciseTimeLeft(exercise.duration);
+      setIsCurrentExerciseTimed(true);
+      setIsExerciseTimerRunning(true); // Auto-start timer for timed exercise
+      setIsExerciseTimerPaused(false);
+      setCanStartRest(false);
+    } else {
+      setCurrentExerciseDetails(exercise);
+      setExerciseTimeLeft(null);
+      setIsCurrentExerciseTimed(false);
+      setIsExerciseTimerRunning(false);
+      setIsExerciseTimerPaused(false);
+      setCanStartRest(true); // Can rest immediately for non-timed exercises
+    }
+  };
+
+  const handleStartWorkout = () => {
+    if (!dict?.page?.errors || !dict?.page?.toasts) return;
+    if (currentWorkout && currentWorkout.exercises.length > 0) {
+      setIsWorkoutSessionActive(true);
+      setActiveExerciseIndex(0);
+      setupExerciseTimer(currentWorkout.exercises[0]);
+      setWorkoutCompletionMessage(null);
+      setError(null);
+      toast({title: dict.page.toasts.workoutStartedTitle, description: dict.page.toasts.workoutStartedDescription});
+    } else {
+      setError(dict.page.errors.cannotStartEmptyWorkout || "Cannot start an empty workout.");
+    }
+  };
+  
+  const handleNextExercise = () => {
+    if (!dict?.page?.toasts || !currentWorkout) return;
+    if (activeExerciseIndex < currentWorkout.exercises.length - 1) {
+      const newIndex = activeExerciseIndex + 1;
+      setActiveExerciseIndex(newIndex);
+      setupExerciseTimer(currentWorkout.exercises[newIndex]);
+    } else if (activeExerciseIndex === currentWorkout.exercises.length - 1) {
+      toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
+      const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
+      const kcalMsg = dict.page.workoutModal?.kcalBurnedPlaceholder || "Estimated Kcal Burned: Calculation coming soon.";
+      setWorkoutCompletionMessage(`${congratsMsg}\n${kcalMsg}`);
+      if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+    }
+  };
+
+  const handlePreviousExercise = () => {
+    if (activeExerciseIndex > 0 && currentWorkout) {
+      const newIndex = activeExerciseIndex - 1;
+      setActiveExerciseIndex(newIndex);
+      setupExerciseTimer(currentWorkout.exercises[newIndex]);
+    }
+  };
+
+  const handleEndWorkout = () => {
+    if (!dict?.page?.toasts) return;
+    setIsWorkoutSessionActive(false);
+    setWorkoutCompletionMessage(null); 
+    if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+    setExerciseTimeLeft(null);
+    setIsExerciseTimerRunning(false);
+    setIsExerciseTimerPaused(false);
+    toast({ title: dict.page.toasts.workoutEndedTitle, description: dict.page.toasts.workoutEndedDescription });
+  };
+
+  const handleToggleExerciseTimerPause = () => {
+    setIsExerciseTimerPaused(prev => !prev);
+    setIsExerciseTimerRunning(prev => !prev); // Also toggle running state
+  };
+
+  const handleExerciseTimerEnd = useCallback(() => {
+    if (!dict?.page?.toasts?.exerciseTimeUpTitle || !dict?.page?.toasts?.exerciseTimeUpDescription) return;
+    setIsExerciseTimerRunning(false);
+    setIsExerciseTimerPaused(false);
+    setCanStartRest(true);
+    if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+    toast({ title: dict.page.toasts.exerciseTimeUpTitle, description: dict.page.toasts.exerciseTimeUpDescription });
+  }, [toast, dict?.page?.toasts?.exerciseTimeUpTitle, dict?.page?.toasts?.exerciseTimeUpDescription]);
+
+  useEffect(() => {
+    if (isExerciseTimerRunning && !isExerciseTimerPaused && exerciseTimeLeft !== null && exerciseTimeLeft > 0) {
+      exerciseIntervalRef.current = setInterval(() => {
+        setExerciseTimeLeft(prevTime => {
+          if (prevTime === null || prevTime <= 1) {
+            if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+            handleExerciseTimerEnd();
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    } else if (exerciseIntervalRef.current) {
+      clearInterval(exerciseIntervalRef.current);
+    }
+    return () => {
+      if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+    };
+  }, [isExerciseTimerRunning, isExerciseTimerPaused, exerciseTimeLeft, handleExerciseTimerEnd]);
+
+
   const handleStartRestTimer = (duration: number) => {
     setTimerDuration(duration);
     setIsTimerRunning(true);
     setTimerKey(prev => prev + 1);
-    // Optionally, scroll to timer if it's outside the modal and visible.
-    // For now, assumes timer is either in modal or user knows where it is.
   };
 
   const handleTimerToggle = () => {
@@ -191,6 +308,8 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setCurrentWorkoutParams(loadedParams);
     setIsWorkoutSessionActive(false);
     setWorkoutCompletionMessage(null);
+    if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+    setExerciseTimeLeft(null);
     toast({ title: dict.page.toasts.workoutLoadedTitle, description: (dict.page.toasts.workoutLoadedDescription || "Loaded \"{name}\" from history.").replace('{name}', workout.name)});
   };
 
@@ -206,52 +325,11 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       setError(null);
     }
   }, [isLoading, isAdjusting]);
-
-  const handleStartWorkout = () => {
-    if (!dict?.page?.errors || !dict?.page?.toasts) return;
-    if (currentWorkout && currentWorkout.exercises.length > 0) {
-      setIsWorkoutSessionActive(true);
-      setActiveExerciseIndex(0);
-      setWorkoutCompletionMessage(null);
-      setError(null);
-      toast({title: dict.page.toasts.workoutStartedTitle, description: dict.page.toasts.workoutStartedDescription});
-    } else {
-      setError(dict.page.errors.cannotStartEmptyWorkout || "Cannot start an empty workout.");
-    }
-  };
-
-  const handleNextExercise = () => {
-    if (!dict?.page?.toasts) return;
-    if (currentWorkout && activeExerciseIndex < currentWorkout.exercises.length - 1) {
-      setActiveExerciseIndex(prev => prev + 1);
-    } else if (currentWorkout && activeExerciseIndex === currentWorkout.exercises.length - 1) {
-      toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
-      const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
-      const kcalMsg = dict.page.workoutModal?.kcalBurnedPlaceholder || "Estimated Kcal Burned: Calculation coming soon.";
-      setWorkoutCompletionMessage(`${congratsMsg}\n${kcalMsg}`);
-      // Keep modal open to show completion message
-    }
-  };
-
-  const handlePreviousExercise = () => {
-    if (activeExerciseIndex > 0) {
-      setActiveExerciseIndex(prev => prev - 1);
-    }
-  };
-
-  const handleEndWorkout = () => {
-    if (!dict?.page?.toasts) return;
-    setIsWorkoutSessionActive(false);
-    setWorkoutCompletionMessage(null); // Clear completion message when ending/closing
-    toast({ title: dict.page.toasts.workoutEndedTitle, description: dict.page.toasts.workoutEndedDescription });
-  };
   
   const handleModalOpenChange = (open: boolean) => {
     if (!open) {
-      // If modal is closed by 'X' or overlay click, treat as ending workout
       handleEndWorkout();
     } else {
-        // If modal is being opened, ensure workout starts correctly (already handled by handleStartWorkout)
         if (currentWorkout && currentWorkout.exercises.length > 0 && !isWorkoutSessionActive) {
              handleStartWorkout();
         }
@@ -262,7 +340,6 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
   if (!dict) {
     return <div className="flex justify-center items-center min-h-screen">{dict?.page?.loadingText || "Loading..."}</div>;
   }
-
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -304,9 +381,9 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
                 
                 <WorkoutDisplay
                   workoutPlan={currentWorkout}
-                  onStartRest={handleStartRestTimer} // This will still trigger the bottom timer
-                  onStartWorkout={handleStartWorkout} // This now opens the modal
-                  isWorkoutActive={isWorkoutSessionActive} // Used to disable start button if session already active
+                  onStartRest={handleStartRestTimer} 
+                  onStartWorkout={handleStartWorkout} 
+                  isWorkoutActive={isWorkoutSessionActive} 
                   dict={dict.page?.workoutDisplay || {}}
                   exerciseCardDict={dict.page?.exerciseCard || {}}
                 />
@@ -341,7 +418,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
         </Tabs>
       </main>
 
-      {isWorkoutSessionActive && currentWorkout && (
+      {isWorkoutSessionActive && currentWorkout && currentExerciseDetails && (
         <Dialog open={isWorkoutSessionActive} onOpenChange={handleModalOpenChange}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -367,12 +444,20 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
             ) : (
               <ActiveWorkoutDisplay
                 workoutPlan={currentWorkout}
+                currentExercise={currentExerciseDetails}
                 currentExerciseIndex={activeExerciseIndex}
                 onNextExercise={handleNextExercise}
                 onPreviousExercise={handlePreviousExercise}
-                onEndWorkout={handleEndWorkout} // This will close the modal
-                onStartRest={handleStartRestTimer} // This triggers the separate RestTimer at page bottom
+                onEndWorkout={handleEndWorkout} 
+                onStartRest={handleStartRestTimer}
                 dict={dict.page?.activeWorkoutDisplay || {}}
+                exerciseTimeLeft={exerciseTimeLeft}
+                isExerciseTimerRunning={isExerciseTimerRunning}
+                isExerciseTimerPaused={isExerciseTimerPaused}
+                isCurrentExerciseTimed={isCurrentExerciseTimed}
+                canStartRest={canStartRest}
+                onToggleExerciseTimerPause={handleToggleExerciseTimerPause}
+                modalDict={dict.page?.workoutModal || {}}
               />
             )}
 
@@ -419,5 +504,3 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     </div>
   );
 }
-
-    
