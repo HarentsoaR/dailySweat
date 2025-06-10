@@ -10,13 +10,14 @@ type Locale = 'en' | 'fr' | 'es' | 'it' | 'zh';
 const dictionaries: Record<Locale, () => Promise<DictionaryType>> = {
   en: () => import('@/locales/en.json').then(module => module.default as DictionaryType),
   fr: () => import('@/locales/fr.json').then(module => module.default as DictionaryType),
-  // TODO: Add imports for es, it, zh once their JSON files are created
-  es: () => import('@/locales/en.json').then(module => module.default as DictionaryType), // Fallback to EN for now
-  it: () => import('@/locales/en.json').then(module => module.default as DictionaryType), // Fallback to EN for now
-  zh: () => import('@/locales/en.json').then(module => module.default as DictionaryType), // Fallback to EN for now
+  es: () => import('@/locales/es.json').then(module => module.default as DictionaryType),
+  it: () => import('@/locales/it.json').then(module => module.default as DictionaryType),
+  zh: () => import('@/locales/zh.json').then(module => module.default as DictionaryType),
 };
 
 export const getDictionary = async (locale: Locale): Promise<DictionaryType> => {
   const load = dictionaries[locale] || dictionaries.en; // Fallback to English if locale is not found
   return load();
 };
+
+    
