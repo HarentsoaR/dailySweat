@@ -175,7 +175,9 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     if (exerciseIntervalRef.current) {
       clearInterval(exerciseIntervalRef.current);
     }
+    console.log("Setting up exercise timer for:", exercise); // DEBUG LOG
     if (exercise && typeof exercise.duration === 'number' && exercise.duration > 0) {
+      console.log("Exercise IS timed. Duration:", exercise.duration); // DEBUG LOG
       setCurrentExerciseDetails(exercise);
       setExerciseTimeLeft(exercise.duration);
       setIsCurrentExerciseTimed(true);
@@ -183,6 +185,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       setIsExerciseTimerPaused(false);
       setCanStartRest(false);
     } else {
+      console.log("Exercise IS NOT timed or duration is invalid. Duration:", exercise?.duration); // DEBUG LOG
       setCurrentExerciseDetails(exercise);
       setExerciseTimeLeft(null);
       setIsCurrentExerciseTimed(false);
