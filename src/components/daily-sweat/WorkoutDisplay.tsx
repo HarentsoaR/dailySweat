@@ -1,8 +1,9 @@
+"use client";
 
 import type { WorkoutPlan } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock, Dumbbell, PlayCircle } from 'lucide-react';
-import { ExerciseCard } from './ExerciseCard';
+// import { ExerciseCard } from './ExerciseCard'; // Removed import as ExerciseCard is no longer used here
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ interface ExerciseCardDict {
 
 interface WorkoutDisplayProps {
   workoutPlan: WorkoutPlan | null;
-  onStartRest: (duration: number) => void;
+  // onStartRest: (duration: number) => void; // Removed as individual cards no longer trigger it
   onStartWorkout: () => void;
   isWorkoutActive: boolean;
   dict: { 
@@ -25,8 +26,9 @@ interface WorkoutDisplayProps {
     emptyState?: string;
     startWorkoutButton?: string;
     noExercises?: string;
+    includesExercises?: string; // New dictionary key for summary
   };
-  exerciseCardDict: ExerciseCardDict;
+  exerciseCardDict: ExerciseCardDict; // Still passed, but not used directly in this component anymore
 }
 
 const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] }) => {
@@ -42,7 +44,7 @@ const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] 
   }
 };
 
-export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWorkoutActive, dict, exerciseCardDict }: WorkoutDisplayProps) {
+export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, dict }: WorkoutDisplayProps) { // onStartRest removed from props
   if (!workoutPlan) {
     return (
       <Card className="shadow-lg">
@@ -61,7 +63,8 @@ export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWor
     );
   }
 
-  const planDescription = workoutPlan.description; // Assuming workoutPlan can have a description
+  const planDescription = workoutPlan.description;
+  const exerciseSummary = workoutPlan.exercises.map(ex => ex.name).join(', ');
 
   return (
     <Card className="shadow-lg">
@@ -98,9 +101,14 @@ export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWor
       </CardHeader>
       <CardContent>
         {workoutPlan.exercises.length > 0 ? (
-          workoutPlan.exercises.map((exercise, index) => (
-            <ExerciseCard key={index} exercise={exercise} onStartRest={onStartRest} dict={exerciseCardDict || {}} />
-          ))
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-foreground">
+              {dict?.includesExercises || "Includes exercises:"}
+            </p>
+            <p className="text-muted-foreground text-sm italic">
+              {exerciseSummary}
+            </p>
+          </div>
         ) : (
           <p className="text-muted-foreground">{dict?.noExercises || "No exercises in this plan. Try generating a new one!"}</p>
         )}
@@ -120,4 +128,3 @@ export function WorkoutDisplay({ workoutPlan, onStartRest, onStartWorkout, isWor
     </Card>
   );
 }
-

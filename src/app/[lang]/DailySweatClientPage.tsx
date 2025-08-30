@@ -1,4 +1,3 @@
-
 "use client";
 
 import { adjustWorkoutDifficulty, type AdjustWorkoutDifficultyInput } from "@/ai/flows/adjust-workout-difficulty";
@@ -389,7 +388,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
                 
                 <WorkoutDisplay
                   workoutPlan={currentWorkout}
-                  onStartRest={handleStartRestTimer} 
+                  // onStartRest={handleStartRestTimer} // Removed
                   onStartWorkout={handleStartWorkout} 
                   isWorkoutActive={isWorkoutSessionActive} 
                   dict={dict.page?.workoutDisplay || {}}

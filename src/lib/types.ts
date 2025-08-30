@@ -1,4 +1,3 @@
-
 // No direct import from AI flow needed here for GenerateWorkoutInput if client page defines its own
 // However, ensure its structure (excluding language) is compatible with what WorkoutGeneratorForm provides.
 
@@ -100,6 +99,7 @@ export interface DictionaryType {
       emptyState?: string;
       startWorkoutButton?: string;
       noExercises?: string;
+      includesExercises?: string; // New
     };
     exerciseCard?: {
       setsLabel?: string;

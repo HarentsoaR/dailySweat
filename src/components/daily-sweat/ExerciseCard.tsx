@@ -1,25 +1,25 @@
+"use client";
 
 import type { Exercise } from '@/lib/types';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dumbbell, Repeat, Target, TimerIcon, Info, Clock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ExerciseCardProps {
   exercise: Exercise;
-  onStartRest: (duration: number) => void;
+  // onStartRest: (duration: number) => void; // Removed
   dict: {
     setsLabel?: string;
     repsLabel?: string;
     restLabel?: string;
     durationLabel?: string; // New
-    startRestButton?: string;
+    // startRestButton?: string; // Removed
     exerciseInfoTooltip?: string;
   };
 }
 
-export function ExerciseCard({ exercise, onStartRest, dict }: ExerciseCardProps) {
-  const startRestButtonText = (dict?.startRestButton || "Start Rest ({duration}s)").replace('{duration}', String(exercise.rest));
+export function ExerciseCard({ exercise, dict }: ExerciseCardProps) { // onStartRest removed from props
+  // const startRestButtonText = (dict?.startRestButton || "Start Rest ({duration}s)").replace('{duration}', String(exercise.rest)); // Removed
   return (
     <Card className="mb-4 shadow-md transition-all hover:shadow-lg">
       <CardHeader className="flex flex-row justify-between items-center">
@@ -65,17 +65,7 @@ export function ExerciseCard({ exercise, onStartRest, dict }: ExerciseCardProps)
           <span className="ml-1">{exercise.rest} seconds</span>
         </div>
       </CardContent>
-      <CardFooter>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onStartRest(exercise.rest)}
-          className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-        >
-          <TimerIcon className="mr-2 h-4 w-4" />
-          {startRestButtonText}
-        </Button>
-      </CardFooter>
+      {/* CardFooter with Start Rest button removed */}
     </Card>
   );
 }
