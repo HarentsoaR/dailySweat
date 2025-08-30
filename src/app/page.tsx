@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
-import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan } from "@/lib/types";
+import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, GenerateWorkoutInput as FormInput } from "@/lib/types";
 import { AlertCircle, DumbbellIcon, History, MessageSquare } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -24,7 +24,7 @@ import { useCallback, useEffect, useState } from "react";
 const DEFAULT_LANGUAGE = 'en';
 
 export default function DailySweatPage() {
-  const [currentWorkoutParams, setCurrentWorkoutParams] = useState<Omit<GenerateWorkoutInput, 'language'> | null>(null);
+  const [currentWorkoutParams, setCurrentWorkoutParams] = useState<FormInput | null>(null);
   const [currentWorkout, setCurrentWorkout] = useState<WorkoutPlan | null>(null);
   const { history: workoutHistory, addWorkoutToHistory, clearHistory, removeWorkoutFromHistory, isLoaded: historyLoaded } = useWorkoutHistory();
   
@@ -41,7 +41,7 @@ export default function DailySweatPage() {
 
   const { toast } = useToast();
 
-  const handleGenerateWorkout = async (data: Omit<GenerateWorkoutInput, 'language'>) => {
+  const handleGenerateWorkout = async (data: FormInput) => {
     setIsLoading(true);
     setError(null);
     setCurrentWorkout(null);
@@ -174,7 +174,7 @@ export default function DailySweatPage() {
     toast({ title: "Workout Loaded", description: `Loaded "${workout.name}" from history.`});
   };
 
-  const defaultGeneratorValues = currentWorkoutParams || {
+  const defaultGeneratorValues: FormInput = currentWorkoutParams || {
       muscleGroups: 'Full Body',
       availableTime: 30,
       equipment: 'Bodyweight',
@@ -343,3 +343,5 @@ export default function DailySweatPage() {
     </div>
   );
 }
+
+    

@@ -1,8 +1,8 @@
 
 "use client";
 
-import { adjustWorkoutDifficulty, type AdjustWorkoutDifficultyInput as FlowAdjustWorkoutDifficultyInput } from "@/ai/flows/adjust-workout-difficulty";
-import { generateWorkout, type GenerateWorkoutInput as FlowGenerateWorkoutInput } from "@/ai/flows/generate-workout";
+import { adjustWorkoutDifficulty } from "@/ai/flows/adjust-workout-difficulty";
+import { generateWorkout } from "@/ai/flows/generate-workout";
 import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { DifficultyFeedback } from "@/components/daily-sweat/DifficultyFeedback";
 import { FitnessChatbotDialog } from "@/components/daily-sweat/FitnessChatbotDialog";
@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
-import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, DictionaryType, GenerateWorkoutInput, Exercise } from "@/lib/types"; // GenerateWorkoutInput from lib/types
+import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, DictionaryType, GenerateWorkoutInput, Exercise } from "@/lib/types";
 import { AlertCircle, DumbbellIcon, History, MessageSquare, PartyPopper } from "lucide-react";
 import { useCallback, useEffect, useState, useRef } from "react";
 
@@ -60,7 +60,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
   const { toast } = useToast();
 
-  const handleGenerateWorkout = async (formValues: GenerateWorkoutInput) => { // formValues is GenerateWorkoutInput from lib/types
+  const handleGenerateWorkout = async (formValues: GenerateWorkoutInput) => {
     if (!dict?.page?.errors || !dict?.page?.toasts) return;
     setIsLoading(true);
     setError(null);
@@ -68,15 +68,13 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setIsWorkoutSessionActive(false);
     setWorkoutCompletionMessage(null);
     try {
-      // Construct payload for the AI flow, including the language
-      const payloadForAI: FlowGenerateWorkoutInput = {
+      const result = await generateWorkout({
         muscleGroups: formValues.muscleGroups,
         availableTime: formValues.availableTime,
         equipment: formValues.equipment,
         difficulty: formValues.difficulty,
         language: params.lang,
-      };
-      const result = await generateWorkout(payloadForAI);
+      });
       let parsedPlan: AIParsedWorkoutOutput;
       try {
         parsedPlan = JSON.parse(result.workoutPlan) as AIParsedWorkoutOutput;
@@ -127,13 +125,11 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setError(null);
     try {
       const workoutPlanString = JSON.stringify(currentWorkout);
-      // Construct payload for the AI flow, including the language
-      const payloadForAI: FlowAdjustWorkoutDifficultyInput = { 
+      const result = await adjustWorkoutDifficulty({ 
         workoutPlan: workoutPlanString, 
         feedback,
         language: params.lang,
-      };
-      const result = await adjustWorkoutDifficulty(payloadForAI);
+      });
 
       let adjustedPlanParsed: AIParsedWorkoutOutput;
       try {
@@ -517,3 +513,5 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     </div>
   );
 }
+
+    
