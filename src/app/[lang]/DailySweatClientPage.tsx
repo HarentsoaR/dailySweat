@@ -67,6 +67,10 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setCurrentWorkout(null);
     setIsWorkoutSessionActive(false);
     setWorkoutCompletionMessage(null);
+
+    const minLoadingTime = 4000; // Minimum 4 seconds loading time
+    const startTime = Date.now();
+
     try {
       const payloadForAI: FlowGenerateWorkoutInput = {
         muscleGroups: formValues.muscleGroups,
@@ -76,7 +80,11 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
         language: params.lang,
       };
 
-      const result = await generateWorkout(payloadForAI);
+      const [result] = await Promise.all([
+        generateWorkout(payloadForAI),
+        new Promise(resolve => setTimeout(resolve, Math.max(0, minLoadingTime - (Date.now() - startTime))))
+      ]);
+      
       let parsedPlan: AIParsedWorkoutOutput;
       try {
         parsedPlan = JSON.parse(result.workoutPlan) as AIParsedWorkoutOutput;
@@ -125,13 +133,20 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     }
     setIsAdjusting(true);
     setError(null);
+
+    const minLoadingTime = 2000; // Minimum 2 seconds loading time for adjustment
+    const startTime = Date.now();
+
     try {
       const payloadForAI: AdjustWorkoutDifficultyInput = {
         workoutPlan: JSON.stringify(currentWorkout), 
         feedback,
         language: params.lang,
       };
-      const result = await adjustWorkoutDifficulty(payloadForAI);
+      const [result] = await Promise.all([
+        adjustWorkoutDifficulty(payloadForAI),
+        new Promise(resolve => setTimeout(resolve, Math.max(0, minLoadingTime - (Date.now() - startTime))))
+      ]);
 
       let adjustedPlanParsed: AIParsedWorkoutOutput;
       try {
