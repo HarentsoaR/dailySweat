@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { WorkoutPlan, Exercise } from '@/lib/types';
