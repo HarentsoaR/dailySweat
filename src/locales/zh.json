@@ -132,7 +132,7 @@
       "restOverTitle": "休息结束！",
       "restOverDescription": "是时候回去训练了！",
       "workoutLoadedTitle": "锻炼已加载",
-      "已从历史记录中加载“{name}”。",
+      "workoutLoadedDescription": "已从历史记录中加载“{name}”。",
       "workoutStartedTitle": "锻炼已开始！",
       "workoutStartedDescription": "让我们开始吧！",
       "workoutCompleteTitle": "锻炼完成！",
