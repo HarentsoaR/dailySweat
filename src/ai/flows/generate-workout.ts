@@ -27,6 +27,8 @@ const GenerateWorkoutInputSchema = z.object({
     .describe('The difficulty level of the workout plan.'),
    language: z
     .string()
+    .optional()
+    .default('en')
     .describe('The target language for the workout plan content (e.g., "en", "fr").'),
 });
 export type GenerateWorkoutInput = z.infer<typeof GenerateWorkoutInputSchema>;

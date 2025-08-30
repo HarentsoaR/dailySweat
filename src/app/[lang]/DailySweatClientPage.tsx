@@ -1,8 +1,8 @@
 
 "use client";
 
-import { adjustWorkoutDifficulty } from "@/ai/flows/adjust-workout-difficulty";
-import { generateWorkout } from "@/ai/flows/generate-workout";
+import { adjustWorkoutDifficulty, type AdjustWorkoutDifficultyInput } from "@/ai/flows/adjust-workout-difficulty";
+import { generateWorkout, type GenerateWorkoutInput as FlowGenerateWorkoutInput } from "@/ai/flows/generate-workout";
 import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { DifficultyFeedback } from "@/components/daily-sweat/DifficultyFeedback";
 import { FitnessChatbotDialog } from "@/components/daily-sweat/FitnessChatbotDialog";
@@ -68,13 +68,15 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setIsWorkoutSessionActive(false);
     setWorkoutCompletionMessage(null);
     try {
-      const result = await generateWorkout({
+      const payloadForAI: FlowGenerateWorkoutInput = {
         muscleGroups: formValues.muscleGroups,
         availableTime: formValues.availableTime,
         equipment: formValues.equipment,
         difficulty: formValues.difficulty,
         language: params.lang,
-      });
+      };
+
+      const result = await generateWorkout(payloadForAI);
       let parsedPlan: AIParsedWorkoutOutput;
       try {
         parsedPlan = JSON.parse(result.workoutPlan) as AIParsedWorkoutOutput;
@@ -124,12 +126,12 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setIsAdjusting(true);
     setError(null);
     try {
-      const workoutPlanString = JSON.stringify(currentWorkout);
-      const result = await adjustWorkoutDifficulty({ 
-        workoutPlan: workoutPlanString, 
+      const payloadForAI: AdjustWorkoutDifficultyInput = {
+        workoutPlan: JSON.stringify(currentWorkout), 
         feedback,
         language: params.lang,
-      });
+      };
+      const result = await adjustWorkoutDifficulty(payloadForAI);
 
       let adjustedPlanParsed: AIParsedWorkoutOutput;
       try {
@@ -250,14 +252,12 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setIsExerciseTimerRunning(false);
     setIsExerciseTimerPaused(false);
     setCanStartRest(true);
-    // The interval is cleared by the main useEffect when isExerciseTimerRunning becomes false.
 
     if (canToast) {
       toast({ title: dict.page.toasts.exerciseTimeUpTitle!, description: dict.page.toasts.exerciseTimeUpDescription! });
     }
   }, [toast, dict?.page?.toasts?.exerciseTimeUpTitle, dict?.page?.toasts?.exerciseTimeUpDescription]);
 
-  // Effect for running the timer interval
   useEffect(() => {
     if (isExerciseTimerRunning && !isExerciseTimerPaused && exerciseTimeLeft !== null && exerciseTimeLeft > 0) {
       exerciseIntervalRef.current = setInterval(() => {
@@ -275,7 +275,6 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     };
   }, [isExerciseTimerRunning, isExerciseTimerPaused, exerciseTimeLeft]);
 
-  // Effect for handling the timer completion
   useEffect(() => {
     if (exerciseTimeLeft === 0 && isExerciseTimerRunning && isCurrentExerciseTimed && !workoutCompletionMessage) {
       handleExerciseTimerEnd();
@@ -513,5 +512,3 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     </div>
   );
 }
-
-    

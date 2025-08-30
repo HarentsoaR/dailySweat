@@ -21,6 +21,8 @@ const AdjustWorkoutDifficultyInputSchema = z.object({
     ),
   language: z
     .string()
+    .optional()
+    .default('en')
     .describe('The target language for the workout plan content (e.g., "en", "fr").'),
 });
 export type AdjustWorkoutDifficultyInput = z.infer<
