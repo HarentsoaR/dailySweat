@@ -122,7 +122,8 @@ export function ActiveWorkoutDisplay({
                 <p className="text-muted-foreground">{dict?.repsLabel || "Reps"}</p> 
                 <p className="font-medium">{currentExercise.reps}</p>
             </div>
-            {!isCurrentExerciseTimed && currentExercise.duration && ( // Show duration if not actively timing (e.g. for info)
+            {/* Always show duration if it exists and is a positive number */}
+            {currentExercise.duration && currentExercise.duration > 0 && (
                  <div>
                     <p className="text-muted-foreground">{dict?.durationLabel || "Duration"}</p>
                     <p className="font-medium">{currentExercise.duration}s</p>
