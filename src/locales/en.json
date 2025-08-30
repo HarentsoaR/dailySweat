@@ -35,7 +35,7 @@
         "availableTimeLabel": "Available Time (minutes)",
         "availableTimePlaceholder": "e.g., 30",
         "equipmentLabel": "Available Equipment",
-        "equipmentPlaceholder": "e.g., Dumbbells, Resistance Bands, Bodyweight",
+        "equipmentPlaceholder": "Select equipment",
         "difficultyLabel": "Difficulty Level",
         "selectDifficulty": "Select difficulty",
         "beginner": "Beginner",
@@ -53,6 +53,13 @@
           "chest": "Chest",
           "legs": "Legs",
           "shoulders": "Shoulders"
+        },
+        "equipmentOptions": {
+          "none": "None / Bodyweight",
+          "dumbbells": "Dumbbells",
+          "resistance_bands": "Resistance Bands",
+          "kettlebells": "Kettlebells",
+          "full_gym": "Full Gym"
         }
     },
     "workoutDisplay": {

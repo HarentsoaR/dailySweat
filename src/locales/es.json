@@ -35,7 +35,7 @@
         "availableTimeLabel": "Tiempo Disponible (minutos)",
         "availableTimePlaceholder": "Ej: 30",
         "equipmentLabel": "Equipamiento Disponible",
-        "equipmentPlaceholder": "Ej: Mancuernas, Bandas de resistencia, Peso corporal",
+        "equipmentPlaceholder": "Selecciona equipamiento",
         "difficultyLabel": "Nivel de Dificultad",
         "selectDifficulty": "Selecciona dificultad",
         "beginner": "Principiante",
@@ -53,6 +53,13 @@
           "chest": "Pecho",
           "legs": "Piernas",
           "shoulders": "Hombros"
+        },
+        "equipmentOptions": {
+          "none": "Ninguno / Peso corporal",
+          "dumbbells": "Mancuernas",
+          "resistance_bands": "Bandas de resistencia",
+          "kettlebells": "Pesas rusas",
+          "full_gym": "Gimnasio completo"
         }
     },
     "workoutDisplay": {

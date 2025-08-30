@@ -35,7 +35,7 @@
         "availableTimeLabel": "Tempo Disponibile (minuti)",
         "availableTimePlaceholder": "Es: 30",
         "equipmentLabel": "Attrezzatura Disponibile",
-        "equipmentPlaceholder": "Es: Manubri, Bande elastiche, Corpo libero",
+        "equipmentPlaceholder": "Seleziona attrezzatura",
         "difficultyLabel": "Livello di Difficoltà",
         "selectDifficulty": "Seleziona difficoltà",
         "beginner": "Principiante",
@@ -53,6 +53,13 @@
           "chest": "Petorali",
           "legs": "Gambe",
           "shoulders": "Spalle"
+        },
+        "equipmentOptions": {
+          "none": "Nessuna / Corpo libero",
+          "dumbbells": "Manubri",
+          "resistance_bands": "Bande elastiche",
+          "kettlebells": "Kettlebell",
+          "full_gym": "Palestra completa"
         }
     },
     "workoutDisplay": {

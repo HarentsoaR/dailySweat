@@ -3,7 +3,7 @@
 
 import type { GenerateWorkoutInput } from '@/lib/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {Clock3, Settings2, Users, Zap } from 'lucide-react';
+import {Clock3, Settings2, Users, Zap, Dumbbell } from 'lucide-react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -43,6 +43,7 @@ interface WorkoutGeneratorFormProps {
     buttonGenerate?: string;
     buttonGenerating?: string;
     muscleGroupsOptions?: Record<string, string>;
+    equipmentOptions?: Record<string, string>;
   };
 }
 
@@ -58,12 +59,11 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading, defaultValues, dict 
   });
 
   const handleSubmit: SubmitHandler<WorkoutGeneratorFormValues> = async (data) => {
-    // Find the displayed value from the dictionary based on the key stored in the form
-    const muscleGroupDisplayValue = dict.muscleGroupsOptions?.[data.muscleGroups] || data.muscleGroups;
-    await onSubmit({ ...data, muscleGroups: muscleGroupDisplayValue });
+    await onSubmit(data);
   };
   
   const muscleGroupOptions = dict.muscleGroupsOptions || { "full_body": "Full Body", "upper_body": "Upper Body", "lower_body": "Lower Body", "core": "Core" };
+  const equipmentOptions = dict.equipmentOptions || { "none": "None / Bodyweight", "dumbbells": "Dumbbells", "resistance_bands": "Resistance Bands" };
 
   return (
     <Card className="shadow-lg">
@@ -119,10 +119,19 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading, defaultValues, dict 
               name="equipment"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center">{dict?.equipmentLabel || "Available Equipment"}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={dict?.equipmentPlaceholder || "e.g., Dumbbells, Resistance Bands, Bodyweight"} {...field} />
-                  </FormControl>
+                  <FormLabel className="flex items-center"><Dumbbell className="mr-2 h-4 w-4" />{dict?.equipmentLabel || "Available Equipment"}</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={dict?.equipmentPlaceholder || "Select equipment"} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.entries(equipmentOptions).map(([key, value]) => (
+                        <SelectItem key={key} value={value}>{value}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

@@ -35,7 +35,7 @@
         "availableTimeLabel": "Temps Disponible (minutes)",
         "availableTimePlaceholder": "Ex : 30",
         "equipmentLabel": "Équipement Disponible",
-        "equipmentPlaceholder": "Ex : Haltères, Bandes de résistance, Poids du corps",
+        "equipmentPlaceholder": "Sélectionnez l'équipement",
         "difficultyLabel": "Niveau de Difficulté",
         "selectDifficulty": "Sélectionnez la difficulté",
         "beginner": "Débutant",
@@ -53,6 +53,13 @@
           "chest": "Pectoraux",
           "legs": "Jambes",
           "shoulders": "Épaules"
+        },
+        "equipmentOptions": {
+          "none": "Aucun / Poids du corps",
+          "dumbbells": "Haltères",
+          "resistance_bands": "Bandes de résistance",
+          "kettlebells": "Kettlebells",
+          "full_gym": "Salle de sport complète"
         }
     },
     "workoutDisplay": {

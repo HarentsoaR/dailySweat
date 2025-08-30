@@ -35,7 +35,7 @@
         "availableTimeLabel": "可用时间（分钟）",
         "availableTimePlaceholder": "例如：30",
         "equipmentLabel": "可用设备",
-        "equipmentPlaceholder": "例如：哑铃、阻力带、自重",
+        "equipmentPlaceholder": "选择设备",
         "difficultyLabel": "难度级别",
         "selectDifficulty": "选择难度",
         "beginner": "初级",
@@ -53,6 +53,13 @@
           "chest": "胸部",
           "legs": "腿部",
           "shoulders": "肩部"
+        },
+        "equipmentOptions": {
+          "none": "无 / 自重",
+          "dumbbells": "哑铃",
+          "resistance_bands": "阻力带",
+          "kettlebells": "壶铃",
+          "full_gym": "健身房"
         }
     },
     "workoutDisplay": {
