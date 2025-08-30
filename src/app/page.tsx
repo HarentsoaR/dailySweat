@@ -254,12 +254,20 @@ export default function DailySweatPage() {
                 {isWorkoutActive && currentWorkout ? (
                   <ActiveWorkoutDisplay
                     workoutPlan={currentWorkout}
+                    currentExercise={currentWorkout.exercises[activeExerciseIndex]}
                     currentExerciseIndex={activeExerciseIndex}
                     onNextExercise={handleNextExercise}
                     onPreviousExercise={handlePreviousExercise}
                     onEndWorkout={handleEndWorkout}
                     onStartRest={handleStartRestTimer}
                     dict={{}} // Provide empty dict
+                    modalDict={{}} // Provide empty dict
+                    exerciseTimeLeft={null} // Non-timed for this page
+                    isExerciseTimerRunning={false}
+                    isExerciseTimerPaused={false}
+                    isCurrentExerciseTimed={false}
+                    canStartRest={true}
+                    onToggleExerciseTimerPause={() => {}}
                   />
                 ) : (
                   <>
@@ -335,4 +343,3 @@ export default function DailySweatPage() {
     </div>
   );
 }
-

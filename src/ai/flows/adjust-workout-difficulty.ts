@@ -17,7 +17,11 @@ const AdjustWorkoutDifficultyInputSchema = z.object({
   feedback: z
     .string()
     .describe(
-      'User feedback on the workout difficulty (e.g., too easy, too hard, just right).',    ),
+      'User feedback on the workout difficulty (e.g., too easy, too hard, just right).',
+    ),
+  language: z
+    .string()
+    .describe('The target language for the workout plan content (e.g., "en", "fr").'),
 });
 export type AdjustWorkoutDifficultyInput = z.infer<
   typeof AdjustWorkoutDifficultyInputSchema
@@ -50,7 +54,11 @@ const prompt = ai.definePrompt({
   The user has provided the following feedback on the workout difficulty:
   {{{feedback}}}
 
+  Target Language for the output: {{{language}}}
+
   Based on this feedback, adjust the workout plan.
+  
+  IMPORTANT: Generate all user-facing text (the 'name' and 'description' of the workout, and the 'name' and 'description' of each exercise) in the specified Target Language. The JSON structure and keys must remain in English.
 
   Return strictly a JSON object string representing the core adjusted workout. The JSON object must conform to the following structure:
   {

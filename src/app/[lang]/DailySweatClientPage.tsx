@@ -2,8 +2,7 @@
 "use client";
 
 import { adjustWorkoutDifficulty, type AdjustWorkoutDifficultyInput as FlowAdjustWorkoutDifficultyInput } from "@/ai/flows/adjust-workout-difficulty";
-import { generateWorkout } from "@/ai/flows/generate-workout";
-import { type GenerateWorkoutInput as FlowGenerateWorkoutInput } from "@/ai/flows/generate-workout"; // Alias for flow input
+import { generateWorkout, type GenerateWorkoutInput as FlowGenerateWorkoutInput } from "@/ai/flows/generate-workout";
 import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { DifficultyFeedback } from "@/components/daily-sweat/DifficultyFeedback";
 import { FitnessChatbotDialog } from "@/components/daily-sweat/FitnessChatbotDialog";
@@ -69,12 +68,13 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setIsWorkoutSessionActive(false);
     setWorkoutCompletionMessage(null);
     try {
-      // Use FlowGenerateWorkoutInput for the AI payload, which doesn't include language
+      // Construct payload for the AI flow, including the language
       const payloadForAI: FlowGenerateWorkoutInput = {
         muscleGroups: formValues.muscleGroups,
         availableTime: formValues.availableTime,
         equipment: formValues.equipment,
         difficulty: formValues.difficulty,
+        language: params.lang,
       };
       const result = await generateWorkout(payloadForAI);
       let parsedPlan: AIParsedWorkoutOutput;
@@ -105,7 +105,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
         description: parsedPlan.description,
       };
       setCurrentWorkout(newWorkout);
-      setCurrentWorkoutParams(formValues); // Store form values (without language)
+      setCurrentWorkoutParams(formValues);
       addWorkoutToHistory(newWorkout);
       toast({ title: dict.page.toasts.workoutGeneratedTitle, description: dict.page.toasts.workoutGeneratedDescription });
     } catch (err) {
@@ -127,8 +127,12 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     setError(null);
     try {
       const workoutPlanString = JSON.stringify(currentWorkout);
-      // Use FlowAdjustWorkoutDifficultyInput which doesn't include language
-      const payloadForAI: FlowAdjustWorkoutDifficultyInput = { workoutPlan: workoutPlanString, feedback };
+      // Construct payload for the AI flow, including the language
+      const payloadForAI: FlowAdjustWorkoutDifficultyInput = { 
+        workoutPlan: workoutPlanString, 
+        feedback,
+        language: params.lang,
+      };
       const result = await adjustWorkoutDifficulty(payloadForAI);
 
       let adjustedPlanParsed: AIParsedWorkoutOutput;
@@ -513,4 +517,3 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     </div>
   );
 }
-

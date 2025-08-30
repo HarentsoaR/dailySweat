@@ -25,6 +25,9 @@ const GenerateWorkoutInputSchema = z.object({
   difficulty: z
     .enum(['beginner', 'intermediate', 'advanced'])
     .describe('The difficulty level of the workout plan.'),
+   language: z
+    .string()
+    .describe('The target language for the workout plan content (e.g., "en", "fr").'),
 });
 export type GenerateWorkoutInput = z.infer<typeof GenerateWorkoutInputSchema>;
 
@@ -51,6 +54,9 @@ const prompt = ai.definePrompt({
   Available Time: {{{availableTime}}} minutes
   Equipment: {{{equipment}}}
   Difficulty: {{{difficulty}}}
+  Target Language: {{{language}}}
+
+  IMPORTANT: Generate all user-facing text (the 'name' and 'description' of the workout, and the 'name' and 'description' of each exercise) in the specified Target Language. The JSON structure and keys must remain in English.
 
   Return the workout plan strictly as a JSON object string. The JSON object must conform to the following structure:
   {
