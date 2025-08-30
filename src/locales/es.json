@@ -1,17 +1,16 @@
-
 {
   "metadata": {
-    "title": "Daily Sweat - Tu Planificador de Ejercicios IA Personal",
-    "description": "Obtén planes de entrenamiento diarios personalizados generados por IA. Sigue tu progreso y mantente motivado con Daily Sweat."
+    "title": "Daily Sweat - Planificador de Ejercicios con IA",
+    "description": "Tu planificador de ejercicios personal con IA"
   },
   "header": {
     "title": "Daily Sweat"
   },
   "footer": {
-    "tagline": "© {year} Daily Sweat. Suda de Forma Más Inteligente, No Más Dura."
+    "tagline": "© {year} Daily Sweat. Suda de forma más inteligente, no más fuerte."
   },
   "page": {
-    "loadingText": "Cargando traducciones...",
+    "loadingText": "Cargando...",
     "tabs": {
       "workout": "Entrenamiento",
       "history": "Historial"
@@ -19,147 +18,147 @@
     "workoutModal": {
       "activeWorkoutModalTitle": "Sesión de Entrenamiento Activa",
       "workoutCompleteTitle": "¡Entrenamiento Terminado!",
-      "workoutCompleteCongrats": "¡Felicidades! Has completado el entrenamiento.",
-      "kcalBurnedPlaceholder": "Kcal Quemadas Estimadas: Cálculo próximamente.",
+      "workoutCompleteCongrats": "¡Entrenamiento completado! ¡Bien hecho!",
+      "kcalBurnedPlaceholder": "Kcal estimadas quemadas: Cálculo próximamente.",
       "closeButton": "Cerrar",
       "exerciseTimerTitle": "Tiempo de Ejercicio",
-      "pauseExerciseButton": "Pausar Ejercicio",
-      "resumeExerciseButton": "Reanudar Ejercicio",
+      "pauseExerciseButton": "Pausar",
+      "resumeExerciseButton": "Reanudar",
       "exerciseLabel": "Ejercicio"
     },
     "workoutGenerator": {
-        "title": "Crea Tu Entrenamiento",
-        "description": "Dinos tus preferencias y generaremos un plan de entrenamiento personalizado para ti.",
-        "muscleGroupsLabel": "Grupos Musculares",
-        "muscleGroupsPlaceholder": "Selecciona un grupo muscular",
-        "availableTimeLabel": "Tiempo Disponible (minutos)",
-        "availableTimePlaceholder": "Ej: 30",
-        "equipmentLabel": "Equipamiento Disponible",
-        "equipmentPlaceholder": "Selecciona equipamiento",
-        "difficultyLabel": "Nivel de Dificultad",
-        "selectDifficulty": "Selecciona dificultad",
-        "beginner": "Principiante",
-        "intermediate": "Intermedio",
-        "advanced": "Avanzado",
-        "buttonGenerate": "Generar Entrenamiento",
-        "buttonGenerating": "Generando...",
-        "muscleGroupsOptions": {
-          "full_body": "Cuerpo Completo",
-          "upper_body": "Tren Superior",
-          "lower_body": "Tren Inferior",
-          "core": "Core/Abdomen",
-          "arms": "Brazos",
-          "back": "Espalda",
-          "chest": "Pecho",
-          "legs": "Piernas",
-          "shoulders": "Hombros"
-        },
-        "equipmentOptions": {
-          "none": "Ninguno / Peso corporal",
-          "dumbbells": "Mancuernas",
-          "resistance_bands": "Bandas de resistencia",
-          "kettlebells": "Pesas rusas",
-          "full_gym": "Gimnasio completo"
-        }
+      "title": "Crea tu Entrenamiento",
+      "description": "Dinos tus preferencias y generaremos un plan de entrenamiento personalizado para ti.",
+      "muscleGroupsLabel": "Grupos Musculares",
+      "muscleGroupsPlaceholder": "Selecciona un grupo muscular",
+      "availableTimeLabel": "Tiempo Disponible (minutos)",
+      "availableTimePlaceholder": "ej: 30",
+      "equipmentLabel": "Equipo Disponible",
+      "equipmentPlaceholder": "Selecciona el equipo",
+      "difficultyLabel": "Nivel de Dificultad",
+      "selectDifficulty": "Selecciona la dificultad",
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado",
+      "buttonGenerate": "Generar Entrenamiento",
+      "buttonGenerating": "Generando...",
+      "muscleGroupsOptions": {
+        "full_body": "Cuerpo Completo",
+        "upper_body": "Parte Superior del Cuerpo",
+        "lower_body": "Parte Inferior del Cuerpo",
+        "core": "Core"
+      },
+      "equipmentOptions": {
+        "none": "Ninguno / Peso Corporal",
+        "dumbbells": "Mancuernas",
+        "resistance_bands": "Bandas de Resistencia"
+      }
     },
     "workoutDisplay": {
-        "title": "Tu Plan de Entrenamiento",
-        "emptyState": "Genera un plan de entrenamiento usando el formulario para verlo aquí.",
-        "startWorkoutButton": "Comenzar Entrenamiento",
-        "noExercises": "No hay ejercicios en este plan. ¡Intenta generar uno nuevo!"
+      "title": "Tu Plan de Entrenamiento",
+      "emptyState": "Genera un plan de entrenamiento usando el formulario para verlo aquí.",
+      "startWorkoutButton": "Iniciar Entrenamiento",
+      "noExercises": "No hay ejercicios en este plan. ¡Intenta generar uno nuevo!",
+      "includesExercises": "Incluye ejercicios:"
     },
     "exerciseCard": {
-        "setsLabel": "Series:",
-        "repsLabel": "Repeticiones:",
-        "restLabel": "Descanso:",
-        "durationLabel": "Duración:",
-        "startRestButton": "Comenzar Descanso ({duration}s)",
-        "exerciseInfoTooltip": "Información del Ejercicio"
+      "setsLabel": "Series:",
+      "repsLabel": "Repeticiones:",
+      "restLabel": "Descanso:",
+      "durationLabel": "Duración:",
+      "exerciseInfoTooltip": "Información del Ejercicio"
     },
     "activeWorkoutDisplay": {
-        "title": "Entrenamiento Activo",
-        "exerciseProgress": "Ejercicio {current} de {total}",
-        "startRestButton": "Comenzar {duration}s de Descanso",
-        "previousButton": "Anterior",
-        "nextButton": "Siguiente Ejercicio",
-        "finishButton": "Finalizar Entrenamiento",
-        "endWorkoutEarlyButton": "Terminar Entrenamiento Antes",
-        "noCurrentExercise": "No hay ejercicio actual. ¡Esto no debería suceder!",
-        "exerciseLabel": "Ejercicio",
-        "setsLabel": "Series",
-        "repsLabel": "Reps",
-        "restLabel": "Descanso",
-        "durationLabel": "Tiempo",
-        "pauseExercise": "Pausa",
-        "resumeExercise": "Reanudar",
-        "exerciseCompleteMessage": "Completa el temporizador del ejercicio para activar el descanso."
+      "title": "Sesión de Entrenamiento Activa",
+      "exerciseProgress": "Ejercicio {current} de {total}",
+      "startRestButton": "Iniciar {duration}s de Descanso",
+      "previousButton": "Anterior",
+      "nextButton": "Siguiente Ejercicio",
+      "finishButton": "Finalizar Entrenamiento",
+      "endWorkoutEarlyButton": "Terminar Entrenamiento Antes",
+      "noCurrentExercise": "No hay ejercicio actual. ¡Esto no debería pasar!",
+      "exerciseLabel": "Ejercicio",
+      "setsLabel": "Series",
+      "repsLabel": "Repeticiones",
+      "restLabel": "Descanso",
+      "durationLabel": "Duración",
+      "pauseExercise": "Pausar",
+      "resumeExercise": "Reanudar",
+      "exerciseCompleteMessage": "Completa el temporizador del ejercicio para habilitar el descanso."
     },
     "difficultyFeedback": {
-        "title": "Valora Tu Entrenamiento",
-        "description": "Ayúdanos a mejorar tu próximo entrenamiento valorando la dificultad de este plan.",
-        "tooEasy": "Demasiado Fácil",
-        "justRight": "Perfecto",
-        "tooHard": "Demasiado Difícil",
-        "adjusting": "Ajustando entrenamiento..."
+      "title": "Califica tu Entrenamiento",
+      "description": "Ayúdanos a mejorar tu próximo entrenamiento calificando la dificultad de este plan.",
+      "tooEasy": "Demasiado Fácil",
+      "justRight": "Justo",
+      "tooHard": "Demasiado Difícil",
+      "adjusting": "Ajustando entrenamiento..."
     },
     "workoutHistory": {
-        "title": "Historial de Entrenamientos",
-        "description": "Revisa tus sesiones de entrenamiento pasadas.",
-        "emptyState": "No se encontraron entrenamientos pasados. ¡Completa algunos entrenamientos para verlos aquí!",
-        "generatedOn": "Generado el: {date}",
-        "feedbackGiven": "Feedback: {feedback}",
-        "viewButton": "Ver",
-        "deleteButton": "Eliminar",
-        "clearAllButton": "Borrar Todo",
-        "loading": "Cargando historial..."
+      "title": "Historial de Entrenamientos",
+      "description": "Revisa tus sesiones de entrenamiento pasadas.",
+      "emptyState": "No se encontraron entrenamientos anteriores. ¡Completa algunos entrenamientos para verlos aquí!",
+      "generatedOn": "Generado el: {date}",
+      "feedbackGiven": "Comentarios: {feedback}",
+      "viewButton": "Ver",
+      "deleteButton": "Eliminar",
+      "clearAllButton": "Borrar Todo",
+      "loading": "Cargando historial..."
     },
     "restTimer": {
-        "title": "Temporizador de Descanso",
-        "description": "¡Tómate un respiro y luego dale duro!",
-        "pauseButtonSR": "Pausa",
-        "playButtonSR": "Reproducir",
-        "resetButtonSR": "Reiniciar"
+      "title": "Temporizador de Descanso",
+      "description": "Tómate un respiro, ¡luego dale con todo!",
+      "pauseButtonSR": "Pausar",
+      "playButtonSR": "Reproducir",
+      "resetButtonSR": "Reiniciar"
     },
     "chatbot": {
-        "dialogTitle": "Chat IA de Daily Sweat",
-        "dialogDescription": "Haz cualquier pregunta relacionada con fitness o nutrición.",
-        "inputPlaceholder": "Pregunta sobre ejercicios, dieta, etc...",
-        "initialMessage": "¡Hola! Soy la IA de Daily Sweat. ¡Pregúntame cualquier cosa sobre fitness, nutrición o tus entrenamientos!",
-        "errorMessage": "Lo siento, estoy teniendo problemas para conectarme en este momento. Por favor, inténtalo de nuevo más tarde.",
-        "sendButtonSR": "Enviar mensaje"
+      "dialogTitle": "Chat IA Daily Sweat",
+      "dialogDescription": "Haz cualquier pregunta relacionada con fitness o nutrición.",
+      "inputPlaceholder": "Pregunta sobre ejercicios, dieta, etc...",
+      "initialMessage": "¡Hola! Soy Daily Sweat IA. ¡Pregúntame cualquier cosa sobre fitness, nutrición o tus entrenamientos!",
+      "errorMessage": "Lo siento, tengo problemas para conectarme en este momento. Por favor, inténtalo de nuevo más tarde.",
+      "sendButtonSR": "Enviar mensaje"
     },
     "toasts": {
-        "workoutGeneratedTitle": "¡Entrenamiento Generado!",
-        "workoutGeneratedDescription": "Tu nuevo plan de entrenamiento está listo.",
-        "generationFailedTitle": "Falló la Generación",
-        "generationFailedDescription": "No se pudo generar el entrenamiento.",
-        "workoutAdjustedTitle": "¡Entrenamiento Ajustado!",
-        "workoutAdjustedDescription": "Percepción de dificultad: {feedback}. Plan actualizado.",
-        "adjustmentFailedTitle": "Falló el Ajuste",
-        "adjustmentFailedDescription": "No se pudo ajustar el entrenamiento.",
-        "restOverTitle": "¡Descanso Terminado!",
-        "restOverDescription": "¡Hora de volver a ello!",
-        "workoutLoadedTitle": "Entrenamiento Cargado",
-        "workoutLoadedDescription": "\"{name}\" cargado del historial.",
-        "workoutStartedTitle": "¡Entrenamiento Iniciado!",
-        "workoutStartedDescription": "¡Vamos a ello!",
-        "workoutCompleteTitle": "¡Entrenamiento Completado!",
-        "workoutCompleteDescription": "¡Buen trabajo terminando tu entrenamiento!",
-        "workoutEndedTitle": "Entrenamiento Terminado",
-        "workoutEndedDescription": "¡Vuelve pronto para otra sesión!",
-        "exerciseTimeUpTitle": "¡Tiempo de ejercicio terminado!",
-        "exerciseTimeUpDescription": "¡Buen trabajo! ¿Listo para tu descanso?"
+      "workoutGeneratedTitle": "¡Entrenamiento Generado!",
+      "workoutGeneratedDescription": "Tu nuevo plan de entrenamiento está listo.",
+      "generationFailedTitle": "Fallo en la Generación",
+      "generationFailedDescription": "No se pudo generar el entrenamiento.",
+      "workoutAdjustedTitle": "¡Entrenamiento Ajustado!",
+      "workoutAdjustedDescription": "Percepción de dificultad: {feedback}. Plan actualizado.",
+      "adjustmentFailedTitle": "Fallo en el Ajuste",
+      "adjustmentFailedDescription": "No se pudo ajustar la dificultad del entrenamiento.",
+      "restOverTitle": "¡Descanso Terminado!",
+      "restOverDescription": "¡Es hora de volver a ello!",
+      "workoutLoadedTitle": "Entrenamiento Cargado",
+      "workoutLoadedDescription": "Se cargó \"{name}\" del historial.",
+      "workoutStartedTitle": "¡Entrenamiento Iniciado!",
+      "workoutStartedDescription": "¡Vamos a ello!",
+      "workoutCompleteTitle": "¡Entrenamiento Completado!",
+      "workoutCompleteDescription": "¡Gran trabajo al terminar tu entrenamiento!",
+      "workoutEndedTitle": "Entrenamiento Terminado",
+      "workoutEndedDescription": "¡Vuelve pronto para otra sesión!",
+      "exerciseTimeUpTitle": "¡Tiempo Agotado!",
+      "exerciseTimeUpDescription": "El tiempo de ejercicio ha terminado. ¡Buen trabajo!"
     },
     "errors": {
-        "alertTitle": "Error",
-        "invalidAIPlan": "Se recibió un formato de plan de entrenamiento inválido de la IA. Por favor, inténtalo de nuevo.",
-        "emptyAIPlan": "La IA generó un plan de entrenamiento vacío. Por favor, prueba con diferentes parámetros.",
-        "noWorkoutToAdjust": "No hay entrenamiento actual para ajustar.",
-        "invalidAdjustedAIPlan": "Se recibió un formato de plan de entrenamiento ajustado inválido de la IA. Por favor, inténtalo de nuevo.",
-        "emptyAdjustedAIPlan": "La IA ajustó a un plan de entrenamiento vacío. Prueba con un feedback diferente o genera un nuevo plan.",
-        "failedToGenerate": "Falló la generación del entrenamiento. Por favor, inténtalo de nuevo más tarde.",
-        "failedToAdjust": "Falló el ajuste de la dificultad del entrenamiento. Por favor, inténtalo de nuevo.",
-        "cannotStartEmptyWorkout": "No se puede iniciar un entrenamiento vacío o inexistente. Por favor, genera un entrenamiento primero."
+      "alertTitle": "Error",
+      "invalidAIPlan": "Se recibió un formato de plan de entrenamiento de IA inválido. Por favor, inténtalo de nuevo.",
+      "emptyAIPlan": "La IA generó un plan de entrenamiento vacío. Por favor, intenta con diferentes parámetros.",
+      "noWorkoutToAdjust": "No hay entrenamiento actual para ajustar.",
+      "invalidAdjustedAIPlan": "Se recibió un formato de plan de entrenamiento de IA ajustado inválido. Por favor, inténtalo de nuevo.",
+      "emptyAdjustedAIPlan": "La IA ajustó el plan a un entrenamiento vacío. Por favor, intenta con otra retroalimentación o genera un nuevo plan.",
+      "failedToGenerate": "Fallo al generar el entrenamiento. Por favor, inténtalo de nuevo más tarde.",
+      "failedToAdjust": "Fallo al ajustar la dificultad del entrenamiento. Por favor, inténtalo de nuevo.",
+      "cannotStartEmptyWorkout": "No se puede iniciar un entrenamiento vacío o inexistente. Por favor, genera un entrenamiento primero."
+    },
+    "workoutLoadingDisplay": {
+      "title": "Generando Entrenamiento",
+      "analyzingParams": "Analizando tus parámetros...",
+      "generatingPlan": "Generando tu plan personalizado...",
+      "optimizingExercises": "Optimizando ejercicios para mejores resultados...",
+      "finalizingWorkout": "Finalizando tu entrenamiento..."
     }
   }
 }

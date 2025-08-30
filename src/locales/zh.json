@@ -1,165 +1,164 @@
-
 {
   "metadata": {
-    "title": "Daily Sweat - 您的个人AI健身计划助手",
-    "description": "获取由AI生成的个性化每日健身计划。通过Daily Sweat跟踪您的进度并保持动力。"
+    "title": "Daily Sweat - AI 健身计划",
+    "description": "您的私人 AI 健身计划"
   },
   "header": {
     "title": "Daily Sweat"
   },
   "footer": {
-    "tagline": "© {year} Daily Sweat。更聪明地流汗，而不是更努力。"
+    "tagline": "© {year} Daily Sweat. 更智能地流汗，而不是更辛苦。"
   },
   "page": {
-    "loadingText": "正在加载翻译...",
+    "loadingText": "加载中...",
     "tabs": {
       "workout": "锻炼",
       "history": "历史记录"
     },
     "workoutModal": {
-      "activeWorkoutModalTitle": "进行中锻炼",
+      "activeWorkoutModalTitle": "活跃锻炼会话",
       "workoutCompleteTitle": "锻炼完成！",
-      "workoutCompleteCongrats": "恭喜！您已完成本次锻炼。",
-      "kcalBurnedPlaceholder": "预计消耗卡路里：计算中，敬请期待。",
+      "workoutCompleteCongrats": "锻炼完成！做得好！",
+      "kcalBurnedPlaceholder": "预计消耗卡路里：计算功能即将推出。",
       "closeButton": "关闭",
-      "exerciseTimerTitle": "锻炼计时",
-      "pauseExerciseButton": "暂停锻炼",
-      "resumeExerciseButton": "继续锻炼",
-      "exerciseLabel": "锻炼项目"
+      "exerciseTimerTitle": "运动时间",
+      "pauseExerciseButton": "暂停",
+      "resumeExerciseButton": "恢复",
+      "exerciseLabel": "运动"
     },
     "workoutGenerator": {
-        "title": "创建您的锻炼计划",
-        "description": "告诉我们您的偏好，我们将为您生成个性化的锻炼计划。",
-        "muscleGroupsLabel": "肌肉群",
-        "muscleGroupsPlaceholder": "选择一个肌肉群",
-        "availableTimeLabel": "可用时间（分钟）",
-        "availableTimePlaceholder": "例如：30",
-        "equipmentLabel": "可用设备",
-        "equipmentPlaceholder": "选择设备",
-        "difficultyLabel": "难度级别",
-        "selectDifficulty": "选择难度",
-        "beginner": "初级",
-        "intermediate": "中级",
-        "advanced": "高级",
-        "buttonGenerate": "生成锻炼计划",
-        "buttonGenerating": "正在生成...",
-        "muscleGroupsOptions": {
-          "full_body": "全身",
-          "upper_body": "上半身",
-          "lower_body": "下半身",
-          "core": "核心",
-          "arms": "手臂",
-          "back": "背部",
-          "chest": "胸部",
-          "legs": "腿部",
-          "shoulders": "肩部"
-        },
-        "equipmentOptions": {
-          "none": "无 / 自重",
-          "dumbbells": "哑铃",
-          "resistance_bands": "阻力带",
-          "kettlebells": "壶铃",
-          "full_gym": "健身房"
-        }
+      "title": "创建您的锻炼",
+      "description": "告诉我们您的偏好，我们将为您生成个性化的锻炼计划。",
+      "muscleGroupsLabel": "肌肉群",
+      "muscleGroupsPlaceholder": "选择肌肉群",
+      "availableTimeLabel": "可用时间（分钟）",
+      "availableTimePlaceholder": "例如：30",
+      "equipmentLabel": "可用设备",
+      "equipmentPlaceholder": "选择设备",
+      "difficultyLabel": "难度级别",
+      "selectDifficulty": "选择难度",
+      "beginner": "初级",
+      "intermediate": "中级",
+      "advanced": "高级",
+      "buttonGenerate": "生成锻炼",
+      "buttonGenerating": "生成中...",
+      "muscleGroupsOptions": {
+        "full_body": "全身",
+        "upper_body": "上半身",
+        "lower_body": "下半身",
+        "core": "核心"
+      },
+      "equipmentOptions": {
+        "none": "无 / 自重",
+        "dumbbells": "哑铃",
+        "resistance_bands": "阻力带"
+      }
     },
     "workoutDisplay": {
-        "title": "您的锻炼计划",
-        "emptyState": "使用表单生成锻炼计划以在此处查看。",
-        "startWorkoutButton": "开始锻炼",
-        "noExercises": "此计划中没有锻炼项目。请尝试生成新的计划！"
+      "title": "您的锻炼计划",
+      "emptyState": "使用表格生成锻炼计划以在此处查看。",
+      "startWorkoutButton": "开始锻炼",
+      "noExercises": "此计划中没有练习。请尝试生成一个新计划！",
+      "includesExercises": "包括练习："
     },
     "exerciseCard": {
-        "setsLabel": "组数：",
-        "repsLabel": "次数：",
-        "restLabel": "休息：",
-        "durationLabel": "时长：",
-        "startRestButton": "开始休息 ({duration}秒)",
-        "exerciseInfoTooltip": "锻炼信息"
+      "setsLabel": "组数：",
+      "repsLabel": "次数：",
+      "restLabel": "休息：",
+      "durationLabel": "持续时间：",
+      "exerciseInfoTooltip": "运动信息"
     },
     "activeWorkoutDisplay": {
-        "title": "进行中锻炼",
-        "exerciseProgress": "锻炼 {current} / {total}",
-        "startRestButton": "开始 {duration}秒 休息",
-        "previousButton": "上一个",
-        "nextButton": "下一个锻炼",
-        "finishButton": "完成锻炼",
-        "endWorkoutEarlyButton": "提前结束锻炼",
-        "noCurrentExercise": "当前没有锻炼项目。这不应该发生！",
-        "exerciseLabel": "锻炼项目",
-        "setsLabel": "组数",
-        "repsLabel": "次数",
-        "restLabel": "休息",
-        "durationLabel": "时长",
-        "pauseExercise": "暂停",
-        "resumeExercise": "继续",
-        "exerciseCompleteMessage": "完成锻炼计时以启用休息。"
+      "title": "活跃锻炼会话",
+      "exerciseProgress": "第 {current} 个练习，共 {total} 个",
+      "startRestButton": "开始 {duration} 秒休息",
+      "previousButton": "上一个",
+      "nextButton": "下一个练习",
+      "finishButton": "完成锻炼",
+      "endWorkoutEarlyButton": "提前结束锻炼",
+      "noCurrentExercise": "当前没有练习。这不应该发生！",
+      "exerciseLabel": "运动",
+      "setsLabel": "组",
+      "repsLabel": "次数",
+      "restLabel": "休息",
+      "durationLabel": "持续时间",
+      "pauseExercise": "暂停",
+      "resumeExercise": "恢复",
+      "exerciseCompleteMessage": "完成运动计时器以启用休息。"
     },
     "difficultyFeedback": {
-        "title": "评价您的锻炼",
-        "description": "通过评价此计划的难度，帮助我们改进您的下一次锻炼。",
-        "tooEasy": "太简单",
-        "justRight": "刚刚好",
-        "tooHard": "太难",
-        "adjusting": "正在调整锻炼计划..."
+      "title": "评价您的锻炼",
+      "description": "通过评价此计划的难度，帮助我们改进您的下一次锻炼。",
+      "tooEasy": "太简单",
+      "justRight": "刚刚好",
+      "tooHard": "太难",
+      "adjusting": "调整锻炼中..."
     },
     "workoutHistory": {
-        "title": "锻炼历史",
-        "description": "查看您过去的锻炼记录。",
-        "emptyState": "未找到过去的锻炼记录。完成一些锻炼以在此处查看！",
-        "generatedOn": "生成于：{date}",
-        "feedbackGiven": "反馈：{feedback}",
-        "viewButton": "查看",
-        "deleteButton": "删除",
-        "clearAllButton": "全部清除",
-        "loading": "正在加载历史记录..."
+      "title": "锻炼历史记录",
+      "description": "回顾您过去的锻炼会话。",
+      "emptyState": "未找到过去的锻炼。完成一些锻炼以在此处查看！",
+      "generatedOn": "生成于：{date}",
+      "feedbackGiven": "反馈：{feedback}",
+      "viewButton": "查看",
+      "deleteButton": "删除",
+      "clearAllButton": "清除所有",
+      "loading": "加载历史记录..."
     },
     "restTimer": {
-        "title": "休息计时器",
-        "description": "稍作休息，然后全力以赴！",
-        "pauseButtonSR": "暂停",
-        "playButtonSR": "播放",
-        "resetButtonSR": "重置"
+      "title": "休息计时器",
+      "description": "休息一下，然后努力训练！",
+      "pauseButtonSR": "暂停",
+      "playButtonSR": "播放",
+      "resetButtonSR": "重置"
     },
     "chatbot": {
-        "dialogTitle": "Daily Sweat AI 聊天",
-        "dialogDescription": "询问任何与健身或营养相关的问题。",
-        "inputPlaceholder": "询问有关锻炼、饮食等问题...",
-        "initialMessage": "你好！我是 Daily Sweat AI。您可以问我任何关于健身、营养或锻炼的问题！",
-        "errorMessage": "抱歉，我现在连接时遇到问题。请稍后再试。",
-        "sendButtonSR": "发送消息"
+      "dialogTitle": "Daily Sweat AI 聊天",
+      "dialogDescription": "提出任何与健身或营养相关的问题。",
+      "inputPlaceholder": "询问有关锻炼、饮食等...",
+      "initialMessage": "您好！我是 Daily Sweat AI。请随意询问任何关于健身、营养或锻炼的问题！",
+      "errorMessage": "抱歉，我目前无法连接。请稍后再试。",
+      "sendButtonSR": "发送消息"
     },
     "toasts": {
-        "workoutGeneratedTitle": "锻炼计划已生成！",
-        "workoutGeneratedDescription": "您的新锻炼计划已准备就绪。",
-        "generationFailedTitle": "生成失败",
-        "generationFailedDescription": "无法生成锻炼计划。",
-        "workoutAdjustedTitle": "锻炼计划已调整！",
-        "workoutAdjustedDescription": "难度感知：{feedback}。计划已更新。",
-        "adjustmentFailedTitle": "调整失败",
-        "adjustmentFailedDescription": "无法调整锻炼计划。",
-        "restOverTitle": "休息结束！",
-        "restOverDescription": "是时候返回锻炼了！",
-        "workoutLoadedTitle": "锻炼计划已加载",
-        "workoutLoadedDescription": "已从历史记录加载“{name}”。",
-        "workoutStartedTitle": "锻炼开始！",
-        "workoutStartedDescription": "开始吧！",
-        "workoutCompleteTitle": "锻炼完成！",
-        "workoutCompleteDescription": "完成锻炼，做得好！",
-        "workoutEndedTitle": "锻炼结束",
-        "workoutEndedDescription": "很快再来一次训练吧！",
-        "exerciseTimeUpTitle": "锻炼时间到！",
-        "exerciseTimeUpDescription": "做得好！准备好休息了吗？"
+      "workoutGeneratedTitle": "锻炼已生成！",
+      "workoutGeneratedDescription": "您的新锻炼计划已准备就绪。",
+      "generationFailedTitle": "生成失败",
+      "generationFailedDescription": "无法生成锻炼。",
+      "workoutAdjustedTitle": "锻炼已调整！",
+      "workoutAdjustedDescription": "难度感知：{feedback}。计划已更新。",
+      "adjustmentFailedTitle": "调整失败",
+      "adjustmentFailedDescription": "无法调整锻炼难度。",
+      "restOverTitle": "休息结束！",
+      "restOverDescription": "是时候回去训练了！",
+      "workoutLoadedTitle": "锻炼已加载",
+      "已从历史记录中加载“{name}”。",
+      "workoutStartedTitle": "锻炼已开始！",
+      "workoutStartedDescription": "让我们开始吧！",
+      "workoutCompleteTitle": "锻炼完成！",
+      "workoutCompleteDescription": "恭喜您完成锻炼！",
+      "workoutEndedTitle": "锻炼结束",
+      "workoutEndedDescription": "欢迎下次再来训练！",
+      "exerciseTimeUpTitle": "时间到！",
+      "exerciseTimeUpDescription": "运动时间结束。做得好！"
     },
     "errors": {
-        "alertTitle": "错误",
-        "invalidAIPlan": "从AI收到无效的锻炼计划格式。请重试。",
-        "emptyAIPlan": "AI生成了一个空的锻炼计划。请尝试不同的参数。",
-        "noWorkoutToAdjust": "当前没有要调整的锻炼计划。",
-        "invalidAdjustedAIPlan": "从AI收到无效的调整后锻炼计划格式。请重试。",
-        "emptyAdjustedAIPlan": "AI调整后的锻炼计划为空。请尝试不同的反馈或生成新的计划。",
-        "failedToGenerate": "生成锻炼计划失败。请稍后再试。",
-        "failedToAdjust": "调整锻炼计划难度失败。请重试。",
-        "cannotStartEmptyWorkout": "无法开始空的或不存在的锻炼计划。请先生成锻炼计划。"
+      "alertTitle": "错误",
+      "invalidAIPlan": "收到无效的 AI 锻炼计划格式。请重试。",
+      "emptyAIPlan": "AI 生成了一个空的锻炼计划。请尝试不同的参数。",
+      "noWorkoutToAdjust": "没有当前锻炼可供调整。",
+      "invalidAdjustedAIPlan": "收到无效的 AI 调整锻炼计划格式。请重试。",
+      "emptyAdjustedAIPlan": "AI 将计划调整为空锻炼。请尝试不同的反馈或生成新计划。",
+      "failedToGenerate": "生成锻炼失败。请稍后再试。",
+      "failedToAdjust": "调整锻炼难度失败。请重试。",
+      "cannotStartEmptyWorkout": "无法开始空或不存在的锻炼。请先生成一个锻炼。"
+    },
+    "workoutLoadingDisplay": {
+      "title": "生成锻炼中",
+      "analyzingParams": "分析您的参数...",
+      "generatingPlan": "生成您的个性化计划...",
+      "optimizingExercises": "优化练习以获得最佳效果...",
+      "finalizingWorkout": "正在完成您的锻炼..."
     }
   }
 }
