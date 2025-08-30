@@ -31,7 +31,7 @@
         "title": "创建您的锻炼计划",
         "description": "告诉我们您的偏好，我们将为您生成个性化的锻炼计划。",
         "muscleGroupsLabel": "肌肉群",
-        "muscleGroupsPlaceholder": "例如：腿部、核心、手臂或全身",
+        "muscleGroupsPlaceholder": "选择一个肌肉群",
         "availableTimeLabel": "可用时间（分钟）",
         "availableTimePlaceholder": "例如：30",
         "equipmentLabel": "可用设备",
@@ -42,7 +42,18 @@
         "intermediate": "中级",
         "advanced": "高级",
         "buttonGenerate": "生成锻炼计划",
-        "buttonGenerating": "正在生成..."
+        "buttonGenerating": "正在生成...",
+        "muscleGroupsOptions": {
+          "full_body": "全身",
+          "upper_body": "上半身",
+          "lower_body": "下半身",
+          "core": "核心",
+          "arms": "手臂",
+          "back": "背部",
+          "chest": "胸部",
+          "legs": "腿部",
+          "shoulders": "肩部"
+        }
     },
     "workoutDisplay": {
         "title": "您的锻炼计划",

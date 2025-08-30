@@ -92,6 +92,7 @@ export interface DictionaryType {
       advanced?: string;
       buttonGenerate?: string;
       buttonGenerating?: string;
+      muscleGroupsOptions?: Record<string, string>;
     };
     workoutDisplay?: {
       title?: string;

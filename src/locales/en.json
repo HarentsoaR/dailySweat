@@ -31,7 +31,7 @@
         "title": "Create Your Workout",
         "description": "Tell us your preferences, and we'll generate a personalized workout plan for you.",
         "muscleGroupsLabel": "Muscle Groups",
-        "muscleGroupsPlaceholder": "e.g., Legs, Core, Arms or Full Body",
+        "muscleGroupsPlaceholder": "Select a muscle group",
         "availableTimeLabel": "Available Time (minutes)",
         "availableTimePlaceholder": "e.g., 30",
         "equipmentLabel": "Available Equipment",
@@ -42,7 +42,18 @@
         "intermediate": "Intermediate",
         "advanced": "Advanced",
         "buttonGenerate": "Generate Workout",
-        "buttonGenerating": "Generating..."
+        "buttonGenerating": "Generating...",
+        "muscleGroupsOptions": {
+          "full_body": "Full Body",
+          "upper_body": "Upper Body",
+          "lower_body": "Lower Body",
+          "core": "Core",
+          "arms": "Arms",
+          "back": "Back",
+          "chest": "Chest",
+          "legs": "Legs",
+          "shoulders": "Shoulders"
+        }
     },
     "workoutDisplay": {
         "title": "Your Workout Plan",

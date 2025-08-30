@@ -42,6 +42,7 @@ interface WorkoutGeneratorFormProps {
     advanced?: string;
     buttonGenerate?: string;
     buttonGenerating?: string;
+    muscleGroupsOptions?: Record<string, string>;
   };
 }
 
@@ -57,8 +58,12 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading, defaultValues, dict 
   });
 
   const handleSubmit: SubmitHandler<WorkoutGeneratorFormValues> = async (data) => {
-    await onSubmit(data);
+    // Find the displayed value from the dictionary based on the key stored in the form
+    const muscleGroupDisplayValue = dict.muscleGroupsOptions?.[data.muscleGroups] || data.muscleGroups;
+    await onSubmit({ ...data, muscleGroups: muscleGroupDisplayValue });
   };
+  
+  const muscleGroupOptions = dict.muscleGroupsOptions || { "full_body": "Full Body", "upper_body": "Upper Body", "lower_body": "Lower Body", "core": "Core" };
 
   return (
     <Card className="shadow-lg">
@@ -80,9 +85,18 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading, defaultValues, dict 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center"><Users className="mr-2 h-4 w-4" />{dict?.muscleGroupsLabel || "Muscle Groups"}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={dict?.muscleGroupsPlaceholder || "e.g., Legs, Core, Arms or Full Body"} {...field} />
-                  </FormControl>
+                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={dict?.muscleGroupsPlaceholder || "Select a muscle group"} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.entries(muscleGroupOptions).map(([key, value]) => (
+                        <SelectItem key={key} value={value}>{value}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -144,4 +158,3 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading, defaultValues, dict 
     </Card>
   );
 }
-

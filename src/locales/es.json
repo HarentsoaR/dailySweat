@@ -31,7 +31,7 @@
         "title": "Crea Tu Entrenamiento",
         "description": "Dinos tus preferencias y generaremos un plan de entrenamiento personalizado para ti.",
         "muscleGroupsLabel": "Grupos Musculares",
-        "muscleGroupsPlaceholder": "Ej: Piernas, Abdomen, Brazos o Cuerpo Completo",
+        "muscleGroupsPlaceholder": "Selecciona un grupo muscular",
         "availableTimeLabel": "Tiempo Disponible (minutos)",
         "availableTimePlaceholder": "Ej: 30",
         "equipmentLabel": "Equipamiento Disponible",
@@ -42,7 +42,18 @@
         "intermediate": "Intermedio",
         "advanced": "Avanzado",
         "buttonGenerate": "Generar Entrenamiento",
-        "buttonGenerating": "Generando..."
+        "buttonGenerating": "Generando...",
+        "muscleGroupsOptions": {
+          "full_body": "Cuerpo Completo",
+          "upper_body": "Tren Superior",
+          "lower_body": "Tren Inferior",
+          "core": "Core/Abdomen",
+          "arms": "Brazos",
+          "back": "Espalda",
+          "chest": "Pecho",
+          "legs": "Piernas",
+          "shoulders": "Hombros"
+        }
     },
     "workoutDisplay": {
         "title": "Tu Plan de Entrenamiento",
