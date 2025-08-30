@@ -10,6 +10,7 @@ import { RestTimer } from "@/components/daily-sweat/RestTimer";
 import { WorkoutDisplay } from "@/components/daily-sweat/WorkoutDisplay";
 import { WorkoutGeneratorForm } from "@/components/daily-sweat/WorkoutGeneratorForm";
 import { WorkoutHistoryDisplay } from "@/components/daily-sweat/WorkoutHistoryDisplay";
+import { WorkoutLoadingDisplay } from "@/components/daily-sweat/WorkoutLoadingDisplay"; // New import
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -389,14 +390,18 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
                   </Alert>
                 )}
                 
-                <WorkoutDisplay
-                  workoutPlan={currentWorkout}
-                  // onStartRest={handleStartRestTimer} // Removed
-                  onStartWorkout={handleStartWorkout} 
-                  isWorkoutActive={isWorkoutSessionActive} 
-                  dict={dict.page?.workoutDisplay || {}}
-                  exerciseCardDict={dict.page?.exerciseCard || {}}
-                />
+                {isLoading ? (
+                  <WorkoutLoadingDisplay dict={dict.page?.workoutLoadingDisplay || {}} />
+                ) : (
+                  <WorkoutDisplay
+                    workoutPlan={currentWorkout}
+                    // onStartRest={handleStartRestTimer} // Removed
+                    onStartWorkout={handleStartWorkout} 
+                    isWorkoutActive={isWorkoutSessionActive} 
+                    dict={dict.page?.workoutDisplay || {}}
+                    exerciseCardDict={dict.page?.exerciseCard || {}}
+                  />
+                )}
                 {currentWorkout && !isWorkoutSessionActive && (
                   <DifficultyFeedback
                     onFeedbackSubmit={handleAdjustDifficulty}

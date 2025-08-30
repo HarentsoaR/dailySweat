@@ -194,5 +194,12 @@ export interface DictionaryType {
       failedToAdjust?: string;
       cannotStartEmptyWorkout?: string;
     };
+    workoutLoadingDisplay?: { // New section for loading messages
+      title?: string;
+      analyzingParams?: string;
+      generatingPlan?: string;
+      optimizingExercises?: string;
+      finalizingWorkout?: string;
+    };
   };
 }
