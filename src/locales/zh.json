@@ -158,7 +158,8 @@
       "analyzingParams": "分析您的参数...",
       "generatingPlan": "生成您的个性化计划...",
       "optimizingExercises": "优化练习以获得最佳效果...",
-      "finalizingWorkout": "正在完成您的锻炼..."
+      "finalizingWorkout": "正在完成您的锻炼...",
+      "aiCraftingMessage": "这可能需要一些时间，因为我们的 AI 正在为您精心打造完美的训练课程。"
     }
   }
 }

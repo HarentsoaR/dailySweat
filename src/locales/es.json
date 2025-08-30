@@ -158,7 +158,8 @@
       "analyzingParams": "Analizando tus parámetros...",
       "generatingPlan": "Generando tu plan personalizado...",
       "optimizingExercises": "Optimizando ejercicios para mejores resultados...",
-      "finalizingWorkout": "Finalizando tu entrenamiento..."
+      "finalizingWorkout": "Finalizando tu entrenamiento...",
+      "aiCraftingMessage": "Esto podría tomar unos momentos mientras nuestra IA elabora tu sesión perfecta."
     }
   }
 }

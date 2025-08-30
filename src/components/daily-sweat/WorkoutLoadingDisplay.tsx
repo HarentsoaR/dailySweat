@@ -11,6 +11,7 @@ interface WorkoutLoadingDisplayProps {
     generatingPlan?: string;
     optimizingExercises?: string;
     finalizingWorkout?: string;
+    aiCraftingMessage?: string; // New dictionary key
   };
 }
 
@@ -48,7 +49,7 @@ export function WorkoutLoadingDisplay({ dict }: WorkoutLoadingDisplayProps) {
           <p>{loadingMessages[currentMessageIndex].text}</p>
         </div>
         <p className="text-sm text-muted-foreground mt-4">
-          This might take a few moments as our AI crafts your perfect session.
+          {dict?.aiCraftingMessage || "This might take a few moments as our AI crafts your perfect session."}
         </p>
       </CardContent>
     </Card>
