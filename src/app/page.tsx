@@ -1,8 +1,8 @@
 
 "use client";
 
-import { adjustWorkoutDifficulty } from "@/ai/flows/adjust-workout-difficulty";
-import { generateWorkout } from "@/ai/flows/generate-workout";
+import { adjustWorkoutDifficulty, type AdjustWorkoutDifficultyInput } from "@/ai/flows/adjust-workout-difficulty";
+import { generateWorkout, type GenerateWorkoutInput } from "@/ai/flows/generate-workout";
 import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { DifficultyFeedback } from "@/components/daily-sweat/DifficultyFeedback";
 import { FitnessChatbotDialog } from "@/components/daily-sweat/FitnessChatbotDialog";
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
-import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, GenerateWorkoutInput, WorkoutPlan } from "@/lib/types";
+import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan } from "@/lib/types";
 import { AlertCircle, DumbbellIcon, History, MessageSquare } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -24,7 +24,7 @@ import { useCallback, useEffect, useState } from "react";
 const DEFAULT_LANGUAGE = 'en';
 
 export default function DailySweatPage() {
-  const [currentWorkoutParams, setCurrentWorkoutParams] = useState<GenerateWorkoutInput | null>(null);
+  const [currentWorkoutParams, setCurrentWorkoutParams] = useState<Omit<GenerateWorkoutInput, 'language'> | null>(null);
   const [currentWorkout, setCurrentWorkout] = useState<WorkoutPlan | null>(null);
   const { history: workoutHistory, addWorkoutToHistory, clearHistory, removeWorkoutFromHistory, isLoaded: historyLoaded } = useWorkoutHistory();
   
@@ -41,7 +41,7 @@ export default function DailySweatPage() {
 
   const { toast } = useToast();
 
-  const handleGenerateWorkout = async (data: GenerateWorkoutInput) => {
+  const handleGenerateWorkout = async (data: Omit<GenerateWorkoutInput, 'language'>) => {
     setIsLoading(true);
     setError(null);
     setCurrentWorkout(null);

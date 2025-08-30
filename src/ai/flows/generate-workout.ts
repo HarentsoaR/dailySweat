@@ -60,8 +60,8 @@ const prompt = ai.definePrompt({
 
   Return the workout plan strictly as a JSON object string. The JSON object must conform to the following structure:
   {
-    "name": "string (optional, e.g., 'Beginner Full Body Blast')",
-    "description": "string (optional, a brief description of the workout focus)",
+    "name": "string (e.g., 'Beginner Full Body Blast')",
+    "description": "string (a brief description of the workout focus)",
     "exercises": [
       {
         "name": "string (e.g., 'Push-ups')",
