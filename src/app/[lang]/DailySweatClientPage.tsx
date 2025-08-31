@@ -108,7 +108,10 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
         availableTime: formValues.availableTime,
         equipment: formValues.equipment,
         difficulty: formValues.difficulty,
-        exercises: parsedPlan.exercises,
+        exercises: parsedPlan.exercises.map((ex, index) => ({ // TEMPORARY: Inject duration for testing
+          ...ex,
+          duration: index === 0 ? 60 : ex.duration, // First exercise gets 60s duration
+        })),
         generatedAt: new Date().toISOString(),
         description: parsedPlan.description,
       };
@@ -216,7 +219,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     if (currentWorkout && currentWorkout.exercises.length > 0) {
       setIsWorkoutSessionActive(true);
       setActiveExerciseIndex(0);
-      setupExerciseTimer(currentWorkout.exercises[0]);
+      setupExerciseTimer(currentWorkout.exercises[0]); // Setup for the first exercise
       setWorkoutCompletionMessage(null);
       setError(null);
       toast({title: dict.page.toasts.workoutStartedTitle, description: dict.page.toasts.workoutStartedDescription});
