@@ -235,11 +235,15 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       setActiveExerciseIndex(newIndex);
       setupExerciseTimer(currentWorkout.exercises[newIndex]);
     } else if (activeExerciseIndex === currentWorkout.exercises.length - 1) {
+      // Last exercise completed
       toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
       const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
       const kcalMsg = dict.page.workoutModal?.kcalBurnedPlaceholder || "Estimated Kcal Burned: Calculation coming soon.";
       setWorkoutCompletionMessage(`${congratsMsg}\n${kcalMsg}`);
       if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+      // DO NOT set setIsWorkoutSessionActive(false) here.
+      // The modal should remain open to show the completion message,
+      // and the user will click the "Close" button in the footer.
     }
   };
 
@@ -253,13 +257,24 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
   const handleEndWorkout = () => {
     if (!dict?.page?.toasts) return;
-    setIsWorkoutSessionActive(false);
-    setWorkoutCompletionMessage(null); 
+    
+    // Only show "Workout Ended" toast if it wasn't a natural completion
+    if (!workoutCompletionMessage) {
+      toast({ title: dict.page.toasts.workoutEndedTitle, description: dict.page.toasts.workoutEndedDescription });
+    }
+
+    setIsWorkoutSessionActive(false); // This closes the modal
+    setWorkoutCompletionMessage(null); // Clear completion message for next workout
     if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
     setExerciseTimeLeft(null);
     setIsExerciseTimerRunning(false);
     setIsExerciseTimerPaused(false);
-    toast({ title: dict.page.toasts.workoutEndedTitle, description: dict.page.toasts.workoutEndedDescription });
+    setIsCurrentExerciseTimed(false); // Reset this too
+    setCanStartRest(false); // Reset this too
+    // Also reset rest timer if it was active
+    setIsTimerRunning(false);
+    setTimerDuration(0);
+    setTimerKey(prev => prev + 1);
   };
 
   const handleToggleExerciseTimerPause = () => {
@@ -355,15 +370,9 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
     }
   }, [isLoading, isAdjusting]);
   
-  const handleModalOpenChange = (open: boolean) => {
-    if (!open) {
-      handleEndWorkout();
-    } else {
-        if (currentWorkout && currentWorkout.exercises.length > 0 && !isWorkoutSessionActive) {
-             handleStartWorkout();
-        }
-    }
-  };
+  // Removed handleModalOpenChange as it's no longer needed.
+  // The Dialog's open state is now strictly controlled by isWorkoutSessionActive,
+  // and external closing is prevented by onPointerDownOutside and onEscapeKeyDown on DialogContent.
 
 
   if (!dict) {
@@ -413,7 +422,6 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
                 ) : (
                   <WorkoutDisplay
                     workoutPlan={currentWorkout}
-                    // onStartRest={handleStartRestTimer} // Removed
                     onStartWorkout={handleStartWorkout} 
                     isWorkoutActive={isWorkoutSessionActive} 
                     dict={dict.page?.workoutDisplay || {}}
@@ -452,8 +460,12 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       </main>
 
       {isWorkoutSessionActive && currentWorkout && currentExerciseDetails && (
-        <Dialog open={isWorkoutSessionActive} onOpenChange={handleModalOpenChange}>
-          <DialogContent className="sm:max-w-md">
+        <Dialog open={isWorkoutSessionActive}> {/* Removed onOpenChange here */}
+          <DialogContent 
+            className="sm:max-w-md"
+            onPointerDownOutside={e => e.preventDefault()} // Prevent closing on outside click
+            onEscapeKeyDown={e => e.preventDefault()} // Prevent closing on escape key
+          >
             <DialogHeader>
               <DialogTitle>
                 {workoutCompletionMessage 
@@ -496,7 +508,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
 
             {workoutCompletionMessage && (
               <DialogFooter className="sm:justify-center">
-                <Button type="button" onClick={handleEndWorkout}>
+                <Button type="button" onClick={handleEndWorkout}> {/* This button will close the modal */}
                   {dict.page?.workoutModal?.closeButton || "Close"}
                 </Button>
               </DialogFooter>
