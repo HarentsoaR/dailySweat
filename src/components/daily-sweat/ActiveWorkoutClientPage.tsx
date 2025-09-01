@@ -93,27 +93,25 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setRestTimerDuration(0);
     setRestTimerKey(prev => prev + 1);
 
+    // Only update the index here. The useEffect below will react to this change.
     setActiveExerciseIndex(prevIndex => {
-      const nextIndexCandidate = prevIndex + 1;
-
-      if (nextIndexCandidate < currentWorkout.exercises.length) {
-        // There is a next exercise
-        setupExerciseTimer(currentWorkout.exercises[nextIndexCandidate]);
-        if (!currentWorkout.exercises[nextIndexCandidate].duration && currentWorkout.exercises[nextIndexCandidate].rest && currentWorkout.exercises[nextIndexCandidate].rest > 0) {
-          handleStartRestTimer(currentWorkout.exercises[nextIndexCandidate].rest);
-        }
-        return nextIndexCandidate;
-      } else {
-        // All exercises are completed
-        calculateSessionStats();
-        toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
-        const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
-        setWorkoutCompletionMessage(congratsMsg);
-        if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
-        return prevIndex; // Keep the index at the last exercise
+      if (prevIndex + 1 < currentWorkout.exercises.length) {
+        return prevIndex + 1;
       }
+      return prevIndex; // If it's the last exercise, keep the index
     });
-  }, [currentWorkout, dict, setupExerciseTimer, calculateSessionStats, toast, handleStartRestTimer]);
+  }, [currentWorkout, dict]);
+
+  const handlePreviousExercise = useCallback(() => {
+    if (activeExerciseIndex > 0 && currentWorkout) {
+      // Stop any active rest timer before moving to the previous exercise
+      setIsRestTimerRunning(false);
+      setRestTimerDuration(0);
+      setRestTimerKey(prev => prev + 1);
+
+      setActiveExerciseIndex(prevIndex => prevIndex - 1);
+    }
+  }, [activeExerciseIndex, currentWorkout]);
 
   const handleExerciseTimerEnd = useCallback(() => {
     if (!dict?.page?.toasts?.exerciseTimeUpTitle || !dict?.page?.toasts?.exerciseTimeUpDescription) return;
@@ -141,8 +139,13 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
       if (foundWorkout) {
         setCurrentWorkout(foundWorkout);
         if (foundWorkout.exercises.length > 0) {
+          // Initial setup for the first exercise
           setupExerciseTimer(foundWorkout.exercises[0]);
           setSessionStartTime(new Date()); // Start session timer when workout is loaded
+          // If the first exercise is rep-based and has rest, start rest timer automatically
+          if (!foundWorkout.exercises[0].duration && foundWorkout.exercises[0].rest && foundWorkout.exercises[0].rest > 0) {
+            handleStartRestTimer(foundWorkout.exercises[0].rest);
+          }
         } else {
           setError(dict.page?.errors?.emptyAIPlan || "This workout plan has no exercises.");
         }
@@ -152,7 +155,28 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     } else if (historyLoaded && !workoutId) {
       setError(dict?.page?.errors?.noWorkoutId || "No workout ID provided.");
     }
-  }, [historyLoaded, workoutHistory, workoutId, dict, setupExerciseTimer]);
+  }, [historyLoaded, workoutHistory, workoutId, dict, setupExerciseTimer, handleStartRestTimer]);
+
+  // Effect to handle exercise progression based on activeExerciseIndex
+  useEffect(() => {
+    if (currentWorkout && currentWorkout.exercises.length > 0) {
+      if (activeExerciseIndex < currentWorkout.exercises.length) {
+        const nextExercise = currentWorkout.exercises[activeExerciseIndex];
+        setupExerciseTimer(nextExercise);
+        // If the new exercise is rep-based and has rest, start rest timer automatically
+        if (!nextExercise.duration && nextExercise.rest && nextExercise.rest > 0) {
+          handleStartRestTimer(nextExercise.rest);
+        }
+      } else {
+        // All exercises are completed
+        calculateSessionStats();
+        toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
+        const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
+        setWorkoutCompletionMessage(congratsMsg);
+        if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+      }
+    }
+  }, [activeExerciseIndex, currentWorkout, setupExerciseTimer, handleStartRestTimer, calculateSessionStats, toast, dict]);
 
 
   useEffect(() => {
@@ -178,17 +202,6 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     }
   }, [exerciseTimeLeft, isExerciseTimerRunning, isCurrentExerciseTimed, workoutCompletionMessage, handleExerciseTimerEnd]);
 
-
-  const handlePreviousExercise = () => {
-    if (activeExerciseIndex > 0 && currentWorkout) {
-      const newIndex = activeExerciseIndex - 1;
-      setActiveExerciseIndex(newIndex);
-      setupExerciseTimer(currentWorkout.exercises[newIndex]);
-      setIsRestTimerRunning(false); // Stop rest timer if going back
-      setRestTimerDuration(0);
-      setRestTimerKey(prev => prev + 1);
-    }
-  };
 
   const handleEndWorkout = () => {
     if (!dict?.page?.toasts) return;
