@@ -17,17 +17,20 @@ import { useWorkoutHistory } from "@/hooks/use-workout-history";
 import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, DictionaryType, GenerateWorkoutInput } from "@/lib/types";
 import { AlertCircle, DumbbellIcon, History, MessageSquare } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter, useParams } from "next/navigation"; // Import useParams
 
 type Lang = 'en' | 'fr' | 'es' | 'it' | 'zh';
 
 interface DailySweatClientPageProps {
-  params: { lang: Lang };
+  // params: { lang: Lang }; // No longer needed as a prop, will use useParams
   dictionary: DictionaryType;
 }
 
-export default function DailySweatClientPage({ params, dictionary: dict }: DailySweatClientPageProps) {
+export default function DailySweatClientPage({ dictionary: dict }: DailySweatClientPageProps) {
   const router = useRouter(); // Initialize useRouter
+  const routeParams = useParams(); // Get params from the hook
+  const lang = routeParams.lang as Lang; // Assert type
+  
   const [currentWorkoutParams, setCurrentWorkoutParams] = useState<GenerateWorkoutInput | null>(null);
   const [currentWorkout, setCurrentWorkout] = useState<WorkoutPlan | null>(null);
   const { history: workoutHistory, addWorkoutToHistory, clearHistory, removeWorkoutFromHistory, isLoaded: historyLoaded } = useWorkoutHistory();
@@ -53,7 +56,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
         availableTime: formValues.availableTime,
         equipment: formValues.equipment,
         difficulty: formValues.difficulty,
-        language: params.lang,
+        language: lang, // Use lang from useParams
       };
 
       const [result] = await Promise.all([
@@ -117,7 +120,7 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
       const payloadForAI: AdjustWorkoutDifficultyInput = {
         workoutPlan: JSON.stringify(currentWorkout), 
         feedback,
-        language: params.lang,
+        language: lang, // Use lang from useParams
       };
       const [result] = await Promise.all([
         adjustWorkoutDifficulty(payloadForAI),
@@ -166,7 +169,9 @@ export default function DailySweatClientPage({ params, dictionary: dict }: Daily
   const handleStartWorkout = () => {
     if (!dict?.page?.errors || !dict?.page?.toasts) return;
     if (currentWorkout && currentWorkout.exercises.length > 0) {
-      router.push(`/${params.lang}/workout/${currentWorkout.id}`); // Navigate to the new workout page
+      const targetPath = `/${lang}/workout/${currentWorkout.id}`; // Use lang from useParams
+      console.log("DEBUG: Attempting to navigate to:", targetPath); // Added debug log
+      router.push(targetPath); // Navigate to the new workout page
     } else {
       setError(dict.page.errors.cannotStartEmptyWorkout || "Cannot start an empty workout.");
     }
