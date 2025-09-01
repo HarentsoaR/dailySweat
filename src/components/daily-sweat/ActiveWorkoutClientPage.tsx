@@ -43,7 +43,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
   // Rest Timer State
   const [restTimerDuration, setRestTimerDuration] = useState(0);
   const [isRestTimerRunning, setIsRestTimerRunning] = useState(false);
-  const [restTimerKey, setRestTimerKey] = useState(0); // Used to force re-render/reset of RestTimer
+  const [restTimerKey, setRestTimerKey] = useState(0); // Used to force re-initialization
 
   const { toast } = useToast();
 
@@ -93,23 +93,27 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setRestTimerDuration(0);
     setRestTimerKey(prev => prev + 1);
 
-    if (activeExerciseIndex < currentWorkout.exercises.length - 1) {
-      const newIndex = activeExerciseIndex + 1;
-      setActiveExerciseIndex(newIndex);
-      setupExerciseTimer(currentWorkout.exercises[newIndex]);
-      // If the new exercise is rep-based and has rest, start rest timer automatically
-      if (!currentWorkout.exercises[newIndex].duration && currentWorkout.exercises[newIndex].rest && currentWorkout.exercises[newIndex].rest > 0) {
-        handleStartRestTimer(currentWorkout.exercises[newIndex].rest);
+    setActiveExerciseIndex(prevIndex => {
+      const nextIndexCandidate = prevIndex + 1;
+
+      if (nextIndexCandidate < currentWorkout.exercises.length) {
+        // There is a next exercise
+        setupExerciseTimer(currentWorkout.exercises[nextIndexCandidate]);
+        if (!currentWorkout.exercises[nextIndexCandidate].duration && currentWorkout.exercises[nextIndexCandidate].rest && currentWorkout.exercises[nextIndexCandidate].rest > 0) {
+          handleStartRestTimer(currentWorkout.exercises[nextIndexCandidate].rest);
+        }
+        return nextIndexCandidate;
+      } else {
+        // All exercises are completed
+        calculateSessionStats();
+        toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
+        const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
+        setWorkoutCompletionMessage(congratsMsg);
+        if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+        return prevIndex; // Keep the index at the last exercise
       }
-    } else if (activeExerciseIndex === currentWorkout.exercises.length - 1) {
-      // Last exercise completed
-      calculateSessionStats();
-      toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
-      const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
-      setWorkoutCompletionMessage(congratsMsg); // Set base message, stats will be added in render
-      if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
-    }
-  }, [activeExerciseIndex, currentWorkout, dict, setupExerciseTimer, calculateSessionStats, toast, handleStartRestTimer]);
+    });
+  }, [currentWorkout, dict, setupExerciseTimer, calculateSessionStats, toast, handleStartRestTimer]);
 
   const handleExerciseTimerEnd = useCallback(() => {
     if (!dict?.page?.toasts?.exerciseTimeUpTitle || !dict?.page?.toasts?.exerciseTimeUpDescription) return;
