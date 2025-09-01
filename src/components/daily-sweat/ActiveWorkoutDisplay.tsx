@@ -2,7 +2,7 @@
 
 import type { WorkoutPlan, Exercise } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, FlagOff, TimerIcon as TimerLucideIcon, Info, PauseCircle, PlayCircle, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, FlagOff, Info, PauseCircle, PlayCircle, Clock } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 interface ActiveWorkoutDisplayProps {
@@ -12,10 +12,10 @@ interface ActiveWorkoutDisplayProps {
   onNextExercise: () => void;
   onPreviousExercise: () => void;
   onEndWorkout: () => void;
-  onStartRest: (duration: number) => void;
+  // onStartRest: (duration: number) => void; // Removed as rest starts automatically
   dict: { 
     exerciseProgress?: string; 
-    startRestButton?: string; 
+    // startRestButton?: string; // Removed
     previousButton?: string;
     nextButton?: string;
     finishButton?: string;
@@ -45,7 +45,7 @@ export function ActiveWorkoutDisplay({
   onNextExercise,
   onPreviousExercise,
   onEndWorkout,
-  onStartRest,
+  // onStartRest, // Removed
   dict,
   exerciseTimeLeft,
   isExerciseTimerRunning,
@@ -70,7 +70,7 @@ export function ActiveWorkoutDisplay({
     .replace('{current}', (currentExerciseIndex + 1).toString())
     .replace('{total}', workoutPlan.exercises.length.toString());
 
-  const startRestButtonText = (dict?.startRestButton || "Start {duration}s Rest").replace('{duration}', currentExercise.rest.toString());
+  // const startRestButtonText = (dict?.startRestButton || "Start {duration}s Rest").replace('{duration}', currentExercise.rest.toString()); // Removed
 
   const formatTime = (seconds: number | null) => {
     if (seconds === null) return "00:00";
@@ -90,8 +90,8 @@ export function ActiveWorkoutDisplay({
 
   // Determine if the "Next Exercise" button should be disabled
   const isNextButtonDisabled = isCurrentExerciseTimed && isExerciseTimerRunning && !isExerciseTimerPaused;
-  // Determine if the "Start Rest" button should be disabled
-  const isStartRestButtonDisabled = isCurrentExerciseTimed && !canStartRest;
+  // Determine if the "Start Rest" button should be disabled (no longer needed, but keeping logic for context if rest starts automatically)
+  // const isStartRestButtonDisabled = isCurrentExerciseTimed && !canStartRest;
 
 
   return (
@@ -150,7 +150,8 @@ export function ActiveWorkoutDisplay({
           )}
       </div>
 
-      {currentExercise.rest > 0 && (
+      {/* Removed Start Rest button as it will be automatic */}
+      {/* {currentExercise.rest > 0 && (
         <Button
           onClick={() => onStartRest(currentExercise.rest)}
           variant="outline"
@@ -160,7 +161,7 @@ export function ActiveWorkoutDisplay({
           <TimerLucideIcon className="mr-2 h-4 w-4" />
           {startRestButtonText}
         </Button>
-      )}
+      )} */}
       
       {isCurrentExerciseTimed && !canStartRest && (
         <p className="text-sm text-center text-muted-foreground py-2">

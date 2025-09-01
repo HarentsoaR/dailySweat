@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,7 @@ interface RestTimerProps {
   onReset: () => void;
   onTimerEnd: () => void;
   timerKey: number; // To force re-initialization
-  className?: string;
+  // className?: string; // Removed
   dict: { 
     title?: string;
     description?: string;
@@ -32,7 +31,7 @@ export function RestTimer({
   onReset,
   onTimerEnd,
   timerKey,
-  className,
+  // className, // Removed
   dict,
 }: RestTimerProps) {
   const [timeLeft, setTimeLeft] = useState(initialDuration);
@@ -76,7 +75,7 @@ export function RestTimer({
   const progressPercentage = initialDuration > 0 ? (timeLeft / initialDuration) * 100 : 0;
 
   return (
-    <Card className={cn("shadow-md sticky bottom-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md z-50", className)}>
+    <Card className={cn("shadow-md w-full max-w-md mx-auto")}> {/* Adjusted styling for central placement */}
       <CardHeader>
         <CardTitle className="flex items-center text-xl font-headline">
           <TimerLucideIcon className="mr-2 h-5 w-5 text-primary" />
@@ -105,4 +104,3 @@ export function RestTimer({
     </Card>
   );
 }
-

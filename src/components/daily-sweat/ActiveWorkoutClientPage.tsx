@@ -85,7 +85,32 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setRestTimerKey(prev => prev + 1); // Reset timer component
   }, []);
 
-  // This needs to be defined before handleNextExercise as it calls it
+  const handleNextExercise = useCallback(() => {
+    if (!dict?.page?.toasts || !currentWorkout) return;
+
+    // Stop any active rest timer before moving to the next exercise
+    setIsRestTimerRunning(false);
+    setRestTimerDuration(0);
+    setRestTimerKey(prev => prev + 1);
+
+    if (activeExerciseIndex < currentWorkout.exercises.length - 1) {
+      const newIndex = activeExerciseIndex + 1;
+      setActiveExerciseIndex(newIndex);
+      setupExerciseTimer(currentWorkout.exercises[newIndex]);
+      // If the new exercise is rep-based and has rest, start rest timer automatically
+      if (!currentWorkout.exercises[newIndex].duration && currentWorkout.exercises[newIndex].rest && currentWorkout.exercises[newIndex].rest > 0) {
+        handleStartRestTimer(currentWorkout.exercises[newIndex].rest);
+      }
+    } else if (activeExerciseIndex === currentWorkout.exercises.length - 1) {
+      // Last exercise completed
+      calculateSessionStats();
+      toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
+      const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
+      setWorkoutCompletionMessage(congratsMsg); // Set base message, stats will be added in render
+      if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+    }
+  }, [activeExerciseIndex, currentWorkout, dict, setupExerciseTimer, calculateSessionStats, toast, handleStartRestTimer]);
+
   const handleExerciseTimerEnd = useCallback(() => {
     if (!dict?.page?.toasts?.exerciseTimeUpTitle || !dict?.page?.toasts?.exerciseTimeUpDescription) return;
 
@@ -100,30 +125,9 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
       handleStartRestTimer(currentExerciseDetails.rest);
     } else {
       // If no rest, automatically move to next exercise
-      handleNextExercise(); // This will be defined below, but useCallback ensures it's stable
+      handleNextExercise();
     }
-  }, [toast, dict, currentExerciseDetails, handleStartRestTimer]); // Added handleNextExercise to dependencies
-
-  const handleNextExercise = useCallback(() => {
-    if (!dict?.page?.toasts || !currentWorkout) return;
-
-    if (activeExerciseIndex < currentWorkout.exercises.length - 1) {
-      const newIndex = activeExerciseIndex + 1;
-      setActiveExerciseIndex(newIndex);
-      setupExerciseTimer(currentWorkout.exercises[newIndex]);
-      // If current exercise was rep-based and had rest, start rest timer automatically
-      if (!isCurrentExerciseTimed && currentExerciseDetails?.rest && currentExerciseDetails.rest > 0) {
-        handleStartRestTimer(currentExerciseDetails.rest);
-      }
-    } else if (activeExerciseIndex === currentWorkout.exercises.length - 1) {
-      // Last exercise completed
-      calculateSessionStats();
-      toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
-      const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
-      setWorkoutCompletionMessage(congratsMsg); // Set base message, stats will be added in render
-      if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
-    }
-  }, [activeExerciseIndex, currentWorkout, dict, setupExerciseTimer, isCurrentExerciseTimed, currentExerciseDetails, calculateSessionStats, toast, handleStartRestTimer]);
+  }, [toast, dict, currentExerciseDetails, handleStartRestTimer, handleNextExercise]);
 
 
   // Load workout from history
@@ -144,7 +148,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     } else if (historyLoaded && !workoutId) {
       setError(dict?.page?.errors?.noWorkoutId || "No workout ID provided.");
     }
-  }, [historyLoaded, workoutHistory, workoutId, dict, setupExerciseTimer]); // setupExerciseTimer is now defined earlier
+  }, [historyLoaded, workoutHistory, workoutId, dict, setupExerciseTimer]);
 
 
   useEffect(() => {
@@ -210,7 +214,6 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setIsExerciseTimerPaused(prev => !prev);
     setIsExerciseTimerRunning(prev => !prev);
   };
-
 
   const handleRestTimerToggle = () => {
     setIsRestTimerRunning(!isRestTimerRunning);
@@ -306,38 +309,39 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
             </Button>
           </div>
         ) : (
-          <ActiveWorkoutDisplay
-            workoutPlan={currentWorkout}
-            currentExercise={currentExerciseDetails}
-            currentExerciseIndex={activeExerciseIndex}
-            onNextExercise={handleNextExercise}
-            onPreviousExercise={handlePreviousExercise}
-            onEndWorkout={handleEndWorkout}
-            onStartRest={handleStartRestTimer}
-            dict={dict.page?.activeWorkoutDisplay || {}}
-            exerciseTimeLeft={exerciseTimeLeft}
-            isExerciseTimerRunning={isExerciseTimerRunning}
-            isExerciseTimerPaused={isExerciseTimerPaused}
-            isCurrentExerciseTimed={isCurrentExerciseTimed}
-            canStartRest={canStartRest}
-            onToggleExerciseTimerPause={handleToggleExerciseTimerPause}
-          />
+          // Conditional rendering: show RestTimer if it's running, otherwise show ActiveWorkoutDisplay
+          isRestTimerRunning ? (
+            <div className="pb-4 px-4">
+              <RestTimer
+                initialDuration={restTimerDuration}
+                isRunning={isRestTimerRunning}
+                onToggle={handleRestTimerToggle}
+                onReset={handleRestTimerReset}
+                onTimerEnd={handleRestTimerEnd}
+                timerKey={restTimerKey}
+                dict={dict.page?.restTimer || {}}
+              />
+            </div>
+          ) : (
+            <ActiveWorkoutDisplay
+              workoutPlan={currentWorkout}
+              currentExercise={currentExerciseDetails}
+              currentExerciseIndex={activeExerciseIndex}
+              onNextExercise={handleNextExercise}
+              onPreviousExercise={handlePreviousExercise}
+              onEndWorkout={handleEndWorkout}
+              // onStartRest={handleStartRestTimer} // Removed
+              dict={dict.page?.activeWorkoutDisplay || {}}
+              exerciseTimeLeft={exerciseTimeLeft}
+              isExerciseTimerRunning={isExerciseTimerRunning}
+              isExerciseTimerPaused={isExerciseTimerPaused}
+              isCurrentExerciseTimed={isCurrentExerciseTimed}
+              canStartRest={canStartRest}
+              onToggleExerciseTimerPause={handleToggleExerciseTimerPause}
+            />
+          )
         )}
       </main>
-
-      {restTimerDuration > 0 && isRestTimerRunning && ( // Only show if rest timer is active
-        <div id="rest-timer-section" className="pb-4 px-4">
-          <RestTimer
-            initialDuration={restTimerDuration}
-            isRunning={isRestTimerRunning}
-            onToggle={handleRestTimerToggle}
-            onReset={handleRestTimerReset}
-            onTimerEnd={handleRestTimerEnd}
-            timerKey={restTimerKey}
-            dict={dict.page?.restTimer || {}}
-          />
-        </div>
-      )}
 
       <FitnessChatbotDialog dict={dict.page?.chatbot || {}}>
         <Button
