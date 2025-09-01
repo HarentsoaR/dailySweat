@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { WorkoutPlan } from '@/lib/types';
@@ -94,9 +93,7 @@ export function WorkoutHistoryDisplay({
                 <Button variant="outline" size="sm" onClick={() => onLoadWorkout(workout)}>
                   <Eye className="mr-1 h-3 w-3" /> {dict?.viewButton || "View"}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => onDeleteWorkout(workout.id)} className="text-destructive hover:bg-destructive/10">
-                  <Trash2 className="mr-1 h-3 w-3" /> {dict?.deleteButton || "Delete"}
-                </Button>
+                {/* The "Start Workout" button will now appear in the main WorkoutDisplay after viewing */}
               </CardFooter>
             </Card>
           ))}
@@ -105,4 +102,3 @@ export function WorkoutHistoryDisplay({
     </Card>
   );
 }
-

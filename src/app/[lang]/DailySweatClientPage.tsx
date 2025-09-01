@@ -22,14 +22,13 @@ import { useRouter, useParams } from "next/navigation"; // Import useParams
 type Lang = 'en' | 'fr' | 'es' | 'it' | 'zh';
 
 interface DailySweatClientPageProps {
-  // params: { lang: Lang }; // No longer needed as a prop, will use useParams
   dictionary: DictionaryType;
 }
 
 export default function DailySweatClientPage({ dictionary: dict }: DailySweatClientPageProps) {
-  const router = useRouter(); // Initialize useRouter
-  const routeParams = useParams(); // Get params from the hook
-  const lang = routeParams.lang as Lang; // Assert type
+  const router = useRouter();
+  const routeParams = useParams();
+  const lang = routeParams.lang as Lang;
   
   const [currentWorkoutParams, setCurrentWorkoutParams] = useState<GenerateWorkoutInput | null>(null);
   const [currentWorkout, setCurrentWorkout] = useState<WorkoutPlan | null>(null);
@@ -38,6 +37,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
   const [isLoading, setIsLoading] = useState(false);
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTab, setSelectedTab] = useState("workout"); // New state for active tab
 
   const { toast } = useToast();
 
@@ -46,6 +46,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
     setIsLoading(true);
     setError(null);
     setCurrentWorkout(null);
+    setSelectedTab("workout"); // Ensure we are on the workout tab after generation
 
     const minLoadingTime = 4000; // Minimum 4 seconds loading time
     const startTime = Date.now();
@@ -56,7 +57,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
         availableTime: formValues.availableTime,
         equipment: formValues.equipment,
         difficulty: formValues.difficulty,
-        language: lang, // Use lang from useParams
+        language: lang,
       };
 
       const [result] = await Promise.all([
@@ -120,7 +121,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
       const payloadForAI: AdjustWorkoutDifficultyInput = {
         workoutPlan: JSON.stringify(currentWorkout), 
         feedback,
-        language: lang, // Use lang from useParams
+        language: lang,
       };
       const [result] = await Promise.all([
         adjustWorkoutDifficulty(payloadForAI),
@@ -169,9 +170,9 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
   const handleStartWorkout = () => {
     if (!dict?.page?.errors || !dict?.page?.toasts) return;
     if (currentWorkout && currentWorkout.exercises.length > 0) {
-      const targetPath = `/${lang}/workout/${currentWorkout.id}`; // Use lang from useParams
-      console.log("DEBUG: Attempting to navigate to:", targetPath); // Added debug log
-      router.push(targetPath); // Navigate to the new workout page
+      const targetPath = `/${lang}/workout/${currentWorkout.id}`;
+      console.log("DEBUG: Attempting to navigate to:", targetPath);
+      router.push(targetPath);
     } else {
       setError(dict.page.errors.cannotStartEmptyWorkout || "Cannot start an empty workout.");
     }
@@ -187,6 +188,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
         difficulty: workout.difficulty,
     };
     setCurrentWorkoutParams(loadedParams);
+    setSelectedTab("workout"); // Switch to workout tab
     toast({ title: dict.page.toasts.workoutLoadedTitle, description: (dict.page.toasts.workoutLoadedDescription || "Loaded \"{name}\" from history.").replace('{name}', workout.name)});
   };
 
@@ -211,7 +213,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
     <div className="flex flex-col min-h-screen bg-background">
       <Header title={dict.header?.title || "Daily Sweat"} />
       <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <Tabs defaultValue="workout" className="w-full">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6 md:w-1/2 mx-auto">
             <TabsTrigger value="workout" className="font-headline text-base">
                 <DumbbellIcon className="mr-2 h-4 w-4" />
