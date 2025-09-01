@@ -25,6 +25,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
   const [error, setError] = useState<string | null>(null);
 
   // Workout Session State
+  const [workoutPhase, setWorkoutPhase] = useState<'loading' | 'exercise' | 'rest' | 'completed' | 'error'>('loading');
   const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
   const [workoutCompletionMessage, setWorkoutCompletionMessage] = useState<string | null>(null);
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
@@ -62,20 +63,26 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     if (exerciseIntervalRef.current) {
       clearInterval(exerciseIntervalRef.current);
     }
+    // Reset all exercise and rest timer states
+    setExerciseTimeLeft(null);
+    setIsExerciseTimerRunning(false);
+    setIsExerciseTimerPaused(false);
+    setIsCurrentExerciseTimed(false);
+    setCanStartRest(false);
+    setIsRestTimerRunning(false); // Ensure rest timer is off when setting up a new exercise
+    setRestTimerDuration(0);
+    setRestTimerKey(prev => prev + 1);
+
+    setCurrentExerciseDetails(exercise);
+
     if (exercise && typeof exercise.duration === 'number' && exercise.duration > 0) {
-      setCurrentExerciseDetails(exercise);
       setExerciseTimeLeft(exercise.duration);
       setIsCurrentExerciseTimed(true);
       setIsExerciseTimerRunning(true);
       setIsExerciseTimerPaused(false);
-      setCanStartRest(false);
     } else {
-      setCurrentExerciseDetails(exercise);
-      setExerciseTimeLeft(null);
-      setIsCurrentExerciseTimed(false);
-      setIsExerciseTimerRunning(false);
-      setIsExerciseTimerPaused(false);
-      setCanStartRest(true); // Rep-based exercises can start rest immediately
+      // Rep-based exercises can immediately proceed to rest/next
+      setCanStartRest(true);
     }
   }, []);
 
@@ -83,24 +90,29 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setRestTimerDuration(duration);
     setIsRestTimerRunning(true);
     setRestTimerKey(prev => prev + 1); // Reset timer component
+    setWorkoutPhase('rest');
   }, []);
 
   const handleNextExercise = useCallback(() => {
-    if (!dict?.page?.toasts || !currentWorkout) return;
+    if (!currentWorkout) return;
 
     // Stop any active rest timer before moving to the next exercise
     setIsRestTimerRunning(false);
     setRestTimerDuration(0);
     setRestTimerKey(prev => prev + 1);
 
-    // Only update the index here. The useEffect below will react to this change.
     setActiveExerciseIndex(prevIndex => {
-      if (prevIndex + 1 < currentWorkout.exercises.length) {
-        return prevIndex + 1;
+      const nextIndexCandidate = prevIndex + 1;
+      if (nextIndexCandidate < currentWorkout.exercises.length) {
+        // There is a next exercise, the useEffect below will handle its setup
+        return nextIndexCandidate;
+      } else {
+        // All exercises are completed
+        setWorkoutPhase('completed');
+        return prevIndex; // Keep the index at the last exercise
       }
-      return prevIndex; // If it's the last exercise, keep the index
     });
-  }, [currentWorkout, dict]);
+  }, [currentWorkout]);
 
   const handlePreviousExercise = useCallback(() => {
     if (activeExerciseIndex > 0 && currentWorkout) {
@@ -110,6 +122,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
       setRestTimerKey(prev => prev + 1);
 
       setActiveExerciseIndex(prevIndex => prevIndex - 1);
+      setWorkoutPhase('exercise'); // Ensure we go back to exercise phase
     }
   }, [activeExerciseIndex, currentWorkout]);
 
@@ -131,54 +144,48 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     }
   }, [toast, dict, currentExerciseDetails, handleStartRestTimer, handleNextExercise]);
 
+  // --- Main Effects for Workout Flow ---
 
-  // Load workout from history
+  // 1. Load workout from history and initialize session
   useEffect(() => {
-    if (historyLoaded && workoutHistory.length > 0 && workoutId && dict) {
+    if (historyLoaded && workoutId && dict) {
       const foundWorkout = workoutHistory.find(w => w.id === workoutId);
       if (foundWorkout) {
         setCurrentWorkout(foundWorkout);
         if (foundWorkout.exercises.length > 0) {
-          // Initial setup for the first exercise
-          setupExerciseTimer(foundWorkout.exercises[0]);
           setSessionStartTime(new Date()); // Start session timer when workout is loaded
-          // If the first exercise is rep-based and has rest, start rest timer automatically
-          if (!foundWorkout.exercises[0].duration && foundWorkout.exercises[0].rest && foundWorkout.exercises[0].rest > 0) {
-            handleStartRestTimer(foundWorkout.exercises[0].rest);
-          }
+          setWorkoutPhase('exercise'); // Start in exercise phase
+          setActiveExerciseIndex(0); // Ensure first exercise is set
         } else {
           setError(dict.page?.errors?.emptyAIPlan || "This workout plan has no exercises.");
+          setWorkoutPhase('error');
         }
       } else {
         setError(dict.page?.errors?.workoutNotFound || "Workout not found in history.");
+        setWorkoutPhase('error');
       }
     } else if (historyLoaded && !workoutId) {
       setError(dict?.page?.errors?.noWorkoutId || "No workout ID provided.");
+      setWorkoutPhase('error');
     }
-  }, [historyLoaded, workoutHistory, workoutId, dict, setupExerciseTimer, handleStartRestTimer]);
+  }, [historyLoaded, workoutHistory, workoutId, dict]);
 
-  // Effect to handle exercise progression based on activeExerciseIndex
+  // 2. Effect to handle exercise progression based on activeExerciseIndex
   useEffect(() => {
-    if (currentWorkout && currentWorkout.exercises.length > 0) {
+    if (workoutPhase === 'exercise' && currentWorkout && currentWorkout.exercises.length > 0) {
       if (activeExerciseIndex < currentWorkout.exercises.length) {
         const nextExercise = currentWorkout.exercises[activeExerciseIndex];
         setupExerciseTimer(nextExercise);
-        // If the new exercise is rep-based and has rest, start rest timer automatically
-        if (!nextExercise.duration && nextExercise.rest && nextExercise.rest > 0) {
-          handleStartRestTimer(nextExercise.rest);
-        }
       } else {
-        // All exercises are completed
-        calculateSessionStats();
-        toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
-        const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
-        setWorkoutCompletionMessage(congratsMsg);
-        if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+        // This case should ideally be caught by handleNextExercise setting workoutPhase to 'completed'
+        // but as a fallback, ensure completion is handled.
+        setWorkoutPhase('completed');
       }
     }
-  }, [activeExerciseIndex, currentWorkout, setupExerciseTimer, handleStartRestTimer, calculateSessionStats, toast, dict]);
+  }, [activeExerciseIndex, currentWorkout, workoutPhase, setupExerciseTimer]);
 
 
+  // 3. Exercise Timer countdown logic
   useEffect(() => {
     if (isExerciseTimerRunning && !isExerciseTimerPaused && exerciseTimeLeft !== null && exerciseTimeLeft > 0) {
       exerciseIntervalRef.current = setInterval(() => {
@@ -196,17 +203,18 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     };
   }, [isExerciseTimerRunning, isExerciseTimerPaused, exerciseTimeLeft]);
 
+  // 4. Trigger handleExerciseTimerEnd when exerciseTimeLeft reaches 0
   useEffect(() => {
-    if (exerciseTimeLeft === 0 && isExerciseTimerRunning && isCurrentExerciseTimed && !workoutCompletionMessage) {
+    if (exerciseTimeLeft === 0 && isExerciseTimerRunning && isCurrentExerciseTimed && workoutPhase === 'exercise') {
       handleExerciseTimerEnd();
     }
-  }, [exerciseTimeLeft, isExerciseTimerRunning, isCurrentExerciseTimed, workoutCompletionMessage, handleExerciseTimerEnd]);
+  }, [exerciseTimeLeft, isExerciseTimerRunning, isCurrentExerciseTimed, workoutPhase, handleExerciseTimerEnd]);
 
 
   const handleEndWorkout = () => {
     if (!dict?.page?.toasts) return;
 
-    if (!workoutCompletionMessage) { // If workout not completed naturally
+    if (workoutPhase !== 'completed') { // If workout not completed naturally
       calculateSessionStats();
       toast({ title: dict.page.toasts.workoutEndedTitle, description: dict.page.toasts.workoutEndedDescription });
       const endedMsg = dict.page.toasts.workoutEndedDescription || "Your workout session has ended early.";
@@ -224,7 +232,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setRestTimerDuration(0);
     setRestTimerKey(prev => prev + 1);
 
-    // router.push(`/${lang}`); // Navigate back to the main page after showing completion message
+    setWorkoutPhase('completed'); // Force completion state
   };
 
   const handleToggleExerciseTimerPause = () => {
@@ -239,8 +247,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
   const handleRestTimerReset = () => {
     setIsRestTimerRunning(false);
     setRestTimerKey(prev => prev + 1);
-    // Optionally, reset timeLeft to initialDuration if the timer is visible
-    // setTimeLeft(initialDuration); // This would require passing initialDuration to this component's state
+    // The RestTimer component will re-initialize timeLeft based on initialDuration when timerKey changes
   };
 
   const handleRestTimerEnd = useCallback(() => {
@@ -259,11 +266,11 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     handleNextExercise(); // Immediately move to the next exercise
   }, [handleNextExercise]);
 
-  if (!historyLoaded) {
+  if (!historyLoaded || workoutPhase === 'loading') {
     return <div className="flex justify-center items-center min-h-screen">{dict?.page?.loadingText || "Loading..."}</div>;
   }
 
-  if (error) {
+  if (workoutPhase === 'error') {
     return (
       <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 flex justify-center items-center">
         <Alert variant="destructive" className="shadow-md max-w-md">
@@ -279,6 +286,8 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
   }
 
   if (!currentWorkout || !currentExerciseDetails) {
+    // This case should ideally be covered by workoutPhase === 'error' or 'loading'
+    // but as a safeguard, display a loading message.
     return (
       <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 flex justify-center items-center">
         <p>{dict.page?.workoutLoadingDisplay?.title || "Loading workout details..."}</p>
@@ -308,7 +317,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
             <span className="sm:hidden">{dict.page?.activeWorkoutPage?.backToGeneratorButton?.split(' ')[0] || "Back"}</span> {/* Shorter text for small screens */}
           </Button>
           <h1 className="text-3xl font-bold text-center flex-grow font-headline">
-            {workoutCompletionMessage
+            {workoutPhase === 'completed'
               ? (dict.page?.workoutModal?.workoutCompleteTitle || "Workout Finished!")
               : (dict.page?.activeWorkoutPage?.title || "Active Workout Session")}
           </h1>
@@ -316,10 +325,10 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
           <div className="w-[100px] sm:w-[200px] invisible"></div> {/* Adjust width as needed */}
         </div>
 
-        {workoutCompletionMessage ? (
+        {workoutPhase === 'completed' ? (
           <div className="py-8 space-y-4 text-center max-w-md mx-auto bg-card p-6 rounded-lg shadow-lg">
             <PartyPopper className="h-20 w-20 text-green-500 mx-auto" />
-            <p className="text-xl font-semibold">{workoutCompletionMessage}</p>
+            <p className="text-xl font-semibold">{workoutCompletionMessage || (dict.page?.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!")}</p>
             {totalSessionDuration !== null && (
               <p className="text-base text-muted-foreground">
                 {(dict.page?.workoutModal?.totalSessionTime || "Total Session Time: {time}").replace('{time}', formatDuration(totalSessionDuration))}
@@ -335,8 +344,8 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
             </Button>
           </div>
         ) : (
-          // Conditional rendering: show RestTimer if it's running, otherwise show ActiveWorkoutDisplay
-          isRestTimerRunning ? (
+          // Conditional rendering based on workoutPhase
+          workoutPhase === 'rest' ? (
             <div className="pb-4 px-4">
               <RestTimer
                 initialDuration={restTimerDuration}
@@ -344,12 +353,12 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
                 onToggle={handleRestTimerToggle}
                 onReset={handleRestTimerReset}
                 onTimerEnd={handleRestTimerEnd}
-                onSkip={handleSkipRest} // Pass the new skip handler
+                onSkip={handleSkipRest}
                 timerKey={restTimerKey}
                 dict={dict.page?.restTimer || {}}
               />
             </div>
-          ) : (
+          ) : ( // workoutPhase === 'exercise'
             <ActiveWorkoutDisplay
               workoutPlan={currentWorkout}
               currentExercise={currentExerciseDetails}
