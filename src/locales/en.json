@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Daily Sweat - AI Workout Planner",
-    "description": "Your Personal AI Workout Planner"
+    "description": "Your personal AI-powered workout planner. Generate custom routines, track your progress, and get fit smarter."
   },
   "header": {
     "title": "Daily Sweat"
@@ -10,21 +10,19 @@
     "tagline": "© {year} Daily Sweat. Sweat Smarter, Not Harder."
   },
   "page": {
-    "loadingText": "Loading...",
+    "loadingText": "Loading application...",
     "tabs": {
       "workout": "Workout",
       "history": "History"
     },
+    "activeWorkoutPage": {
+      "title": "Active Workout Session"
+    },
     "workoutModal": {
-      "activeWorkoutModalTitle": "Active Workout Session",
       "workoutCompleteTitle": "Workout Finished!",
-      "workoutCompleteCongrats": "Workout Complete! Well done!",
+      "workoutCompleteCongrats": "Congratulations! You've completed your workout!",
       "kcalBurnedPlaceholder": "Estimated Kcal Burned: Calculation coming soon.",
-      "closeButton": "Close",
-      "exerciseTimerTitle": "Exercise Time",
-      "pauseExerciseButton": "Pause",
-      "resumeExerciseButton": "Resume",
-      "exerciseLabel": "Exercise"
+      "closeButton": "Close"
     },
     "workoutGenerator": {
       "title": "Create Your Workout",
@@ -51,7 +49,8 @@
       "equipmentOptions": {
         "none": "None / Bodyweight",
         "dumbbells": "Dumbbells",
-        "resistance_bands": "Resistance Bands"
+        "resistance_bands": "Resistance Bands",
+        "full_gym": "Full Gym"
       }
     },
     "workoutDisplay": {
@@ -66,6 +65,7 @@
       "repsLabel": "Reps:",
       "restLabel": "Rest:",
       "durationLabel": "Duration:",
+      "startRestButton": "Start {duration}s Rest",
       "exerciseInfoTooltip": "Exercise Information"
     },
     "activeWorkoutDisplay": {
@@ -83,7 +83,7 @@
       "restLabel": "Rest",
       "durationLabel": "Duration",
       "pauseExercise": "Pause",
-      "resumeExercise": "Resume",
+      "resumeExercise": "Play",
       "exerciseCompleteMessage": "Complete the exercise timer to enable rest."
     },
     "difficultyFeedback": {
@@ -108,9 +108,9 @@
     "restTimer": {
       "title": "Rest Timer",
       "description": "Take a breather, then hit it hard!",
-      "pauseButtonSR": "Pause",
-      "playButtonSR": "Play",
-      "resetButtonSR": "Reset"
+      "pauseButtonSR": "Pause rest timer",
+      "playButtonSR": "Play rest timer",
+      "resetButtonSR": "Reset rest timer"
     },
     "chatbot": {
       "dialogTitle": "Daily Sweat AI Chat",
@@ -139,8 +139,8 @@
       "workoutCompleteDescription": "Great job finishing your workout!",
       "workoutEndedTitle": "Workout Ended",
       "workoutEndedDescription": "Come back soon for another session!",
-      "exerciseTimeUpTitle": "Time's Up!",
-      "exerciseTimeUpDescription": "Exercise time is over. Good job!"
+      "exerciseTimeUpTitle": "Exercise Time Up!",
+      "exerciseTimeUpDescription": "Time for the next set or rest."
     },
     "errors": {
       "alertTitle": "Error",
@@ -151,14 +151,17 @@
       "emptyAdjustedAIPlan": "The AI adjusted to an empty workout plan. Please try different feedback or generate a new plan.",
       "failedToGenerate": "Failed to generate workout. Please try again later.",
       "failedToAdjust": "Failed to adjust workout difficulty. Please try again.",
-      "cannotStartEmptyWorkout": "Cannot start an empty or non-existent workout. Please generate a workout first."
+      "cannotStartEmptyWorkout": "Cannot start an empty or non-existent workout. Please generate a workout first.",
+      "workoutNotFound": "The requested workout could not be found.",
+      "noWorkoutId": "No workout ID was provided.",
+      "backToHome": "Back to Home"
     },
     "workoutLoadingDisplay": {
       "title": "Generating Workout",
       "analyzingParams": "Analyzing your parameters...",
       "generatingPlan": "Generating your personalized plan...",
       "optimizingExercises": "Optimizing exercises for best results...",
-      "finalizingWorkout": "Finalizing your workout...",
+      "finalizingWorkout": "Almost there, just a moment...",
       "aiCraftingMessage": "This might take a few moments as our AI crafts your perfect session."
     }
   }

@@ -64,16 +64,14 @@ export interface DictionaryType {
       workout?: string;
       history?: string;
     };
-    workoutModal?: {
-      activeWorkoutModalTitle?: string;
+    activeWorkoutPage?: { // New section for the dedicated workout page
+      title?: string;
+    };
+    workoutModal?: { // Renamed to reflect it's now just for completion messages
       workoutCompleteTitle?: string;
       workoutCompleteCongrats?: string;
       kcalBurnedPlaceholder?: string;
       closeButton?: string;
-      exerciseTimerTitle?: string;
-      pauseExerciseButton?: string;
-      resumeExerciseButton?: string;
-      exerciseLabel?: string;
     };
     workoutGenerator?: {
       title?: string;
@@ -99,7 +97,7 @@ export interface DictionaryType {
       emptyState?: string;
       startWorkoutButton?: string;
       noExercises?: string;
-      includesExercises?: string; // New
+      includesExercises?: string;
     };
     exerciseCard?: {
       setsLabel?: string;
@@ -193,8 +191,11 @@ export interface DictionaryType {
       failedToGenerate?: string;
       failedToAdjust?: string;
       cannotStartEmptyWorkout?: string;
+      workoutNotFound?: string; // New
+      noWorkoutId?: string; // New
+      backToHome?: string; // New
     };
-    workoutLoadingDisplay?: { // New section for loading messages
+    workoutLoadingDisplay?: {
       title?: string;
       analyzingParams?: string;
       generatingPlan?: string;

@@ -3,7 +3,7 @@
 import type { WorkoutPlan, Exercise } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, FlagOff, TimerIcon as TimerLucideIcon, Info, PauseCircle, PlayCircle, Clock } from 'lucide-react';
-import { Progress } from '@/components/ui/progress'; // For visual timer progress
+import { Progress } from '@/components/ui/progress';
 
 interface ActiveWorkoutDisplayProps {
   workoutPlan: WorkoutPlan;
@@ -33,14 +33,9 @@ interface ActiveWorkoutDisplayProps {
   exerciseTimeLeft: number | null;
   isExerciseTimerRunning: boolean;
   isExerciseTimerPaused: boolean;
-  isCurrentExerciseTimed: boolean; // Still useful for disabling 'Next' and 'Start Rest'
+  isCurrentExerciseTimed: boolean;
   canStartRest: boolean;
   onToggleExerciseTimerPause: () => void;
-  modalDict: { // For general modal button text not specific to this component
-    exerciseTimerTitle?: string;
-    pauseExerciseButton?: string;
-    resumeExerciseButton?: string;
-  }
 }
 
 export function ActiveWorkoutDisplay({
@@ -55,10 +50,9 @@ export function ActiveWorkoutDisplay({
   exerciseTimeLeft,
   isExerciseTimerRunning,
   isExerciseTimerPaused,
-  isCurrentExerciseTimed, // Keep this for logic, but not for rendering the timer block itself
+  isCurrentExerciseTimed,
   canStartRest,
   onToggleExerciseTimerPause,
-  modalDict,
 }: ActiveWorkoutDisplayProps) {
 
   if (!currentExercise) {
@@ -85,27 +79,25 @@ export function ActiveWorkoutDisplay({
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
   
-  // Calculate progress based on initial duration and time left
-  const initialExerciseDuration = currentExercise.duration || 0; // Use 0 if duration is missing
+  const initialExerciseDuration = currentExercise.duration || 0;
   const displayTime = (isExerciseTimerRunning || isExerciseTimerPaused) && exerciseTimeLeft !== null 
     ? exerciseTimeLeft 
-    : initialExerciseDuration; // Show initial duration if timer not started/active
+    : initialExerciseDuration;
   
   const exerciseTimerProgress = initialExerciseDuration > 0 
     ? ((initialExerciseDuration - displayTime) / initialExerciseDuration) * 100 
     : 0;
 
   return (
-    <div className="space-y-4 pt-2 pb-4"> 
+    <div className="space-y-4 pt-2 pb-4 max-w-md mx-auto"> 
       <p className="text-sm text-muted-foreground text-center mb-2">{exerciseProgressText}</p>
       
       <div className="p-4 border rounded-lg bg-card shadow">
           <h3 className="text-xl font-semibold mb-2 text-center">{currentExercise.name}</h3>
           
-          {/* Timer display block - now only conditioned on currentExercise.duration > 0 */}
           {currentExercise.duration && currentExercise.duration > 0 && (
             <div className="my-3 text-center space-y-2">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">{modalDict?.exerciseTimerTitle || dict?.durationLabel || "Time"}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">{dict?.durationLabel || "Time"}</p>
               <p className="text-4xl font-bold font-mono text-primary">
                 {formatTime(displayTime)}
               </p>
@@ -115,10 +107,10 @@ export function ActiveWorkoutDisplay({
                 variant="ghost" 
                 size="sm"
                 className="text-sm"
-                disabled={displayTime === 0 && !isExerciseTimerRunning} // Disable pause/play if timer is finished and not running
+                disabled={displayTime === 0 && !isExerciseTimerRunning}
               >
                 {isExerciseTimerRunning && !isExerciseTimerPaused ? <PauseCircle className="mr-2 h-4 w-4" /> : <PlayCircle className="mr-2 h-4 w-4" />}
-                {isExerciseTimerRunning && !isExerciseTimerPaused ? (modalDict?.pauseExerciseButton || dict?.pauseExercise || "Pause") : (modalDict?.resumeExerciseButton || dict?.resumeExercise || "Play")}
+                {isExerciseTimerRunning && !isExerciseTimerPaused ? (dict?.pauseExercise || "Pause") : (dict?.resumeExercise || "Play")}
               </Button>
             </div>
           )}
@@ -132,7 +124,6 @@ export function ActiveWorkoutDisplay({
                 <p className="text-muted-foreground">{dict?.repsLabel || "Reps"}</p> 
                 <p className="font-medium">{currentExercise.reps}</p>
             </div>
-            {/* Always show duration in info grid if it exists and is positive */}
             {currentExercise.duration && currentExercise.duration > 0 && (
                  <div>
                     <p className="text-muted-foreground">{dict?.durationLabel || "Duration"}</p>
@@ -153,20 +144,18 @@ export function ActiveWorkoutDisplay({
           )}
       </div>
 
-      {/* Start Rest button logic */}
-      {currentExercise.rest > 0 && ( // Only show rest button if rest duration is positive
+      {currentExercise.rest > 0 && (
         <Button
           onClick={() => onStartRest(currentExercise.rest)}
           variant="outline"
           className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-          disabled={isCurrentExerciseTimed && !canStartRest} // Disable if timed and not finished
+          disabled={isCurrentExerciseTimed && !canStartRest}
         >
           <TimerLucideIcon className="mr-2 h-4 w-4" />
           {startRestButtonText}
         </Button>
       )}
       
-      {/* Message if timed exercise is not yet complete */}
       {isCurrentExerciseTimed && !canStartRest && (
         <p className="text-sm text-center text-muted-foreground py-2">
             <Clock className="inline mr-1 h-4 w-4" /> 
@@ -182,7 +171,7 @@ export function ActiveWorkoutDisplay({
         <Button 
             onClick={onNextExercise} 
             className="w-full sm:w-auto bg-primary hover:bg-primary/90"
-            disabled={isCurrentExerciseTimed && isExerciseTimerRunning && !isExerciseTimerPaused} // Disable if timed and actively running
+            disabled={isCurrentExerciseTimed && isExerciseTimerRunning && !isExerciseTimerPaused}
         >
           {currentExerciseIndex === workoutPlan.exercises.length - 1 ? (dict?.finishButton || "Finish Workout") : (dict?.nextButton || "Next Exercise")} 
           <ChevronRight className="ml-2 h-4 w-4" />

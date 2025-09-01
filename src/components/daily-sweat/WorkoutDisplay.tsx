@@ -3,7 +3,6 @@
 import type { WorkoutPlan } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock, Dumbbell, PlayCircle } from 'lucide-react';
-// import { ExerciseCard } from './ExerciseCard'; // Removed import as ExerciseCard is no longer used here
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from '@/components/ui/button';
@@ -18,15 +17,14 @@ interface ExerciseCardDict {
 
 interface WorkoutDisplayProps {
   workoutPlan: WorkoutPlan | null;
-  // onStartRest: (duration: number) => void; // Removed as individual cards no longer trigger it
   onStartWorkout: () => void;
-  isWorkoutActive: boolean;
+  isWorkoutActive: boolean; // Still useful for conditional rendering of the start button
   dict: { 
     title?: string;
     emptyState?: string;
     startWorkoutButton?: string;
     noExercises?: string;
-    includesExercises?: string; // New dictionary key for summary
+    includesExercises?: string;
   };
   exerciseCardDict: ExerciseCardDict; // Still passed, but not used directly in this component anymore
 }
@@ -44,7 +42,7 @@ const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] 
   }
 };
 
-export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, dict }: WorkoutDisplayProps) { // onStartRest removed from props
+export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, dict }: WorkoutDisplayProps) {
   if (!workoutPlan) {
     return (
       <Card className="shadow-lg">
