@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Daily Sweat - AI Workout Planner",
-    "description": "Your personal AI-powered workout planner. Generate custom routines, track your progress, and get fit smarter."
+    "description": "Your personal AI-powered workout planner. Generate custom routines, track progress, and get fit!"
   },
   "header": {
     "title": "Daily Sweat"
@@ -10,17 +10,18 @@
     "tagline": "© {year} Daily Sweat. Sweat Smarter, Not Harder."
   },
   "page": {
-    "loadingText": "Loading application...",
+    "loadingText": "Loading...",
     "tabs": {
       "workout": "Workout",
       "history": "History"
     },
     "activeWorkoutPage": {
-      "title": "Active Workout Session"
+      "title": "Active Workout Session",
+      "backToGeneratorButton": "Back to Workout Generator"
     },
     "workoutModal": {
       "workoutCompleteTitle": "Workout Finished!",
-      "workoutCompleteCongrats": "Congratulations! You've completed your workout!",
+      "workoutCompleteCongrats": "Workout Complete! Well done!",
       "kcalBurnedPlaceholder": "Estimated Kcal Burned: Calculation coming soon.",
       "closeButton": "Close"
     },
@@ -44,13 +45,20 @@
         "full_body": "Full Body",
         "upper_body": "Upper Body",
         "lower_body": "Lower Body",
-        "core": "Core"
+        "core": "Core",
+        "arms": "Arms",
+        "legs": "Legs",
+        "chest": "Chest",
+        "back": "Back",
+        "shoulders": "Shoulders"
       },
       "equipmentOptions": {
         "none": "None / Bodyweight",
         "dumbbells": "Dumbbells",
         "resistance_bands": "Resistance Bands",
-        "full_gym": "Full Gym"
+        "full_gym": "Full Gym",
+        "kettlebell": "Kettlebell",
+        "barbell": "Barbell"
       }
     },
     "workoutDisplay": {
@@ -108,9 +116,9 @@
     "restTimer": {
       "title": "Rest Timer",
       "description": "Take a breather, then hit it hard!",
-      "pauseButtonSR": "Pause rest timer",
-      "playButtonSR": "Play rest timer",
-      "resetButtonSR": "Reset rest timer"
+      "pauseButtonSR": "Pause",
+      "playButtonSR": "Play",
+      "resetButtonSR": "Reset"
     },
     "chatbot": {
       "dialogTitle": "Daily Sweat AI Chat",
@@ -122,47 +130,39 @@
     },
     "toasts": {
       "workoutGeneratedTitle": "Workout Generated!",
-      "workoutGeneratedDescription": "Your new workout plan is ready.",
+      "workoutGeneratedDescription": "Your personalized workout plan is ready.",
       "generationFailedTitle": "Generation Failed",
-      "generationFailedDescription": "Could not generate workout.",
+      "generationFailedDescription": "Could not generate workout plan.",
       "workoutAdjustedTitle": "Workout Adjusted!",
       "workoutAdjustedDescription": "Difficulty perception: {feedback}. Plan updated.",
       "adjustmentFailedTitle": "Adjustment Failed",
-      "adjustmentFailedDescription": "Could not adjust workout.",
+      "adjustmentFailedDescription": "Could not adjust workout difficulty.",
       "restOverTitle": "Rest Over!",
-      "restOverDescription": "Time to get back to it!",
-      "workoutLoadedTitle": "Workout Loaded",
+      "restOverDescription": "Time to get back to work!",
+      "workoutLoadedTitle": "Workout Loaded!",
       "workoutLoadedDescription": "Loaded \"{name}\" from history.",
       "workoutStartedTitle": "Workout Started!",
-      "workoutStartedDescription": "Let's get to it!",
+      "workoutStartedDescription": "Your active session has begun.",
       "workoutCompleteTitle": "Workout Complete!",
-      "workoutCompleteDescription": "Great job finishing your workout!",
+      "workoutCompleteDescription": "You've finished your workout!",
       "workoutEndedTitle": "Workout Ended",
-      "workoutEndedDescription": "Come back soon for another session!",
+      "workoutEndedDescription": "Your workout session has ended early.",
       "exerciseTimeUpTitle": "Exercise Time Up!",
-      "exerciseTimeUpDescription": "Time for the next set or rest."
+      "exerciseTimeUpDescription": "Time for the next part of your exercise or rest."
     },
     "errors": {
       "alertTitle": "Error",
-      "invalidAIPlan": "Received an invalid workout plan format from AI. Please try again.",
-      "emptyAIPlan": "The AI generated an empty workout plan. Please try different parameters.",
+      "invalidAIPlan": "Received an invalid workout plan format from AI.",
+      "emptyAIPlan": "The AI generated an empty workout plan.",
       "noWorkoutToAdjust": "No current workout to adjust.",
-      "invalidAdjustedAIPlan": "Received an invalid adjusted workout plan format from AI. Please try again.",
-      "emptyAdjustedAIPlan": "The AI adjusted to an empty workout plan. Please try different feedback or generate a new plan.",
-      "failedToGenerate": "Failed to generate workout. Please try again later.",
-      "failedToAdjust": "Failed to adjust workout difficulty. Please try again.",
-      "cannotStartEmptyWorkout": "Cannot start an empty or non-existent workout. Please generate a workout first.",
-      "workoutNotFound": "The requested workout could not be found.",
-      "noWorkoutId": "No workout ID was provided.",
+      "invalidAdjustedAIPlan": "Received an invalid adjusted workout plan format from AI.",
+      "emptyAdjustedAIPlan": "The AI adjusted to an empty workout plan.",
+      "failedToGenerate": "Failed to generate workout.",
+      "failedToAdjust": "Failed to adjust workout difficulty.",
+      "cannotStartEmptyWorkout": "Cannot start an empty workout.",
+      "workoutNotFound": "Workout not found in history.",
+      "noWorkoutId": "No workout ID provided.",
       "backToHome": "Back to Home"
-    },
-    "workoutLoadingDisplay": {
-      "title": "Generating Workout",
-      "analyzingParams": "Analyzing your parameters...",
-      "generatingPlan": "Generating your personalized plan...",
-      "optimizingExercises": "Optimizing exercises for best results...",
-      "finalizingWorkout": "Almost there, just a moment...",
-      "aiCraftingMessage": "This might take a few moments as our AI crafts your perfect session."
     }
   }
 }

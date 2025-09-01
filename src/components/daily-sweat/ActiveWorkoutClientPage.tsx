@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useWorkoutHistory } from "@/hooks/use-workout-history";
 import type { WorkoutPlan, Exercise, DictionaryType } from "@/lib/types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, MessageSquare, PartyPopper } from "lucide-react";
+import { AlertCircle, MessageSquare, PartyPopper, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ActiveWorkoutClientPageProps {
@@ -218,11 +218,25 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
   return (
     <>
       <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-center mb-8 font-headline">
-          {workoutCompletionMessage
-            ? (dict.page?.workoutModal?.workoutCompleteTitle || "Workout Finished!")
-            : (dict.page?.activeWorkoutPage?.title || "Active Workout Session")}
-        </h1>
+        <div className="flex items-center justify-between mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => router.push(`/${lang}`)} 
+            className="text-muted-foreground hover:text-foreground px-2"
+            aria-label={dict.page?.activeWorkoutPage?.backToGeneratorButton || "Back to Workout Generator"}
+          >
+            <ChevronLeft className="h-5 w-5 mr-1" />
+            <span className="hidden sm:inline">{dict.page?.activeWorkoutPage?.backToGeneratorButton || "Back to Workout Generator"}</span>
+            <span className="sm:hidden">{dict.page?.activeWorkoutPage?.backToGeneratorButton?.split(' ')[0] || "Back"}</span> {/* Shorter text for small screens */}
+          </Button>
+          <h1 className="text-3xl font-bold text-center flex-grow font-headline">
+            {workoutCompletionMessage
+              ? (dict.page?.workoutModal?.workoutCompleteTitle || "Workout Finished!")
+              : (dict.page?.activeWorkoutPage?.title || "Active Workout Session")}
+          </h1>
+          {/* Placeholder to balance the flex layout if needed, or remove if not */}
+          <div className="w-[100px] sm:w-[200px] invisible"></div> {/* Adjust width as needed */}
+        </div>
 
         {workoutCompletionMessage ? (
           <div className="py-8 space-y-4 text-center max-w-md mx-auto bg-card p-6 rounded-lg shadow-lg">

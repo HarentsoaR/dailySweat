@@ -66,6 +66,7 @@ export interface DictionaryType {
     };
     activeWorkoutPage?: { // New section for the dedicated workout page
       title?: string;
+      backToGeneratorButton?: string; // New key
     };
     workoutModal?: { // Renamed to reflect it's now just for completion messages
       workoutCompleteTitle?: string;
