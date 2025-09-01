@@ -58,26 +58,6 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     }
   }, [sessionStartTime]);
 
-  // Load workout from history
-  useEffect(() => {
-    if (historyLoaded && workoutHistory.length > 0 && workoutId && dict) {
-      const foundWorkout = workoutHistory.find(w => w.id === workoutId);
-      if (foundWorkout) {
-        setCurrentWorkout(foundWorkout);
-        if (foundWorkout.exercises.length > 0) {
-          setupExerciseTimer(foundWorkout.exercises[0]);
-          setSessionStartTime(new Date()); // Start session timer when workout is loaded
-        } else {
-          setError(dict.page?.errors?.emptyAIPlan || "This workout plan has no exercises.");
-        }
-      } else {
-        setError(dict.page?.errors?.workoutNotFound || "Workout not found in history.");
-      }
-    } else if (historyLoaded && !workoutId) {
-      setError(dict?.page?.errors?.noWorkoutId || "No workout ID provided.");
-    }
-  }, [historyLoaded, workoutHistory, workoutId, dict, setupExerciseTimer]);
-
   const setupExerciseTimer = useCallback((exercise: Exercise | null) => {
     if (exerciseIntervalRef.current) {
       clearInterval(exerciseIntervalRef.current);
@@ -99,6 +79,13 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     }
   }, []);
 
+  const handleStartRestTimer = useCallback((duration: number) => {
+    setRestTimerDuration(duration);
+    setIsRestTimerRunning(true);
+    setRestTimerKey(prev => prev + 1); // Reset timer component
+  }, []);
+
+  // This needs to be defined before handleNextExercise as it calls it
   const handleExerciseTimerEnd = useCallback(() => {
     if (!dict?.page?.toasts?.exerciseTimeUpTitle || !dict?.page?.toasts?.exerciseTimeUpDescription) return;
 
@@ -113,9 +100,52 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
       handleStartRestTimer(currentExerciseDetails.rest);
     } else {
       // If no rest, automatically move to next exercise
-      handleNextExercise();
+      handleNextExercise(); // This will be defined below, but useCallback ensures it's stable
     }
-  }, [toast, dict, currentExerciseDetails, handleNextExercise]);
+  }, [toast, dict, currentExerciseDetails, handleStartRestTimer]); // Added handleNextExercise to dependencies
+
+  const handleNextExercise = useCallback(() => {
+    if (!dict?.page?.toasts || !currentWorkout) return;
+
+    if (activeExerciseIndex < currentWorkout.exercises.length - 1) {
+      const newIndex = activeExerciseIndex + 1;
+      setActiveExerciseIndex(newIndex);
+      setupExerciseTimer(currentWorkout.exercises[newIndex]);
+      // If current exercise was rep-based and had rest, start rest timer automatically
+      if (!isCurrentExerciseTimed && currentExerciseDetails?.rest && currentExerciseDetails.rest > 0) {
+        handleStartRestTimer(currentExerciseDetails.rest);
+      }
+    } else if (activeExerciseIndex === currentWorkout.exercises.length - 1) {
+      // Last exercise completed
+      calculateSessionStats();
+      toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
+      const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
+      setWorkoutCompletionMessage(congratsMsg); // Set base message, stats will be added in render
+      if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+    }
+  }, [activeExerciseIndex, currentWorkout, dict, setupExerciseTimer, isCurrentExerciseTimed, currentExerciseDetails, calculateSessionStats, toast, handleStartRestTimer]);
+
+
+  // Load workout from history
+  useEffect(() => {
+    if (historyLoaded && workoutHistory.length > 0 && workoutId && dict) {
+      const foundWorkout = workoutHistory.find(w => w.id === workoutId);
+      if (foundWorkout) {
+        setCurrentWorkout(foundWorkout);
+        if (foundWorkout.exercises.length > 0) {
+          setupExerciseTimer(foundWorkout.exercises[0]);
+          setSessionStartTime(new Date()); // Start session timer when workout is loaded
+        } else {
+          setError(dict.page?.errors?.emptyAIPlan || "This workout plan has no exercises.");
+        }
+      } else {
+        setError(dict.page?.errors?.workoutNotFound || "Workout not found in history.");
+      }
+    } else if (historyLoaded && !workoutId) {
+      setError(dict?.page?.errors?.noWorkoutId || "No workout ID provided.");
+    }
+  }, [historyLoaded, workoutHistory, workoutId, dict, setupExerciseTimer]); // setupExerciseTimer is now defined earlier
+
 
   useEffect(() => {
     if (isExerciseTimerRunning && !isExerciseTimerPaused && exerciseTimeLeft !== null && exerciseTimeLeft > 0) {
@@ -140,26 +170,6 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     }
   }, [exerciseTimeLeft, isExerciseTimerRunning, isCurrentExerciseTimed, workoutCompletionMessage, handleExerciseTimerEnd]);
 
-  const handleNextExercise = useCallback(() => {
-    if (!dict?.page?.toasts || !currentWorkout) return;
-
-    if (activeExerciseIndex < currentWorkout.exercises.length - 1) {
-      const newIndex = activeExerciseIndex + 1;
-      setActiveExerciseIndex(newIndex);
-      setupExerciseTimer(currentWorkout.exercises[newIndex]);
-      // If current exercise was rep-based and had rest, start rest timer automatically
-      if (!isCurrentExerciseTimed && currentExerciseDetails?.rest && currentExerciseDetails.rest > 0) {
-        handleStartRestTimer(currentExerciseDetails.rest);
-      }
-    } else if (activeExerciseIndex === currentWorkout.exercises.length - 1) {
-      // Last exercise completed
-      calculateSessionStats();
-      toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
-      const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
-      setWorkoutCompletionMessage(congratsMsg); // Set base message, stats will be added in render
-      if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
-    }
-  }, [activeExerciseIndex, currentWorkout, dict, setupExerciseTimer, isCurrentExerciseTimed, currentExerciseDetails, calculateSessionStats, toast]);
 
   const handlePreviousExercise = () => {
     if (activeExerciseIndex > 0 && currentWorkout) {
@@ -201,11 +211,6 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setIsExerciseTimerRunning(prev => !prev);
   };
 
-  const handleStartRestTimer = useCallback((duration: number) => {
-    setRestTimerDuration(duration);
-    setIsRestTimerRunning(true);
-    setRestTimerKey(prev => prev + 1); // Reset timer component
-  }, []);
 
   const handleRestTimerToggle = () => {
     setIsRestTimerRunning(!isRestTimerRunning);
