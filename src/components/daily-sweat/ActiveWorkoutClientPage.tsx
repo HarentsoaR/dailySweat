@@ -93,26 +93,41 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setWorkoutPhase('rest');
   }, []);
 
-  const handleNextExercise = useCallback(() => {
+  // Centralized function to advance the workout
+  const advanceWorkoutStep = useCallback(() => {
     if (!currentWorkout) return;
 
-    // Stop any active rest timer before moving to the next exercise
-    setIsRestTimerRunning(false);
+    // If we are currently in the 'exercise' phase and the current exercise has rest,
+    // transition to the 'rest' phase.
+    if (workoutPhase === 'exercise' && currentExerciseDetails?.rest && currentExerciseDetails.rest > 0) {
+      handleStartRestTimer(currentExerciseDetails.rest);
+      return; // Don't advance exercise index yet, just start rest
+    }
+
+    // If we are in 'rest' phase, or if the current exercise had no rest,
+    // then we should advance to the next exercise.
+    setIsRestTimerRunning(false); // Ensure rest timer is off
     setRestTimerDuration(0);
     setRestTimerKey(prev => prev + 1);
 
     setActiveExerciseIndex(prevIndex => {
       const nextIndexCandidate = prevIndex + 1;
       if (nextIndexCandidate < currentWorkout.exercises.length) {
-        // There is a next exercise, the useEffect below will handle its setup
+        setWorkoutPhase('exercise'); // Move to the next exercise phase
         return nextIndexCandidate;
       } else {
         // All exercises are completed
-        setWorkoutPhase('completed');
+        calculateSessionStats();
+        toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
+        const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
+        setWorkoutCompletionMessage(congratsMsg);
+        if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
+        setWorkoutPhase('completed'); // Set phase to completed
         return prevIndex; // Keep the index at the last exercise
       }
     });
-  }, [currentWorkout]);
+  }, [currentWorkout, workoutPhase, currentExerciseDetails, handleStartRestTimer, calculateSessionStats, toast, dict]);
+
 
   const handlePreviousExercise = useCallback(() => {
     if (activeExerciseIndex > 0 && currentWorkout) {
@@ -135,14 +150,9 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
 
     toast({ title: dict.page.toasts.exerciseTimeUpTitle, description: dict.page.toasts.exerciseTimeUpDescription });
 
-    // Automatically start rest if available, or move to next exercise if no rest
-    if (currentExerciseDetails?.rest && currentExerciseDetails.rest > 0) {
-      handleStartRestTimer(currentExerciseDetails.rest);
-    } else {
-      // If no rest, automatically move to next exercise
-      handleNextExercise();
-    }
-  }, [toast, dict, currentExerciseDetails, handleStartRestTimer, handleNextExercise]);
+    // After a timed exercise ends, always try to advance the step, which will check for rest.
+    advanceWorkoutStep();
+  }, [toast, dict, advanceWorkoutStep]);
 
   // --- Main Effects for Workout Flow ---
 
@@ -171,16 +181,14 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
   }, [historyLoaded, workoutHistory, workoutId, dict]);
 
   // 2. Effect to handle exercise progression based on activeExerciseIndex
+  // This effect only sets up the exercise details when workoutPhase is 'exercise'
   useEffect(() => {
     if (workoutPhase === 'exercise' && currentWorkout && currentWorkout.exercises.length > 0) {
       if (activeExerciseIndex < currentWorkout.exercises.length) {
-        const nextExercise = currentWorkout.exercises[activeExerciseIndex];
-        setupExerciseTimer(nextExercise);
-      } else {
-        // This case should ideally be caught by handleNextExercise setting workoutPhase to 'completed'
-        // but as a fallback, ensure completion is handled.
-        setWorkoutPhase('completed');
+        const exerciseToSetup = currentWorkout.exercises[activeExerciseIndex];
+        setupExerciseTimer(exerciseToSetup);
       }
+      // No 'else' here for completion, as advanceWorkoutStep handles that.
     }
   }, [activeExerciseIndex, currentWorkout, workoutPhase, setupExerciseTimer]);
 
@@ -255,16 +263,17 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setIsRestTimerRunning(false);
     toast({ title: dict.page.toasts.restOverTitle, description: dict.page.toasts.restOverDescription });
 
-    // Automatically move to the next exercise after rest
-    handleNextExercise();
-  }, [toast, dict, handleNextExercise]);
+    // After rest, always advance to the next exercise
+    advanceWorkoutStep();
+  }, [toast, dict, advanceWorkoutStep]);
 
   const handleSkipRest = useCallback(() => {
     setIsRestTimerRunning(false);
     setRestTimerDuration(0); // Ensure duration is reset
     setRestTimerKey(prev => prev + 1); // Force re-render/reset
-    handleNextExercise(); // Immediately move to the next exercise
-  }, [handleNextExercise]);
+    // After skipping rest, always advance to the next exercise
+    advanceWorkoutStep();
+  }, [advanceWorkoutStep]);
 
   if (!historyLoaded || workoutPhase === 'loading') {
     return <div className="flex justify-center items-center min-h-screen">{dict?.page?.loadingText || "Loading..."}</div>;
@@ -363,7 +372,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
               workoutPlan={currentWorkout}
               currentExercise={currentExerciseDetails}
               currentExerciseIndex={activeExerciseIndex}
-              onNextExercise={handleNextExercise}
+              onNextExercise={advanceWorkoutStep} {/* Now calls advanceWorkoutStep */}
               onPreviousExercise={handlePreviousExercise}
               onEndWorkout={handleEndWorkout}
               dict={dict.page?.activeWorkoutDisplay || {}}
