@@ -73,6 +73,8 @@ export interface DictionaryType {
       workoutCompleteCongrats?: string;
       kcalBurnedPlaceholder?: string;
       closeButton?: string;
+      totalSessionTime?: string; // New
+      estimatedKcal?: string; // New
     };
     workoutGenerator?: {
       title?: string;

@@ -88,6 +88,12 @@ export function ActiveWorkoutDisplay({
     ? ((initialExerciseDuration - displayTime) / initialExerciseDuration) * 100 
     : 0;
 
+  // Determine if the "Next Exercise" button should be disabled
+  const isNextButtonDisabled = isCurrentExerciseTimed && isExerciseTimerRunning && !isExerciseTimerPaused;
+  // Determine if the "Start Rest" button should be disabled
+  const isStartRestButtonDisabled = isCurrentExerciseTimed && !canStartRest;
+
+
   return (
     <div className="space-y-4 pt-2 pb-4 max-w-md mx-auto"> 
       <p className="text-sm text-muted-foreground text-center mb-2">{exerciseProgressText}</p>
@@ -149,7 +155,7 @@ export function ActiveWorkoutDisplay({
           onClick={() => onStartRest(currentExercise.rest)}
           variant="outline"
           className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-          disabled={isCurrentExerciseTimed && !canStartRest}
+          disabled={isStartRestButtonDisabled}
         >
           <TimerLucideIcon className="mr-2 h-4 w-4" />
           {startRestButtonText}
@@ -171,7 +177,7 @@ export function ActiveWorkoutDisplay({
         <Button 
             onClick={onNextExercise} 
             className="w-full sm:w-auto bg-primary hover:bg-primary/90"
-            disabled={isCurrentExerciseTimed && isExerciseTimerRunning && !isExerciseTimerPaused}
+            disabled={isNextButtonDisabled}
         >
           {currentExerciseIndex === workoutPlan.exercises.length - 1 ? (dict?.finishButton || "Finish Workout") : (dict?.nextButton || "Next Exercise")} 
           <ChevronRight className="ml-2 h-4 w-4" />

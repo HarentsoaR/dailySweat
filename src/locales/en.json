@@ -23,7 +23,9 @@
       "workoutCompleteTitle": "Workout Finished!",
       "workoutCompleteCongrats": "Workout Complete! Well done!",
       "kcalBurnedPlaceholder": "Estimated Kcal Burned: Calculation coming soon.",
-      "closeButton": "Close"
+      "closeButton": "Close",
+      "totalSessionTime": "Total Session Time: {time}",
+      "estimatedKcal": "Estimated Kcal Burned: {kcal}"
     },
     "workoutGenerator": {
       "title": "Create Your Workout",

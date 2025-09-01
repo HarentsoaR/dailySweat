@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation"; // useParams is not needed here as workoutId is a prop
+import { useRouter } from "next/navigation";
 import { ActiveWorkoutDisplay } from "@/components/daily-sweat/ActiveWorkoutDisplay";
 import { RestTimer } from "@/components/daily-sweat/RestTimer";
 import { FitnessChatbotDialog } from "@/components/daily-sweat/FitnessChatbotDialog";
@@ -27,6 +27,9 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
   // Workout Session State
   const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
   const [workoutCompletionMessage, setWorkoutCompletionMessage] = useState<string | null>(null);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [totalSessionDuration, setTotalSessionDuration] = useState<number | null>(null); // in seconds
+  const [estimatedKcalBurned, setEstimatedKcalBurned] = useState<number | null>(null);
 
   // Exercise Timer State
   const [currentExerciseDetails, setCurrentExerciseDetails] = useState<Exercise | null>(null);
@@ -40,9 +43,20 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
   // Rest Timer State
   const [restTimerDuration, setRestTimerDuration] = useState(0);
   const [isRestTimerRunning, setIsRestTimerRunning] = useState(false);
-  const [restTimerKey, setRestTimerKey] = useState(0);
+  const [restTimerKey, setRestTimerKey] = useState(0); // Used to force re-render/reset of RestTimer
 
   const { toast } = useToast();
+
+  // Helper to calculate session stats
+  const calculateSessionStats = useCallback(() => {
+    if (sessionStartTime) {
+      const endTime = new Date();
+      const durationInSeconds = Math.floor((endTime.getTime() - sessionStartTime.getTime()) / 1000);
+      setTotalSessionDuration(durationInSeconds);
+      // Simple estimation: 0.1 kcal per second (approx 6 kcal/minute)
+      setEstimatedKcalBurned(Math.round(durationInSeconds * 0.1));
+    }
+  }, [sessionStartTime]);
 
   // Load workout from history
   useEffect(() => {
@@ -52,6 +66,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
         setCurrentWorkout(foundWorkout);
         if (foundWorkout.exercises.length > 0) {
           setupExerciseTimer(foundWorkout.exercises[0]);
+          setSessionStartTime(new Date()); // Start session timer when workout is loaded
         } else {
           setError(dict.page?.errors?.emptyAIPlan || "This workout plan has no exercises.");
         }
@@ -61,7 +76,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     } else if (historyLoaded && !workoutId) {
       setError(dict?.page?.errors?.noWorkoutId || "No workout ID provided.");
     }
-  }, [historyLoaded, workoutHistory, workoutId, dict]);
+  }, [historyLoaded, workoutHistory, workoutId, dict, setupExerciseTimer]);
 
   const setupExerciseTimer = useCallback((exercise: Exercise | null) => {
     if (exerciseIntervalRef.current) {
@@ -80,7 +95,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
       setIsCurrentExerciseTimed(false);
       setIsExerciseTimerRunning(false);
       setIsExerciseTimerPaused(false);
-      setCanStartRest(true);
+      setCanStartRest(true); // Rep-based exercises can start rest immediately
     }
   }, []);
 
@@ -89,10 +104,18 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
 
     setIsExerciseTimerRunning(false);
     setIsExerciseTimerPaused(false);
-    setCanStartRest(true);
+    setCanStartRest(true); // Allow rest or next exercise after timed exercise finishes
 
     toast({ title: dict.page.toasts.exerciseTimeUpTitle, description: dict.page.toasts.exerciseTimeUpDescription });
-  }, [toast, dict]);
+
+    // Automatically start rest if available, or move to next exercise if no rest
+    if (currentExerciseDetails?.rest && currentExerciseDetails.rest > 0) {
+      handleStartRestTimer(currentExerciseDetails.rest);
+    } else {
+      // If no rest, automatically move to next exercise
+      handleNextExercise();
+    }
+  }, [toast, dict, currentExerciseDetails, handleNextExercise]);
 
   useEffect(() => {
     if (isExerciseTimerRunning && !isExerciseTimerPaused && exerciseTimeLeft !== null && exerciseTimeLeft > 0) {
@@ -117,35 +140,46 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     }
   }, [exerciseTimeLeft, isExerciseTimerRunning, isCurrentExerciseTimed, workoutCompletionMessage, handleExerciseTimerEnd]);
 
-  const handleNextExercise = () => {
+  const handleNextExercise = useCallback(() => {
     if (!dict?.page?.toasts || !currentWorkout) return;
+
     if (activeExerciseIndex < currentWorkout.exercises.length - 1) {
       const newIndex = activeExerciseIndex + 1;
       setActiveExerciseIndex(newIndex);
       setupExerciseTimer(currentWorkout.exercises[newIndex]);
+      // If current exercise was rep-based and had rest, start rest timer automatically
+      if (!isCurrentExerciseTimed && currentExerciseDetails?.rest && currentExerciseDetails.rest > 0) {
+        handleStartRestTimer(currentExerciseDetails.rest);
+      }
     } else if (activeExerciseIndex === currentWorkout.exercises.length - 1) {
       // Last exercise completed
+      calculateSessionStats();
       toast({ title: dict.page.toasts.workoutCompleteTitle, description: dict.page.toasts.workoutCompleteDescription });
       const congratsMsg = dict.page.workoutModal?.workoutCompleteCongrats || "Workout Complete! Well done!";
-      const kcalMsg = dict.page.workoutModal?.kcalBurnedPlaceholder || "Estimated Kcal Burned: Calculation coming soon.";
-      setWorkoutCompletionMessage(`${congratsMsg}\n${kcalMsg}`);
+      setWorkoutCompletionMessage(congratsMsg); // Set base message, stats will be added in render
       if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
     }
-  };
+  }, [activeExerciseIndex, currentWorkout, dict, setupExerciseTimer, isCurrentExerciseTimed, currentExerciseDetails, calculateSessionStats, toast]);
 
   const handlePreviousExercise = () => {
     if (activeExerciseIndex > 0 && currentWorkout) {
       const newIndex = activeExerciseIndex - 1;
       setActiveExerciseIndex(newIndex);
       setupExerciseTimer(currentWorkout.exercises[newIndex]);
+      setIsRestTimerRunning(false); // Stop rest timer if going back
+      setRestTimerDuration(0);
+      setRestTimerKey(prev => prev + 1);
     }
   };
 
   const handleEndWorkout = () => {
     if (!dict?.page?.toasts) return;
 
-    if (!workoutCompletionMessage) {
+    if (!workoutCompletionMessage) { // If workout not completed naturally
+      calculateSessionStats();
       toast({ title: dict.page.toasts.workoutEndedTitle, description: dict.page.toasts.workoutEndedDescription });
+      const endedMsg = dict.page.toasts.workoutEndedDescription || "Your workout session has ended early.";
+      setWorkoutCompletionMessage(endedMsg);
     }
 
     if (exerciseIntervalRef.current) clearInterval(exerciseIntervalRef.current);
@@ -159,7 +193,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setRestTimerDuration(0);
     setRestTimerKey(prev => prev + 1);
 
-    router.push(`/${lang}`); // Navigate back to the main page
+    // router.push(`/${lang}`); // Navigate back to the main page after showing completion message
   };
 
   const handleToggleExerciseTimerPause = () => {
@@ -167,11 +201,11 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setIsExerciseTimerRunning(prev => !prev);
   };
 
-  const handleStartRestTimer = (duration: number) => {
+  const handleStartRestTimer = useCallback((duration: number) => {
     setRestTimerDuration(duration);
     setIsRestTimerRunning(true);
-    setRestTimerKey(prev => prev + 1);
-  };
+    setRestTimerKey(prev => prev + 1); // Reset timer component
+  }, []);
 
   const handleRestTimerToggle = () => {
     setIsRestTimerRunning(!isRestTimerRunning);
@@ -186,7 +220,10 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     if (!dict?.page?.toasts?.restOverTitle || !dict?.page?.toasts?.restOverDescription) return;
     setIsRestTimerRunning(false);
     toast({ title: dict.page.toasts.restOverTitle, description: dict.page.toasts.restOverDescription });
-  }, [toast, dict]);
+
+    // Automatically move to the next exercise after rest
+    handleNextExercise();
+  }, [toast, dict, handleNextExercise]);
 
   if (!historyLoaded) {
     return <div className="flex justify-center items-center min-h-screen">{dict?.page?.loadingText || "Loading..."}</div>;
@@ -215,6 +252,13 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     );
   }
 
+  const formatDuration = (seconds: number | null) => {
+    if (seconds === null || seconds < 0) return "00:00";
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  };
+
   return (
     <>
       <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -241,10 +285,18 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
         {workoutCompletionMessage ? (
           <div className="py-8 space-y-4 text-center max-w-md mx-auto bg-card p-6 rounded-lg shadow-lg">
             <PartyPopper className="h-20 w-20 text-green-500 mx-auto" />
-            {workoutCompletionMessage.split('\n').map((line, index) => (
-              <p key={index} className={index === 0 ? "text-xl font-semibold" : "text-base text-muted-foreground"}>{line}</p>
-            ))}
-            <Button type="button" onClick={handleEndWorkout} className="mt-6 w-full">
+            <p className="text-xl font-semibold">{workoutCompletionMessage}</p>
+            {totalSessionDuration !== null && (
+              <p className="text-base text-muted-foreground">
+                {(dict.page?.workoutModal?.totalSessionTime || "Total Session Time: {time}").replace('{time}', formatDuration(totalSessionDuration))}
+              </p>
+            )}
+            {estimatedKcalBurned !== null && (
+              <p className="text-base text-muted-foreground">
+                {(dict.page?.workoutModal?.estimatedKcal || "Estimated Kcal Burned: {kcal}").replace('{kcal}', estimatedKcalBurned.toString())}
+              </p>
+            )}
+            <Button type="button" onClick={() => router.push(`/${lang}`)} className="mt-6 w-full">
               {dict.page?.workoutModal?.closeButton || "Close"}
             </Button>
           </div>
@@ -268,7 +320,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
         )}
       </main>
 
-      {restTimerDuration > 0 && (
+      {restTimerDuration > 0 && isRestTimerRunning && ( // Only show if rest timer is active
         <div id="rest-timer-section" className="pb-4 px-4">
           <RestTimer
             initialDuration={restTimerDuration}
