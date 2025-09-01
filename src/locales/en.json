@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Daily Sweat - AI Workout Planner",
-    "description": "Your personal AI-powered workout planner. Generate custom routines, track progress, and get fit!"
+    "description": "Your Personal AI Workout Planner"
   },
   "header": {
     "title": "Daily Sweat"
@@ -22,7 +22,7 @@
     "workoutModal": {
       "workoutCompleteTitle": "Workout Finished!",
       "workoutCompleteCongrats": "Workout Complete! Well done!",
-      "kcalBurnedPlaceholder": "Estimated Kcal Burned: Calculation coming soon.",
+      "kcalBurnedPlaceholder": "Estimated {kcal} Kcal Burned",
       "closeButton": "Close",
       "totalSessionTime": "Total Session Time: {time}",
       "estimatedKcal": "Estimated Kcal Burned: {kcal}"
@@ -50,17 +50,17 @@
         "core": "Core",
         "arms": "Arms",
         "legs": "Legs",
-        "chest": "Chest",
         "back": "Back",
+        "chest": "Chest",
         "shoulders": "Shoulders"
       },
       "equipmentOptions": {
         "none": "None / Bodyweight",
         "dumbbells": "Dumbbells",
         "resistance_bands": "Resistance Bands",
-        "full_gym": "Full Gym",
+        "barbell": "Barbell",
         "kettlebell": "Kettlebell",
-        "barbell": "Barbell"
+        "gym_machines": "Gym Machines"
       }
     },
     "workoutDisplay": {
@@ -74,9 +74,9 @@
       "setsLabel": "Sets:",
       "repsLabel": "Reps:",
       "restLabel": "Rest:",
-      "durationLabel": "Duration:",
-      "startRestButton": "Start {duration}s Rest",
-      "exerciseInfoTooltip": "Exercise Information"
+      "startRestButton": "Start Rest ({duration}s)",
+      "exerciseInfoTooltip": "Exercise Information",
+      "durationLabel": "Duration:"
     },
     "activeWorkoutDisplay": {
       "title": "Active Workout Session",
@@ -118,9 +118,11 @@
     "restTimer": {
       "title": "Rest Timer",
       "description": "Take a breather, then hit it hard!",
-      "pauseButtonSR": "Pause",
-      "playButtonSR": "Play",
-      "resetButtonSR": "Reset"
+      "pauseButtonSR": "Pause rest timer",
+      "playButtonSR": "Play rest timer",
+      "resetButtonSR": "Reset rest timer",
+      "skipButton": "Skip Rest",
+      "skipButtonSR": "Skip rest period"
     },
     "chatbot": {
       "dialogTitle": "Daily Sweat AI Chat",
@@ -144,13 +146,13 @@
       "workoutLoadedTitle": "Workout Loaded!",
       "workoutLoadedDescription": "Loaded \"{name}\" from history.",
       "workoutStartedTitle": "Workout Started!",
-      "workoutStartedDescription": "Your active session has begun.",
+      "workoutStartedDescription": "Your active workout session has begun.",
       "workoutCompleteTitle": "Workout Complete!",
-      "workoutCompleteDescription": "You've finished your workout!",
-      "workoutEndedTitle": "Workout Ended",
+      "workoutCompleteDescription": "You've finished your workout. Great job!",
+      "workoutEndedTitle": "Workout Ended Early",
       "workoutEndedDescription": "Your workout session has ended early.",
       "exerciseTimeUpTitle": "Exercise Time Up!",
-      "exerciseTimeUpDescription": "Time for the next part of your exercise or rest."
+      "exerciseTimeUpDescription": "Time for the next set or rest."
     },
     "errors": {
       "alertTitle": "Error",
@@ -165,6 +167,13 @@
       "workoutNotFound": "Workout not found in history.",
       "noWorkoutId": "No workout ID provided.",
       "backToHome": "Back to Home"
+    },
+    "workoutLoadingDisplay": {
+      "title": "Generating Workout",
+      "analyzingParams": "Analyzing your parameters...",
+      "generatingPlan": "Generating your personalized plan...",
+      "optimizingExercises": "Optimizing exercises for best results...",
+      "finalizingWorkout": "Almost there, just a moment..."
     }
   }
 }

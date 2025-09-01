@@ -153,6 +153,8 @@ export interface DictionaryType {
       pauseButtonSR?: string;
       playButtonSR?: string;
       resetButtonSR?: string;
+      skipButton?: string; // New: Text for the skip button
+      skipButtonSR?: string; // New: Screen reader text for the skip button
     };
     chatbot?: {
       dialogTitle?: string;

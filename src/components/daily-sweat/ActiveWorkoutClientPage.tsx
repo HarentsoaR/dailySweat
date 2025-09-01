@@ -222,6 +222,8 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
   const handleRestTimerReset = () => {
     setIsRestTimerRunning(false);
     setRestTimerKey(prev => prev + 1);
+    // Optionally, reset timeLeft to initialDuration if the timer is visible
+    // setTimeLeft(initialDuration); // This would require passing initialDuration to this component's state
   };
 
   const handleRestTimerEnd = useCallback(() => {
@@ -232,6 +234,13 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     // Automatically move to the next exercise after rest
     handleNextExercise();
   }, [toast, dict, handleNextExercise]);
+
+  const handleSkipRest = useCallback(() => {
+    setIsRestTimerRunning(false);
+    setRestTimerDuration(0); // Ensure duration is reset
+    setRestTimerKey(prev => prev + 1); // Force re-render/reset
+    handleNextExercise(); // Immediately move to the next exercise
+  }, [handleNextExercise]);
 
   if (!historyLoaded) {
     return <div className="flex justify-center items-center min-h-screen">{dict?.page?.loadingText || "Loading..."}</div>;
@@ -318,6 +327,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
                 onToggle={handleRestTimerToggle}
                 onReset={handleRestTimerReset}
                 onTimerEnd={handleRestTimerEnd}
+                onSkip={handleSkipRest} // Pass the new skip handler
                 timerKey={restTimerKey}
                 dict={dict.page?.restTimer || {}}
               />
@@ -330,7 +340,6 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
               onNextExercise={handleNextExercise}
               onPreviousExercise={handlePreviousExercise}
               onEndWorkout={handleEndWorkout}
-              // onStartRest={handleStartRestTimer} // Removed
               dict={dict.page?.activeWorkoutDisplay || {}}
               exerciseTimeLeft={exerciseTimeLeft}
               isExerciseTimerRunning={isExerciseTimerRunning}
