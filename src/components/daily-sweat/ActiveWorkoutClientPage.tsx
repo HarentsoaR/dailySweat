@@ -352,9 +352,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
               {dict.page?.workoutModal?.closeButton || "Close"}
             </Button>
           </div>
-        ) : (
-          // Conditional rendering based on workoutPhase
-          workoutPhase === 'rest' ? (
+        ) : workoutPhase === 'rest' ? (
             <div className="pb-4 px-4">
               <RestTimer
                 initialDuration={restTimerDuration}
@@ -372,7 +370,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
               workoutPlan={currentWorkout}
               currentExercise={currentExerciseDetails}
               currentExerciseIndex={activeExerciseIndex}
-              onNextExercise={advanceWorkoutStep} {/* Now calls advanceWorkoutStep */}
+              onNextExercise={advanceWorkoutStep}
               onPreviousExercise={handlePreviousExercise}
               onEndWorkout={handleEndWorkout}
               dict={dict.page?.activeWorkoutDisplay || {}}
@@ -384,7 +382,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
               onToggleExerciseTimerPause={handleToggleExerciseTimerPause}
             />
           )
-        )}
+        }
       </main>
 
       <FitnessChatbotDialog dict={dict.page?.chatbot || {}}>
