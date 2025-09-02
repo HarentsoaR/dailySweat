@@ -4,6 +4,8 @@ import type { WorkoutPlan, Exercise } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, FlagOff, Info, PauseCircle, PlayCircle, Clock } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { ExerciseAnimation } from '@/components/daily-sweat/ExerciseAnimation';
 
 interface ActiveWorkoutDisplayProps {
   workoutPlan: WorkoutPlan;
@@ -55,6 +57,26 @@ export function ActiveWorkoutDisplay({
   onToggleExerciseTimerPause,
 }: ActiveWorkoutDisplayProps) {
 
+  // Touch swipe navigation support
+  let touchStartX = 0;
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX = e.changedTouches[0]?.clientX || 0;
+  };
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const endX = e.changedTouches[0]?.clientX || 0;
+    const delta = endX - touchStartX;
+    if (Math.abs(delta) < 50) return; // ignore tiny swipes
+    if (delta < 0) {
+      // swipe left -> next
+      if (!(isCurrentExerciseTimed && isExerciseTimerRunning && !isExerciseTimerPaused)) {
+        onNextExercise();
+      }
+    } else {
+      // swipe right -> prev
+      if (currentExerciseIndex > 0) onPreviousExercise();
+    }
+  };
+
   if (!currentExercise) {
     return (
       <div className="p-4 text-center">
@@ -95,16 +117,22 @@ export function ActiveWorkoutDisplay({
 
 
   return (
-    <div className="space-y-4 pt-2 pb-4 max-w-md mx-auto"> 
+    <div
+      className="space-y-4 pt-2 pb-24 max-w-xl mx-auto"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    > 
       <p className="text-sm text-muted-foreground text-center mb-2">{exerciseProgressText}</p>
       
-      <div className="p-4 border rounded-lg bg-card shadow">
-          <h3 className="text-xl font-semibold mb-2 text-center">{currentExercise.name}</h3>
+      <ExerciseAnimation exercise={currentExercise} workout={workoutPlan} className="mt-2" />
+
+      <div className="p-5 border rounded-xl bg-card shadow-lg">
+          <h3 className="text-2xl font-semibold mb-3 text-center font-headline tracking-tight">{currentExercise.name}</h3>
           
           {currentExercise.duration && currentExercise.duration > 0 && (
-            <div className="my-3 text-center space-y-2">
+            <div className="my-4 text-center space-y-2">
               <p className="text-xs text-muted-foreground uppercase tracking-wider">{dict?.durationLabel || "Time"}</p>
-              <p className="text-4xl font-bold font-mono text-primary">
+              <p className="text-5xl font-bold font-mono text-primary tabular-nums" aria-live="polite">
                 {formatTime(displayTime)}
               </p>
               <Progress value={exerciseTimerProgress} className="h-2 [&>div]:bg-primary transition-all duration-1000 ease-linear" />
@@ -121,25 +149,25 @@ export function ActiveWorkoutDisplay({
             </div>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-sm mb-3">
-            <div>
-                <p className="text-muted-foreground">{dict?.setsLabel || "Sets"}</p> 
-                <p className="font-medium">{currentExercise.sets}</p>
-            </div>
-            <div>
-                <p className="text-muted-foreground">{dict?.repsLabel || "Reps"}</p> 
-                <p className="font-medium">{currentExercise.reps}</p>
-            </div>
+          <div className="flex flex-wrap justify-center gap-2 text-sm mb-4">
+            <Badge variant="outline" className="px-3 py-1">
+              {dict?.setsLabel || "Sets"}
+              <span className="ml-2 font-semibold">{currentExercise.sets}</span>
+            </Badge>
+            <Badge variant="outline" className="px-3 py-1">
+              {dict?.repsLabel || "Reps"}
+              <span className="ml-2 font-semibold">{currentExercise.reps}</span>
+            </Badge>
             {currentExercise.duration && currentExercise.duration > 0 && (
-                 <div>
-                    <p className="text-muted-foreground">{dict?.durationLabel || "Duration"}</p>
-                    <p className="font-medium">{currentExercise.duration}s</p>
-                </div>
+              <Badge variant="outline" className="px-3 py-1">
+                {dict?.durationLabel || "Duration"}
+                <span className="ml-2 font-semibold">{currentExercise.duration}s</span>
+              </Badge>
             )}
-            <div>
-                <p className="text-muted-foreground">{dict?.restLabel || "Rest"}</p> 
-                <p className="font-medium">{currentExercise.rest}s</p>
-            </div>
+            <Badge variant="outline" className="px-3 py-1">
+              {dict?.restLabel || "Rest"}
+              <span className="ml-2 font-semibold">{currentExercise.rest}s</span>
+            </Badge>
           </div>
 
           {currentExercise.description && (
@@ -170,24 +198,26 @@ export function ActiveWorkoutDisplay({
         </p>
       )}
 
-
-      <div className="flex flex-col sm:flex-row justify-between gap-2 pt-2">
-        <Button onClick={onPreviousExercise} disabled={currentExerciseIndex === 0} variant="outline" className="w-full sm:w-auto">
-          <ChevronLeft className="mr-2 h-4 w-4" /> {dict?.previousButton || "Previous"}
-        </Button>
-        <Button 
-            onClick={onNextExercise} 
-            className="w-full sm:w-auto bg-primary hover:bg-primary/90"
-            disabled={isNextButtonDisabled}
-        >
-          {currentExerciseIndex === workoutPlan.exercises.length - 1 ? (dict?.finishButton || "Finish Workout") : (dict?.nextButton || "Next Exercise")} 
-          <ChevronRight className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
-      <div className="pt-2">
-        <Button onClick={onEndWorkout} variant="ghost" size="sm" className="w-full text-destructive hover:bg-destructive/10">
-            <FlagOff className="mr-2 h-4 w-4" /> {dict?.endWorkoutEarlyButton || "End Workout Early"}
-        </Button>
+      {/* Sticky action bar */}
+      <div className="sticky bottom-0 left-0 right-0 mx-auto max-w-xl pb-4">
+        <div className="rounded-xl border bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-2 shadow-sm">
+          <div className="flex flex-col sm:flex-row justify-between gap-2">
+            <Button onClick={onPreviousExercise} disabled={currentExerciseIndex === 0} variant="outline" className="w-full sm:w-auto">
+              <ChevronLeft className="mr-2 h-4 w-4" /> {dict?.previousButton || "Previous"}
+            </Button>
+            <Button 
+                onClick={onNextExercise} 
+                className="w-full sm:w-auto bg-primary hover:bg-primary/90"
+                disabled={isNextButtonDisabled}
+            >
+              {currentExerciseIndex === workoutPlan.exercises.length - 1 ? (dict?.finishButton || "Finish Workout") : (dict?.nextButton || "Next Exercise")} 
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+          <Button onClick={onEndWorkout} variant="ghost" size="sm" className="w-full text-destructive hover:bg-destructive/10 mt-2">
+              <FlagOff className="mr-2 h-4 w-4" /> {dict?.endWorkoutEarlyButton || "End Workout Early"}
+          </Button>
+        </div>
       </div>
     </div>
   );

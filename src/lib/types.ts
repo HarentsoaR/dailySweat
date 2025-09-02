@@ -8,6 +8,9 @@ export interface Exercise {
   rest: number; // in seconds
   description?: string;
   duration?: number; // Optional: duration of the exercise itself in seconds (for timed exercises)
+  // Optional media mapping to drive how-to animations/images
+  mediaKey?: string; // slug to locate an asset in /public/exercises
+  mediaAlt?: string; // localized alt text override
 }
 
 export interface WorkoutPlan {

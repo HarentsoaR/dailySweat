@@ -11,6 +11,7 @@ import type { WorkoutPlan, Exercise, DictionaryType } from "@/lib/types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, MessageSquare, PartyPopper, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 interface ActiveWorkoutClientPageProps {
   lang: 'en' | 'fr' | 'es' | 'it' | 'zh';
@@ -218,6 +219,32 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     }
   }, [exerciseTimeLeft, isExerciseTimerRunning, isCurrentExerciseTimed, workoutPhase, handleExerciseTimerEnd]);
 
+  const handleToggleExerciseTimerPause = useCallback(() => {
+    setIsExerciseTimerPaused(prev => !prev);
+    setIsExerciseTimerRunning(prev => !prev);
+  }, []);
+
+  // 5. Keyboard shortcuts for a smoother UX
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (workoutPhase === 'completed' || !currentWorkout) return;
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        advanceWorkoutStep();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handlePreviousExercise();
+      } else if (e.key === ' ' || e.code === 'Space') {
+        if (workoutPhase === 'exercise' && isCurrentExerciseTimed) {
+          e.preventDefault();
+          handleToggleExerciseTimerPause();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [advanceWorkoutStep, handlePreviousExercise, handleToggleExerciseTimerPause, workoutPhase, isCurrentExerciseTimed, currentWorkout]);
+
 
   const handleEndWorkout = () => {
     if (!dict?.page?.toasts) return;
@@ -243,10 +270,7 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
     setWorkoutPhase('completed'); // Force completion state
   };
 
-  const handleToggleExerciseTimerPause = () => {
-    setIsExerciseTimerPaused(prev => !prev);
-    setIsExerciseTimerRunning(prev => !prev);
-  };
+  
 
   const handleRestTimerToggle = () => {
     setIsRestTimerRunning(!isRestTimerRunning);
@@ -333,6 +357,21 @@ export function ActiveWorkoutClientPage({ lang, workoutId, dict }: ActiveWorkout
           {/* Placeholder to balance the flex layout if needed, or remove if not */}
           <div className="w-[100px] sm:w-[200px] invisible"></div> {/* Adjust width as needed */}
         </div>
+
+        {/* Session progress under header for modern clarity */}
+        {currentWorkout && workoutPhase !== 'completed' && (
+          <div className="mb-6 max-w-2xl mx-auto">
+            <Progress
+              value={((activeExerciseIndex + 1) / currentWorkout.exercises.length) * 100}
+              className="h-2 [&>div]:bg-accent"
+              aria-label={
+                (dict.page?.activeWorkoutDisplay?.exerciseProgress || 'Exercise {current} of {total}')
+                  .replace('{current}', String(activeExerciseIndex + 1))
+                  .replace('{total}', String(currentWorkout.exercises.length))
+              }
+            />
+          </div>
+        )}
 
         {workoutPhase === 'completed' ? (
           <div className="py-8 space-y-4 text-center max-w-md mx-auto bg-card p-6 rounded-lg shadow-lg">
