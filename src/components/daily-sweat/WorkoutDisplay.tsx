@@ -6,6 +6,7 @@ import { ClipboardList, Flame, Leaf, Zap, Info, CalendarDays, Clock, Dumbbell, P
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface ExerciseCardDict {
   setsLabel?: string;
@@ -27,6 +28,8 @@ interface WorkoutDisplayProps {
     includesExercises?: string;
   };
   exerciseCardDict: ExerciseCardDict; // Still passed, but not used directly in this component anymore
+  onRegenerate?: (hint: string) => void;
+  isRegenerating?: boolean;
 }
 
 const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] }) => {
@@ -42,7 +45,7 @@ const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] 
   }
 };
 
-export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, dict }: WorkoutDisplayProps) {
+export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, dict, onRegenerate, isRegenerating }: WorkoutDisplayProps) {
   if (!workoutPlan) {
     return (
       <Card className="shadow-lg">
@@ -90,6 +93,24 @@ export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, d
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          <div className="flex items-center gap-2">
+            {onRegenerate && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" size="sm" disabled={isRegenerating}>
+                    {isRegenerating ? 'Regenerating…' : 'Regenerate'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onRegenerate('more cardio')}>More cardio</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onRegenerate('less equipment')}>Less equipment</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onRegenerate('core focus')}>Core focus</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onRegenerate('shorter duration')}>Shorter duration</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onRegenerate('add warm-up and cooldown')}>Add warm-up & cooldown</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
         <div className="flex flex-wrap gap-2 pt-2">
           <Badge variant="secondary" className="flex items-center gap-1"><CalendarDays className="h-3 w-3" />{workoutPlan.muscleGroups}</Badge>

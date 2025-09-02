@@ -30,6 +30,10 @@ const GenerateWorkoutInputSchema = z.object({
     .optional()
     .default('en')
     .describe('The target language for the workout plan content (e.g., "en", "fr").'),
+  emphasisHint: z
+    .string()
+    .optional()
+    .describe("Optional emphasis or constraint to bias the plan (e.g., 'more cardio', 'less equipment', 'core focus', 'shorter rest', 'add warm-up and cooldown')."),
 });
 export type GenerateWorkoutInput = z.infer<typeof GenerateWorkoutInputSchema>;
 
@@ -57,6 +61,7 @@ const prompt = ai.definePrompt({
   Equipment: {{{equipment}}}
   Difficulty: {{{difficulty}}}
   Target Language: {{{language}}}
+  Optional Emphasis: {{{emphasisHint}}}
 
   IMPORTANT: Generate all user-facing text (the 'name' and 'description' of the workout, and the 'name' and 'description' of each exercise) in the specified Target Language. The JSON structure and keys must remain in English.
 
@@ -77,6 +82,7 @@ const prompt = ai.definePrompt({
     ]
   }
   Ensure the output is only the JSON string, with no other text before or after it. The 'exercises' array must not be empty.
+  If an Optional Emphasis is provided, incorporate it sensibly while keeping the plan safe and achievable within the available time.
   If an exercise is time-based (e.g., plank, wall sit, timed run), include a 'duration' field in seconds. For rep-based exercises, 'duration' can be omitted.
   `,
 });

@@ -18,11 +18,13 @@ import type { AIParsedWorkoutOutput, DifficultyFeedbackOption, WorkoutPlan, Dict
 import { AlertCircle, DumbbellIcon, History, MessageSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation"; // Import useParams
+import { BottomTabBar } from "@/components/daily-sweat/BottomTabBar";
 
 type Lang = 'en' | 'fr' | 'es' | 'it' | 'zh';
 
 interface DailySweatClientPageProps {
   dictionary: DictionaryType;
+  params?: { lang: Lang };
 }
 
 export default function DailySweatClientPage({ dictionary: dict }: DailySweatClientPageProps) {
@@ -36,6 +38,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
 
   const [isLoading, setIsLoading] = useState(false);
   const [isAdjusting, setIsAdjusting] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState("workout"); // New state for active tab
 
@@ -206,13 +209,13 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
   }, [isLoading, isAdjusting]);
   
   if (!dict) {
-    return <div className="flex justify-center items-center min-h-screen">{dict?.page?.loadingText || "Loading..."}</div>;
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header title={dict.header?.title || "Daily Sweat"} />
-      <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <main id="main" className="flex-grow container mx-auto px-4 py-8 sm:px-6">
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6 md:w-1/2 mx-auto">
             <TabsTrigger value="workout" className="font-headline text-base">
@@ -234,10 +237,18 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
                   isLoading={isLoading}
                   defaultValues={defaultGeneratorValues}
                   dict={dict.page?.workoutGenerator || {}}
+                  lang={lang}
                 />
               </section>
 
-              <section aria-labelledby="current-workout-heading" className="space-y-6">
+              <section
+                aria-labelledby="current-workout-heading"
+                className="space-y-6"
+                aria-live="polite"
+                aria-atomic="false"
+                aria-busy={isLoading}
+                role="status"
+              >
                 <h2 id="current-workout-heading" className="sr-only">{dict.page?.workoutDisplay?.title || "Current Workout"}</h2>
                 {error && (
                   <Alert variant="destructive" className="shadow-md">
@@ -256,6 +267,51 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
                     isWorkoutActive={false} // No longer active on this page
                     dict={dict.page?.workoutDisplay || {}}
                     exerciseCardDict={dict.page?.exerciseCard || {}}
+                    onRegenerate={async (hint) => {
+                      if (!currentWorkoutParams) return;
+                      setIsRegenerating(true);
+                      setError(null);
+                      try {
+                        const payloadForAI: FlowGenerateWorkoutInput = {
+                          muscleGroups: currentWorkoutParams.muscleGroups,
+                          availableTime: currentWorkoutParams.availableTime,
+                          equipment: currentWorkoutParams.equipment,
+                          difficulty: currentWorkoutParams.difficulty,
+                          language: lang,
+                          emphasisHint: hint,
+                        };
+                        const minLoadingTime = 2000;
+                        const startTime = Date.now();
+                        const [result] = await Promise.all([
+                          generateWorkout(payloadForAI),
+                          new Promise(resolve => setTimeout(resolve, Math.max(0, minLoadingTime - (Date.now() - startTime))))
+                        ]);
+                        let parsedPlan: AIParsedWorkoutOutput;
+                        try {
+                          parsedPlan = JSON.parse(result.workoutPlan) as AIParsedWorkoutOutput;
+                        } catch (e) {
+                          setError(dict?.page?.errors?.invalidAIPlan || "Received an invalid workout plan format from AI.");
+                          return;
+                        }
+                        const newWorkout: WorkoutPlan = {
+                          id: Date.now().toString(),
+                          name: parsedPlan.name || `${currentWorkoutParams.difficulty} ${currentWorkoutParams.muscleGroups} Workout`,
+                          muscleGroups: currentWorkoutParams.muscleGroups,
+                          availableTime: currentWorkoutParams.availableTime,
+                          equipment: currentWorkoutParams.equipment,
+                          difficulty: currentWorkoutParams.difficulty,
+                          exercises: parsedPlan.exercises,
+                          generatedAt: new Date().toISOString(),
+                          description: parsedPlan.description,
+                        };
+                        setCurrentWorkout(newWorkout);
+                        addWorkoutToHistory(newWorkout);
+                        toast({ title: dict?.page?.toasts?.workoutGeneratedTitle, description: (dict?.page?.toasts?.workoutGeneratedDescription || "New variation generated.")});
+                      } finally {
+                        setIsRegenerating(false);
+                      }
+                    }}
+                    isRegenerating={isRegenerating}
                   />
                 )}
                 {currentWorkout && (
@@ -280,6 +336,12 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
                   onDeleteWorkout={removeWorkoutFromHistory}
                   onClearHistory={clearHistory}
                   dict={dict.page?.workoutHistory || {}}
+                  lang={lang}
+                  onUseSuggestedParams={(params) => {
+                    setCurrentWorkoutParams(params);
+                    setSelectedTab('workout');
+                    toast({ title: dict.page?.toasts?.workoutLoadedTitle || 'Plan loaded', description: 'Suggested parameters applied. Ready to generate.' });
+                  }}
                 />
               ) : (
                 <p>{dict.page?.workoutHistory?.loading || "Loading history..."}</p>
@@ -293,7 +355,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
         <Button
           variant="outline"
           size="icon"
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-primary-foreground hover:scale-105 transition-transform"
+          className="fixed right-6 h-14 w-14 rounded-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-primary-foreground hover:scale-105 transition-transform bottom-28 md:bottom-6"
           aria-label={dict.page?.chatbot?.dialogTitle || "Open Fitness Chatbot"}
         >
           <MessageSquare className="h-7 w-7" />
@@ -303,6 +365,12 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
       <footer className="text-center py-4 border-t text-sm text-muted-foreground mt-16">
         <p>{(dict.footer?.tagline || "© {year} Daily Sweat. Sweat Smarter, Not Harder.").replace('{year}', new Date().getFullYear().toString())}</p>
       </footer>
+
+      {/* Mobile bottom navigation */}
+      <BottomTabBar
+        active={selectedTab === "history" ? "history" : "workout"}
+        onChange={(tab) => setSelectedTab(tab)}
+      />
     </div>
   );
 }

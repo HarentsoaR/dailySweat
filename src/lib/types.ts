@@ -82,6 +82,14 @@ export interface DictionaryType {
     workoutGenerator?: {
       title?: string;
       description?: string;
+      tabDescribe?: string;
+      tabForm?: string;
+      describeInputLabel?: string;
+      describePlaceholder?: string;
+      aiAutofill?: string;
+      aiAutofilling?: string;
+      suggestionsTitle?: string;
+      refreshSuggestions?: string;
       muscleGroupsLabel?: string;
       muscleGroupsPlaceholder?: string;
       availableTimeLabel?: string;
