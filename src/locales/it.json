@@ -129,7 +129,14 @@
       "inputPlaceholder": "Chiedi di esercizi, dieta, ecc...",
       "initialMessage": "Ciao! Sono Daily Sweat AI. Chiedimi qualsiasi cosa su fitness, nutrizione o i tuoi allenamenti!",
       "errorMessage": "Spiacente, ho problemi di connessione in questo momento. Riprova più tardi.",
-      "sendButtonSR": "Invia messaggio"
+      "sendButtonSR": "Invia messaggio",
+      "quickPromptsTitle": "Idee rapide",
+      "quickPrompts": [
+        "Piano pasti per massa pulita",
+        "Riscaldamento prima del leg day",
+        "Come fermare i crampi ai polpacci?",
+        "HIIT 20 min principianti"
+      ]
     },
     "toasts": {
       "workoutGeneratedTitle": "Allenamento Generato!",

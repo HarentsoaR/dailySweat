@@ -32,7 +32,7 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
           aria-label="Home"
         >
           {isActive("home") && <span aria-hidden className="absolute -top-px left-0 right-0 h-0.5 bg-primary rounded-t" />}
-          <Home className={`h-5 w-5 ${isActive("home") ? 'text-primary' : ''}`} />
+          <Home className={`h-5 w-5 ${isActive("home") ? 'text-primary-foreground' : ''}`} />
           <span className="text-[11px] leading-3">Home</span>
         </Button>
         <Button
@@ -42,7 +42,7 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
           aria-label="Generate"
         >
           {isActive("workout") && <span aria-hidden className="absolute -top-px left-0 right-0 h-0.5 bg-primary rounded-t" />}
-          <Dumbbell className={`h-5 w-5 ${isActive("workout") ? 'text-primary' : ''}`} />
+          <Dumbbell className={`h-5 w-5 ${isActive("workout") ? 'text-primary-foreground' : ''}`} />
           <span className="text-[11px] leading-3">Generate</span>
         </Button>
         <Button
@@ -52,7 +52,7 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
           aria-label="History"
         >
           {isActive("history") && <span aria-hidden className="absolute -top-px left-0 right-0 h-0.5 bg-primary rounded-t" />}
-          <HistoryIcon className={`h-5 w-5 ${isActive("history") ? 'text-primary' : ''}`} />
+          <HistoryIcon className={`h-5 w-5 ${isActive("history") ? 'text-primary-foreground' : ''}`} />
           <span className="text-[11px] leading-3">History</span>
         </Button>
         <Sheet>
@@ -63,7 +63,7 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
               aria-label="Settings"
             >
               {isActive("settings") && <span aria-hidden className="absolute -top-px left-0 right-0 h-0.5 bg-primary rounded-t" />}
-              <SettingsIcon className={`h-5 w-5 ${isActive("settings") ? 'text-primary' : ''}`} />
+              <SettingsIcon className={`h-5 w-5 ${isActive("settings") ? 'text-primary-foreground' : ''}`} />
               <span className="text-[11px] leading-3">Settings</span>
             </Button>
           </SheetTrigger>

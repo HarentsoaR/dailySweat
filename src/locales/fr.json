@@ -139,7 +139,14 @@
       "inputPlaceholder": "Posez des questions sur les exercices, le régime, etc...",
       "initialMessage": "Bonjour ! Je suis Daily Sweat IA. Posez-moi n'importe quelle question sur le fitness, la nutrition ou vos entraînements !",
       "errorMessage": "Désolé, j'ai du mal à me connecter en ce moment. Veuillez réessayer plus tard.",
-      "sendButtonSR": "Envoyer le message"
+      "sendButtonSR": "Envoyer le message",
+      "quickPromptsTitle": "Idées rapides",
+      "quickPrompts": [
+        "Plan repas prise de masse propre",
+        "Échauffement avant séance jambes",
+        "Que faire contre crampes mollets ?",
+        "HIIT 20 min débutant"
+      ]
     },
     "toasts": {
       "workoutGeneratedTitle": "Entraînement généré !",

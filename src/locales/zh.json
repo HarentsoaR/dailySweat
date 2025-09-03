@@ -129,7 +129,14 @@
       "inputPlaceholder": "询问有关锻炼、饮食等...",
       "initialMessage": "您好！我是 Daily Sweat AI。请随意询问任何关于健身、营养或锻炼的问题！",
       "errorMessage": "抱歉，我目前无法连接。请稍后再试。",
-      "sendButtonSR": "发送消息"
+      "sendButtonSR": "发送消息",
+      "quickPromptsTitle": "快速想法",
+      "quickPrompts": [
+        "增肌期清洁饮食计划",
+        "腿部训练前热身",
+        "小腿抽筋怎么办？",
+        "初学者 20 分钟 HIIT"
+      ]
     },
     "toasts": {
       "workoutGeneratedTitle": "锻炼已生成！",

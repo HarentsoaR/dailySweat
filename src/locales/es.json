@@ -129,7 +129,14 @@
       "inputPlaceholder": "Pregunta sobre ejercicios, dieta, etc...",
       "initialMessage": "¡Hola! Soy Daily Sweat IA. ¡Pregúntame cualquier cosa sobre fitness, nutrición o tus entrenamientos!",
       "errorMessage": "Lo siento, tengo problemas para conectarme en este momento. Por favor, inténtalo de nuevo más tarde.",
-      "sendButtonSR": "Enviar mensaje"
+      "sendButtonSR": "Enviar mensaje",
+      "quickPromptsTitle": "Ideas rápidas",
+      "quickPrompts": [
+        "Plan de comidas para volumen limpio",
+        "Calentamiento antes de pierna",
+        "¿Qué hago con calambres en pantorrillas?",
+        "HIIT 20 min principiante"
+      ]
     },
     "toasts": {
       "workoutGeneratedTitle": "¡Entrenamiento Generado!",

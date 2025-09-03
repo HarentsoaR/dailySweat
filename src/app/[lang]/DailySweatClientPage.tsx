@@ -407,10 +407,12 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
         <Button
           variant="outline"
           size="icon"
-          className="fixed right-6 h-14 w-14 rounded-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-primary-foreground hover:scale-105 transition-transform bottom-28 md:bottom-6"
+          className="fixed right-6 h-14 w-14 rounded-full shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-primary-foreground hover:scale-105 transition-transform bottom-28 md:bottom-6 z-50"
           aria-label={dict.page?.chatbot?.dialogTitle || "Open Fitness Chatbot"}
+          title={dict.page?.chatbot?.dialogTitle || "Daily Sweat AI Coach"}
         >
           <MessageSquare className="h-7 w-7" />
+          <span aria-hidden className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-background animate-pulse" />
         </Button>
       </FitnessChatbotDialog>
 

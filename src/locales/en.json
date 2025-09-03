@@ -141,7 +141,14 @@
       "inputPlaceholder": "Ask about exercises, diet, etc...",
       "initialMessage": "Hello! I'm Daily Sweat AI. Ask me anything about fitness, nutrition, or your workouts!",
       "errorMessage": "Sorry, I'm having trouble connecting right now. Please try again later.",
-      "sendButtonSR": "Send message"
+      "sendButtonSR": "Send message",
+      "quickPromptsTitle": "Quick ideas",
+      "quickPrompts": [
+        "Clean bulk meal plan",
+        "Warm-up before leg day",
+        "How to stop calf cramps?",
+        "Beginner 20‑min HIIT"
+      ]
     },
     "toasts": {
       "workoutGeneratedTitle": "Workout Generated!",
