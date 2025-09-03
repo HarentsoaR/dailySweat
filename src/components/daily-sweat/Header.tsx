@@ -22,7 +22,7 @@ export function Header({ title }: HeaderProps) {
             {title}
           </h1>
         </div>
-        <div className="flex items-center gap-2"> {/* Wrapper for toggles */}
+        <div className="hidden md:flex items-center gap-2"> {/* Hide toggles on mobile */}
           <LanguageSwitcher /> {/* Added LanguageSwitcher */}
           <ThemeToggle />
         </div>

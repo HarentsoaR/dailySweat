@@ -254,7 +254,7 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading, defaultValues, dict,
                       </div>
                     </div>
                   ) : null}
-                  <div className="flex justify-end gap-2">
+                  <div className="hidden md:flex justify-end gap-2">
                     <Button type="button" variant="secondary" onClick={handleAIAutofill} disabled={isParsing} className="transition-all duration-200 hover:shadow-md active:scale-[.98]">
                       {isParsing ? (
                         dict?.aiAutofilling || 'Autofilling…'
