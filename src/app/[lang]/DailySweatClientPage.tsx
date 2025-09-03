@@ -34,6 +34,25 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
   const langRaw = routeParams.lang as string;
   const supportedLangs = ['en','fr','es','it','zh'] as const;
   const lang: Lang = (supportedLangs as readonly string[]).includes(langRaw) ? (langRaw as Lang) : 'en';
+
+  // Lightweight language detector for EN/ES/FR/IT/zh used to enforce output locale
+  const detectLanguage = (text: string): Lang | 'unknown' => {
+    const t = (text || '').toLowerCase();
+    if (!t.trim()) return 'unknown';
+    if (/[\u3400-\u9FBF\uF900-\uFAFF]/.test(t)) return 'zh';
+    const scores: Record<Lang, number> = { en: 0, es: 0, fr: 0, it: 0, zh: 0 };
+    const add = (l: Lang, re: RegExp) => { const m = t.match(re); if (m) scores[l] += m.length; };
+    add('en', /\b(the|and|with|for|of|workout|push[- ]?ups|plank|squats|rest)\b/g);
+    add('es', /\b(el|la|los|las|con|para|de|y|entrenamiento|flexiones|sentadillas|plancha|cuerpo)\b/g);
+    add('fr', /\b(le|la|les|des|du|de|et|avec|pour|entraîne?ment|pompes|squats|planche)\b/g);
+    add('it', /\b(il|lo|la|gli|le|con|per|di|allenamento|flessioni|affondi|panca|plancia)\b/g);
+    const entries = Object.entries(scores) as [Lang, number][];
+    entries.sort((a, b) => b[1] - a[1]);
+    const [topLang, topScore] = entries[0];
+    const [secondLang, secondScore] = entries[1];
+    if (topScore >= 2 && topScore >= (secondScore + 1)) return topLang;
+    return 'unknown';
+  };
   
   const [currentWorkoutParams, setCurrentWorkoutParams] = useState<GenerateWorkoutInput | null>(null);
   const [currentWorkout, setCurrentWorkout] = useState<WorkoutPlan | null>(null);
@@ -88,18 +107,10 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
          return;
       }
 
-      // Language enforcement fallback: if the plan appears in the wrong language, translate
-      const seemsMismatched = () => {
-        const sample = `${parsedPlan.name || ''} ${parsedPlan.description || ''} ${parsedPlan.exercises?.[0]?.name || ''}`.toLowerCase();
-        if (!sample) return false;
-        if (lang === 'fr') return /\b(la|les|des|pour|avec|du|de|le|et)\b/.test(sample) ? false : /\b(di|con|per|gli|una|uno|il|lo)\b/.test(sample);
-        if (lang === 'en') return /\b(the|and|with|for|of)\b/.test(sample) ? false : /\b(di|con|per|gli|una|uno|il|lo)\b/.test(sample);
-        if (lang === 'es') return /\b(el|la|los|las|con|para|de|y)\b/.test(sample) ? false : /\b(di|con|per|gli|una|uno|il|lo)\b/.test(sample);
-        if (lang === 'it') return false; // Italian is expected
-        if (lang === 'zh') return /[\u4e00-\u9fff]/.test(sample) ? false : /\b(di|con|per|gli|una|uno|il|lo)\b/.test(sample);
-        return false;
-      };
-      if (seemsMismatched()) {
+      // Language enforcement fallback: detect output language and translate to the route's lang when mismatched.
+      const sample = `${parsedPlan.name || ''} ${parsedPlan.description || ''} ${parsedPlan.exercises?.[0]?.name || ''}`;
+      const detected = detectLanguage(sample);
+      if (detected !== 'unknown' && detected !== lang) {
         try {
           const translated = await translateWorkoutPlan({ workoutPlan: JSON.stringify(parsedPlan), language: lang } as TranslateWorkoutPlanInput);
           parsedPlan = JSON.parse(translated.translatedWorkoutPlan) as AIParsedWorkoutOutput;
@@ -144,7 +155,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
     const minLoadingTime = 2000; // Minimum 2 seconds loading time for adjustment
     const startTime = Date.now();
 
-    try {
+  try {
       const payloadForAI: AdjustWorkoutDifficultyInput = {
         workoutPlan: JSON.stringify(currentWorkout), 
         feedback,
@@ -170,6 +181,16 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
         setIsAdjusting(false);
         return;
       }
+
+      // Language enforcement for adjusted plans as well
+      try {
+        const sampleAdj = `${adjustedPlanParsed.name || ''} ${adjustedPlanParsed.description || ''} ${adjustedPlanParsed.exercises?.[0]?.name || ''}`;
+        const detectedAdj = detectLanguage(sampleAdj);
+        if (detectedAdj !== 'unknown' && detectedAdj !== lang) {
+          const translatedAdj = await translateWorkoutPlan({ workoutPlan: JSON.stringify(adjustedPlanParsed), language: lang } as TranslateWorkoutPlanInput);
+          adjustedPlanParsed = JSON.parse(translatedAdj.translatedWorkoutPlan) as AIParsedWorkoutOutput;
+        }
+      } catch { /* non-fatal; keep original adjusted plan */ }
 
       const adjustedWorkout: WorkoutPlan = {
         ...currentWorkout,
