@@ -1,0 +1,7 @@
+[build.environment]
+# Allow Netlify to install even if pnpm-lock.yaml is out of date
+PNPM_FLAGS = "--no-frozen-lockfile"
+
+# Ensure a modern Node for Next.js/Genkit
+NODE_VERSION = "20"
+
