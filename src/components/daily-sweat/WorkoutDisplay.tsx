@@ -48,9 +48,9 @@ const DifficultyIcon = ({ difficulty }: { difficulty: WorkoutPlan['difficulty'] 
 export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, dict, onRegenerate, isRegenerating }: WorkoutDisplayProps) {
   if (!workoutPlan) {
     return (
-      <Card className="shadow-lg">
+      <Card className="shadow-lg rounded-xl">
         <CardHeader>
-          <CardTitle className="flex items-center text-2xl font-headline">
+          <CardTitle className="flex items-center text-2xl font-headline tracking-tight">
             <ClipboardList className="mr-2 h-6 w-6 text-primary" />
             {dict?.title || "Your Workout Plan"}
           </CardTitle>
@@ -68,16 +68,16 @@ export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, d
   const exerciseSummary = workoutPlan.exercises.map(ex => ex.name).join(', ');
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="flex items-center text-2xl font-headline">
+            <CardTitle className="flex items-center text-2xl font-headline tracking-tight">
               <ClipboardList className="mr-2 h-6 w-6 text-primary" />
               {workoutPlan.name || dict?.title || "Your Workout Plan"}
             </CardTitle>
             {planDescription && ( 
-              <CardDescription className="mt-1 flex items-center">
+              <CardDescription className="mt-1 flex items-center leading-relaxed">
                 <Info className="mr-1.5 h-4 w-4 text-muted-foreground" />
                 {planDescription}
               </CardDescription>
@@ -97,7 +97,7 @@ export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, d
             {onRegenerate && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="secondary" size="sm" disabled={isRegenerating}>
+                  <Button variant="secondary" size="sm" disabled={isRegenerating} className="transition-all duration-200 active:scale-95">
                     {isRegenerating ? 'Regenerating…' : 'Regenerate'}
                   </Button>
                 </DropdownMenuTrigger>
@@ -113,9 +113,15 @@ export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, d
           </div>
         </div>
         <div className="flex flex-wrap gap-2 pt-2">
-          <Badge variant="secondary" className="flex items-center gap-1"><CalendarDays className="h-3 w-3" />{workoutPlan.muscleGroups}</Badge>
-          <Badge variant="secondary" className="flex items-center gap-1"><Clock className="h-3 w-3" />{workoutPlan.availableTime} min</Badge>
-          <Badge variant="secondary" className="flex items-center gap-1"><Dumbbell className="h-3 w-3" />{workoutPlan.equipment}</Badge>
+          <Badge variant="outline" className="bg-primary/5 border-primary/20 text-foreground flex items-center gap-1">
+            <CalendarDays className="h-3 w-3" />{workoutPlan.muscleGroups}
+          </Badge>
+          <Badge variant="outline" className="bg-primary/5 border-primary/20 text-foreground flex items-center gap-1">
+            <Clock className="h-3 w-3" />{workoutPlan.availableTime} min
+          </Badge>
+          <Badge variant="outline" className="bg-primary/5 border-primary/20 text-foreground flex items-center gap-1">
+            <Dumbbell className="h-3 w-3" />{workoutPlan.equipment}
+          </Badge>
         </div>
       </CardHeader>
       <CardContent>
@@ -136,7 +142,7 @@ export function WorkoutDisplay({ workoutPlan, onStartWorkout, isWorkoutActive, d
         <CardFooter>
           <Button 
             onClick={onStartWorkout} 
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:shadow-md active:scale-[.98]"
             size="lg"
           >
             <PlayCircle className="mr-2 h-5 w-5" />

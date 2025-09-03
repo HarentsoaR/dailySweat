@@ -17,6 +17,8 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
   const params = useParams();
   const lang = (params?.lang as string) || "en";
 
+  const isActive = (tab: BottomTabBarProps["active"]) => active === tab;
+
   return (
     <nav
       aria-label="Primary navigation"
@@ -24,54 +26,58 @@ export function BottomTabBar({ active, onChange }: BottomTabBarProps) {
     >
       <div className="grid grid-cols-4 gap-1 px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
         <Button
-          variant={active === "home" ? "default" : "ghost"}
-          className="flex flex-col items-center justify-center h-14"
+          variant={isActive("home") ? "default" : "ghost"}
+          className="relative flex flex-col items-center justify-center h-14 transition-transform active:scale-95"
           onClick={() => router.push(`/${lang}`)}
           aria-label="Home"
         >
-          <Home className="h-5 w-5" />
+          {isActive("home") && <span aria-hidden className="absolute -top-px left-0 right-0 h-0.5 bg-primary rounded-t" />}
+          <Home className={`h-5 w-5 ${isActive("home") ? 'text-primary' : ''}`} />
           <span className="text-[11px] leading-3">Home</span>
         </Button>
         <Button
-          variant={active === "workout" ? "default" : "ghost"}
-          className="flex flex-col items-center justify-center h-14"
+          variant={isActive("workout") ? "default" : "ghost"}
+          className="relative flex flex-col items-center justify-center h-14 transition-transform active:scale-95"
           onClick={() => onChange("workout")}
           aria-label="Generate"
         >
-          <Dumbbell className="h-5 w-5" />
+          {isActive("workout") && <span aria-hidden className="absolute -top-px left-0 right-0 h-0.5 bg-primary rounded-t" />}
+          <Dumbbell className={`h-5 w-5 ${isActive("workout") ? 'text-primary' : ''}`} />
           <span className="text-[11px] leading-3">Generate</span>
         </Button>
         <Button
-          variant={active === "history" ? "default" : "ghost"}
-          className="flex flex-col items-center justify-center h-14"
+          variant={isActive("history") ? "default" : "ghost"}
+          className="relative flex flex-col items-center justify-center h-14 transition-transform active:scale-95"
           onClick={() => onChange("history")}
           aria-label="History"
         >
-          <HistoryIcon className="h-5 w-5" />
+          {isActive("history") && <span aria-hidden className="absolute -top-px left-0 right-0 h-0.5 bg-primary rounded-t" />}
+          <HistoryIcon className={`h-5 w-5 ${isActive("history") ? 'text-primary' : ''}`} />
           <span className="text-[11px] leading-3">History</span>
         </Button>
         <Sheet>
           <SheetTrigger asChild>
             <Button
-              variant={active === "settings" ? "default" : "ghost"}
-              className="flex flex-col items-center justify-center h-14"
+              variant={isActive("settings") ? "default" : "ghost"}
+              className="relative flex flex-col items-center justify-center h-14 transition-transform active:scale-95"
               aria-label="Settings"
             >
-              <SettingsIcon className="h-5 w-5" />
+              {isActive("settings") && <span aria-hidden className="absolute -top-px left-0 right-0 h-0.5 bg-primary rounded-t" />}
+              <SettingsIcon className={`h-5 w-5 ${isActive("settings") ? 'text-primary' : ''}`} />
               <span className="text-[11px] leading-3">Settings</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="bottom" className="h-[60vh]">
-            <SheetHeader>
+            <SheetHeader className="border-b pb-2">
               <SheetTitle>Settings</SheetTitle>
             </SheetHeader>
             <div className="mt-4 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Theme</span>
+                <span className="text-sm text-muted-foreground">Theme</span>
                 <ThemeToggle />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Language</span>
+                <span className="text-sm text-muted-foreground">Language</span>
                 <LanguageSwitcher />
               </div>
             </div>

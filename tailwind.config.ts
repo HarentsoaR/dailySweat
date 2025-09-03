@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['PT Sans', 'sans-serif'],
-        headline: ['PT Sans', 'sans-serif'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
+        headline: ['Manrope', 'system-ui', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -79,6 +79,35 @@ export default {
         sm: 'calc(var(--radius) - 4px)',
       },
       keyframes: {
+        'scale-in': {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        'scale-out': {
+          '0%': { transform: 'scale(1)', opacity: '1' },
+          '100%': { transform: 'scale(0.95)', opacity: '0' },
+        },
+        'slide-in-from-bottom': {
+          '0%': { transform: 'translateY(8px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        'slide-in-from-top': {
+          '0%': { transform: 'translateY(-8px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        'fade-out': {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        'pulse-ring': {
+          '0%': { boxShadow: '0 0 0 0 hsl(var(--primary)/0.4)' },
+          '70%': { boxShadow: '0 0 0 10px hsl(var(--primary)/0.0)' },
+          '100%': { boxShadow: '0 0 0 0 hsl(var(--primary)/0.0)' },
+        },
         'accordion-down': {
           from: {
             height: '0',
@@ -97,6 +126,13 @@ export default {
         },
       },
       animation: {
+        'scale-in': 'scale-in 0.2s ease-out',
+        'scale-out': 'scale-out 0.2s ease-out',
+        'slide-in-from-bottom': 'slide-in-from-bottom 0.22s ease-out',
+        'slide-in-from-top': 'slide-in-from-top 0.22s ease-out',
+        'fade-in': 'fade-in 0.2s ease-out',
+        'fade-out': 'fade-out 0.2s ease-out',
+        'pulse-ring': 'pulse-ring 2s ease-out infinite',
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },

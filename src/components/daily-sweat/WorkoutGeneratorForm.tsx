@@ -181,198 +181,200 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading, defaultValues, dict,
   
 
   return (
-    <Card className="shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center text-2xl font-headline">
-          <Settings2 className="mr-2 h-6 w-6 text-primary" />
-          {dict?.title || "Create Your Workout"}
-        </CardTitle>
-        <CardDescription>
-          {dict?.description || "Tell us your preferences, and we'll generate a personalized workout plan for you."}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          {/* Mode switch */}
-          <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)} className="w-full">
-            <TabsList className="grid grid-cols-2 w-full mb-4">
-              <TabsTrigger value="describe">{dict?.tabDescribe || 'Describe'}</TabsTrigger>
-              <TabsTrigger value="form">{dict?.tabForm || 'Form'}</TabsTrigger>
-            </TabsList>
-            <TabsContent value="describe" className="space-y-4">
-              <div className="space-y-2">
-                <FormLabel className="flex items-center"><Settings2 className="mr-2 h-4 w-4" />{dict?.describeInputLabel || 'Describe your workout'}</FormLabel>
-                <textarea
-                  value={aiRequest}
-                  onChange={(e) => setAiRequest(e.target.value)}
-                  placeholder={dict?.describePlaceholder || 'e.g., 20‑min beginner HIIT, no equipment, focus legs'}
-                  className="w-full min-h-24 resize-y rounded-md border bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                />
-                {/* Suggestions list (no buttons, non-interactive) */}
-                {isSuggesting && visibleSuggestions.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">{dict?.loadingSuggestions || 'Loading suggestions…'}</p>
-                ) : visibleSuggestions.length > 0 ? (
-                  <div className="mt-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-xs font-medium text-muted-foreground">{dict?.suggestionsTitle || 'Suggestions'}</p>
-                      <button
-                        type="button"
-                        onClick={refreshVisibleSuggestions}
-                        className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-accent hover:text-accent-foreground"
-                        aria-label="Refresh suggestions"
-                        disabled={isSuggesting}
-                      >
-                        <RefreshCcw className="h-3 w-3" /> {dict?.refreshSuggestions || 'Refresh'}
-                      </button>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {visibleSuggestions.map((s, i) => (
+    <Card className="shadow-lg rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 p-[1px]">
+      <div className="bg-card rounded-[inherit]">
+        <CardHeader>
+          <CardTitle className="flex items-center text-2xl md:text-3xl font-headline tracking-tight">
+            <Settings2 className="mr-2 h-6 w-6 text-primary" />
+            {dict?.title || "Create Your Workout"}
+          </CardTitle>
+          <CardDescription className="leading-relaxed">
+            {dict?.description || "Tell us your preferences, and we'll generate a personalized workout plan for you."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-5 md:p-6">
+          <Form {...form}>
+            {/* Mode switch */}
+            <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)} className="w-full">
+              <TabsList className="grid grid-cols-2 w-full mb-4">
+                <TabsTrigger value="describe">{dict?.tabDescribe || 'Describe'}</TabsTrigger>
+                <TabsTrigger value="form">{dict?.tabForm || 'Form'}</TabsTrigger>
+              </TabsList>
+              <TabsContent value="describe" className="space-y-4">
+                <div className="space-y-2">
+                  <FormLabel className="flex items-center"><Settings2 className="mr-2 h-4 w-4" />{dict?.describeInputLabel || 'Describe your workout'}</FormLabel>
+                  <textarea
+                    value={aiRequest}
+                    onChange={(e) => setAiRequest(e.target.value)}
+                    placeholder={dict?.describePlaceholder || 'e.g., 20‑min beginner HIIT, no equipment, focus legs'}
+                    className="w-full min-h-24 resize-y rounded-xl border bg-background px-3 py-2.5 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all duration-200"
+                  />
+                  {/* Suggestions list (no buttons, non-interactive) */}
+                  {isSuggesting && visibleSuggestions.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">{dict?.loadingSuggestions || 'Loading suggestions…'}</p>
+                  ) : visibleSuggestions.length > 0 ? (
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{dict?.suggestionsTitle || 'Suggestions'}</p>
                         <button
-                          key={i}
                           type="button"
-                          onClick={async () => {
-                            setAiRequest(s);
-                            // Fill structured fields for convenience
-                            setIsParsing(true);
-                            try {
-                              const parsed = await parseWorkoutRequest({ request: s, language: lang || 'en' });
-                              const mgKey = (parsed as any).muscleGroupKey || keyFromLabel(muscleGroupOptions, (parsed as any).muscleGroups);
-                              const eqKey = (parsed as any).equipmentKey || keyFromLabel(equipmentOptions, (parsed as any).equipment);
-                              if (mgKey) form.setValue('muscleGroups', mgKey as any, { shouldValidate: true });
-                              if (typeof parsed.availableTime === 'number') form.setValue('availableTime', parsed.availableTime, { shouldValidate: true, shouldDirty: true });
-                              if (eqKey) form.setValue('equipment', eqKey as any, { shouldValidate: true });
-                              if (parsed.difficulty) form.setValue('difficulty', parsed.difficulty, { shouldValidate: true });
-                            } finally { setIsParsing(false); }
-                          }}
-                          className="text-left text-xs px-2 py-1 rounded-md border hover:bg-accent hover:text-accent-foreground"
-                          aria-label={`Suggestion ${i+1}`}
+                          onClick={refreshVisibleSuggestions}
+                          className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border hover:bg-accent hover:text-accent-foreground transition-all duration-200 active:scale-[.98]"
+                          aria-label="Refresh suggestions"
+                          disabled={isSuggesting}
                         >
-                          {s}
+                          <RefreshCcw className="h-3 w-3" /> {dict?.refreshSuggestions || 'Refresh'}
                         </button>
-                      ))}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {visibleSuggestions.map((s, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={async () => {
+                              setAiRequest(s);
+                              // Fill structured fields for convenience
+                              setIsParsing(true);
+                              try {
+                                const parsed = await parseWorkoutRequest({ request: s, language: lang || 'en' });
+                                const mgKey = (parsed as any).muscleGroupKey || keyFromLabel(muscleGroupOptions, (parsed as any).muscleGroups);
+                                const eqKey = (parsed as any).equipmentKey || keyFromLabel(equipmentOptions, (parsed as any).equipment);
+                                if (mgKey) form.setValue('muscleGroups', mgKey as any, { shouldValidate: true });
+                                if (typeof parsed.availableTime === 'number') form.setValue('availableTime', parsed.availableTime, { shouldValidate: true, shouldDirty: true });
+                                if (eqKey) form.setValue('equipment', eqKey as any, { shouldValidate: true });
+                                if (parsed.difficulty) form.setValue('difficulty', parsed.difficulty, { shouldValidate: true });
+                              } finally { setIsParsing(false); }
+                            }}
+                            className="text-left text-xs px-2 py-1 rounded-md border hover:bg-accent hover:text-accent-foreground transition-all duration-200 active:scale-[.98]"
+                            aria-label={`Suggestion ${i+1}`}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
                     </div>
+                  ) : null}
+                  <div className="flex justify-end gap-2">
+                    <Button type="button" variant="secondary" onClick={handleAIAutofill} disabled={isParsing} className="transition-all duration-200 hover:shadow-md active:scale-[.98]">
+                      {isParsing ? (
+                        dict?.aiAutofilling || 'Autofilling…'
+                      ) : (
+                        <span className="inline-flex items-center gap-1">
+                          <Sparkles className="h-4 w-4" />
+                          <span>{dict?.aiAutofill || 'Fill'}</span>
+                        </span>
+                      )}
+                    </Button>
+                    <Button type="button" onClick={handlePrimaryGenerateClick} disabled={anyBusy} className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:shadow-md active:scale-[.98] focus-visible:ring-2 focus-visible:ring-ring">
+                      {isParsing ? 'Generating…' : (dict?.buttonGenerate || 'Generate Workout')}
+                    </Button>
                   </div>
-                ) : null}
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="secondary" onClick={handleAIAutofill} disabled={isParsing}>
-                    {isParsing ? (
-                      dict?.aiAutofilling || 'Autofilling…'
-                    ) : (
-                      <span className="inline-flex items-center gap-1">
-                        <Sparkles className="h-4 w-4" />
-                        <span>{dict?.aiAutofill || 'Fill'}</span>
-                      </span>
-                    )}
-                  </Button>
-                  <Button type="button" onClick={handlePrimaryGenerateClick} disabled={anyBusy} className="bg-primary hover:bg-primary/90">
-                    {isParsing ? 'Generating…' : (dict?.buttonGenerate || 'Generate Workout')}
-                  </Button>
                 </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="form">
-              <form id="generator-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="muscleGroups"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center"><Users className="mr-2 h-4 w-4" />{dict?.muscleGroupsLabel || "Muscle Groups"}</FormLabel>
-                   <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={dict?.muscleGroupsPlaceholder || "Select a muscle group"} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.entries(muscleGroupOptions).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>{value}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="availableTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center"><Clock3 className="mr-2 h-4 w-4" />{dict?.availableTimeLabel || "Available Time (minutes)"}</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder={dict?.availableTimePlaceholder || "e.g., 30"} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="equipment"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center"><Dumbbell className="mr-2 h-4 w-4" />{dict?.equipmentLabel || "Available Equipment"}</FormLabel>
-                   <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={dict?.equipmentPlaceholder || "Select equipment"} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.entries(equipmentOptions).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>{value}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="difficulty"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center"><Zap className="mr-2 h-4 w-4" />{dict?.difficultyLabel || "Difficulty Level"}</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={dict?.selectDifficulty || "Select difficulty"} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="beginner">{dict?.beginner || "Beginner"}</SelectItem>
-                      <SelectItem value="intermediate">{dict?.intermediate || "Intermediate"}</SelectItem>
-                      <SelectItem value="advanced">{dict?.advanced || "Advanced"}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Desktop/Tablet submit button */}
-            <div className="hidden md:block">
-              <Button type="submit" disabled={isLoading} className="w-full bg-primary hover:bg-primary/90">
-                {isLoading ? (dict?.buttonGenerating || "Generating...") : (dict?.buttonGenerate || "Generate Workout")}
-              </Button>
-            </div>
-          </form>
-            </TabsContent>
-          </Tabs>
-        </Form>
-      </CardContent>
-      {/* Mobile sticky submit bar */}
-      <div className="md:hidden fixed bottom-20 left-0 right-0 z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
-        {mode === 'form' ? (
-          <Button type="submit" form="generator-form" disabled={isLoading} className="w-full bg-primary hover:bg-primary/90">
-            {isLoading ? (dict?.buttonGenerating || "Generating...") : (dict?.buttonGenerate || "Generate Workout")}
-          </Button>
-        ) : (
-          <Button type="button" onClick={handlePrimaryGenerateClick} disabled={isBusy} className="w-full bg-primary hover:bg-primary/90">
-            {isBusy ? (dict?.buttonGenerating || "Generating...") : (dict?.buttonGenerate || "Generate Workout")}
-          </Button>
-        )}
+              </TabsContent>
+              <TabsContent value="form">
+                <form id="generator-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="muscleGroups"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center"><Users className="mr-2 h-4 w-4" />{dict?.muscleGroupsLabel || "Muscle Groups"}</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="px-3 py-2.5">
+                              <SelectValue placeholder={dict?.muscleGroupsPlaceholder || "Select a muscle group"} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.entries(muscleGroupOptions).map(([key, value]) => (
+                              <SelectItem key={key} value={key}>{value}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="availableTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center"><Clock3 className="mr-2 h-4 w-4" />{dict?.availableTimeLabel || "Available Time (minutes)"}</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder={dict?.availableTimePlaceholder || "e.g., 30"} {...field} className="px-3 py-2.5" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="equipment"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center"><Dumbbell className="mr-2 h-4 w-4" />{dict?.equipmentLabel || "Available Equipment"}</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="px-3 py-2.5">
+                              <SelectValue placeholder={dict?.equipmentPlaceholder || "Select equipment"} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.entries(equipmentOptions).map(([key, value]) => (
+                              <SelectItem key={key} value={key}>{value}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="difficulty"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center"><Zap className="mr-2 h-4 w-4" />{dict?.difficultyLabel || "Difficulty Level"}</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="px-3 py-2.5">
+                              <SelectValue placeholder={dict?.selectDifficulty || "Select difficulty"} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="beginner">{dict?.beginner || "Beginner"}</SelectItem>
+                            <SelectItem value="intermediate">{dict?.intermediate || "Intermediate"}</SelectItem>
+                            <SelectItem value="advanced">{dict?.advanced || "Advanced"}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Desktop/Tablet submit button */}
+                  <div className="hidden md:block">
+                    <Button type="submit" disabled={isLoading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:shadow-md active:scale-[.98] focus-visible:ring-2 focus-visible:ring-ring">
+                      {isLoading ? (dict?.buttonGenerating || "Generating...") : (dict?.buttonGenerate || "Generate Workout")}
+                    </Button>
+                  </div>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </Form>
+        </CardContent>
+        {/* Mobile sticky submit bar */}
+        <div className="md:hidden fixed bottom-20 left-0 right-0 z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
+          {mode === 'form' ? (
+            <Button type="submit" form="generator-form" disabled={isLoading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:shadow-md active:scale-[.98]">
+              {isLoading ? (dict?.buttonGenerating || "Generating...") : (dict?.buttonGenerate || "Generate Workout")}
+            </Button>
+          ) : (
+            <Button type="button" onClick={handlePrimaryGenerateClick} disabled={isBusy} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:shadow-md active:scale-[.98]">
+              {isBusy ? (dict?.buttonGenerating || "Generating...") : (dict?.buttonGenerate || "Generate Workout")}
+            </Button>
+          )}
+        </div>
       </div>
     </Card>
   );

@@ -21,9 +21,9 @@ interface ExerciseCardProps {
 export function ExerciseCard({ exercise, dict }: ExerciseCardProps) { // onStartRest removed from props
   // const startRestButtonText = (dict?.startRestButton || "Start Rest ({duration}s)").replace('{duration}', String(exercise.rest)); // Removed
   return (
-    <Card className="mb-4 shadow-md transition-all hover:shadow-lg">
+    <Card className="mb-4 shadow-md rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
       <CardHeader className="flex flex-row justify-between items-center">
-        <CardTitle className="flex items-center text-xl font-headline">
+        <CardTitle className="flex items-center text-xl md:text-2xl font-headline tracking-tight">
           <Dumbbell className="mr-2 h-5 w-5 text-primary" />
           {exercise.name}
         </CardTitle>
@@ -42,27 +42,29 @@ export function ExerciseCard({ exercise, dict }: ExerciseCardProps) { // onStart
         )}
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="flex items-center text-sm">
-          <Repeat className="mr-2 h-4 w-4 text-accent" />
-          <span className="font-semibold">{dict?.setsLabel || "Sets:"}</span>
-          <span className="ml-1">{exercise.sets}</span>
-        </div>
-        <div className="flex items-center text-sm">
-          <Target className="mr-2 h-4 w-4 text-accent" />
-          <span className="font-semibold">{dict?.repsLabel || "Reps:"}</span>
-          <span className="ml-1">{exercise.reps}</span>
-        </div>
-        {exercise.duration && (
-          <div className="flex items-center text-sm">
-            <Clock className="mr-2 h-4 w-4 text-accent" />
-            <span className="font-semibold">{dict?.durationLabel || "Duration:"}</span>
-            <span className="ml-1">{exercise.duration} seconds</span>
-          </div>
-        )}
-        <div className="flex items-center text-sm">
-          <TimerIcon className="mr-2 h-4 w-4 text-accent" />
-          <span className="font-semibold">{dict?.restLabel || "Rest:"}</span>
-          <span className="ml-1">{exercise.rest} seconds</span>
+        <div className="flex flex-wrap gap-2 text-sm">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border bg-primary/5 border-primary/20">
+            <Repeat className="h-4 w-4 text-primary" />
+            <span className="font-medium">{dict?.setsLabel || "Sets"}</span>
+            <span className="font-semibold">{exercise.sets}</span>
+          </span>
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border bg-primary/5 border-primary/20">
+            <Target className="h-4 w-4 text-primary" />
+            <span className="font-medium">{dict?.repsLabel || "Reps"}</span>
+            <span className="font-semibold">{exercise.reps}</span>
+          </span>
+          {exercise.duration && (
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border bg-primary/5 border-primary/20">
+              <Clock className="h-4 w-4 text-primary" />
+              <span className="font-medium">{dict?.durationLabel || "Duration"}</span>
+              <span className="font-semibold">{exercise.duration} s</span>
+            </span>
+          )}
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border bg-primary/5 border-primary/20">
+            <TimerIcon className="h-4 w-4 text-primary" />
+            <span className="font-medium">{dict?.restLabel || "Rest"}</span>
+            <span className="font-semibold">{exercise.rest} s</span>
+          </span>
         </div>
       </CardContent>
       {/* CardFooter with Start Rest button removed */}

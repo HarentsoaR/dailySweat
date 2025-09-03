@@ -30,7 +30,9 @@ interface DailySweatClientPageProps {
 export default function DailySweatClientPage({ dictionary: dict }: DailySweatClientPageProps) {
   const router = useRouter();
   const routeParams = useParams();
-  const lang = routeParams.lang as Lang;
+  const langRaw = routeParams.lang as string;
+  const supportedLangs = ['en','fr','es','it','zh'] as const;
+  const lang: Lang = (supportedLangs as readonly string[]).includes(langRaw) ? (langRaw as Lang) : 'en';
   
   const [currentWorkoutParams, setCurrentWorkoutParams] = useState<GenerateWorkoutInput | null>(null);
   const [currentWorkout, setCurrentWorkout] = useState<WorkoutPlan | null>(null);

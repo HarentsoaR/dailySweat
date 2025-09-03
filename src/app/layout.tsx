@@ -1,8 +1,13 @@
 
 import './globals.css';
+import { Inter, Manrope } from 'next/font/google';
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata, Viewport } from 'next';
+
+// Load fonts at module scope
+const inter = Inter({ subsets: ['latin'], display: 'swap', weight: ['400','500'], variable: '--font-body' });
+const manrope = Manrope({ subsets: ['latin'], display: 'swap', weight: ['600','700'], variable: '--font-headline' });
 
 // Default metadata for the root layout
 export const metadata: Metadata = {
@@ -25,12 +30,8 @@ export default function RootLayout({
   return (
     // Default lang to "en", will be updated client-side by SetLangAttributeClient
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased min-h-screen flex flex-col">
+      <head />
+      <body className={`font-body antialiased min-h-screen flex flex-col ${inter.className} ${inter.variable} ${manrope.variable}`}>
         {/* Accessible skip link for keyboard users */}
         <a
           href="#main"

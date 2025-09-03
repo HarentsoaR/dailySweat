@@ -2,6 +2,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { runWithRetries } from '@/ai/utils';
 
 const SuggestWorkoutDescriptionsInputSchema = z.object({
   language: z.string().optional().default('en'),
@@ -40,7 +41,7 @@ const suggestWorkoutDescriptionsFlow = ai.defineFlow(
     outputSchema: SuggestWorkoutDescriptionsOutputSchema,
   },
   async (input) => {
-    const { output } = await suggestManyPrompt(input);
+    const { output } = await runWithRetries(() => suggestManyPrompt(input));
     return output!;
   }
 );

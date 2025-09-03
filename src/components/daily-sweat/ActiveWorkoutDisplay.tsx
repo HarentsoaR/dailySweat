@@ -126,21 +126,33 @@ export function ActiveWorkoutDisplay({
       
       <ExerciseAnimation exercise={currentExercise} workout={workoutPlan} className="mt-2" />
 
-      <div className="p-5 border rounded-xl bg-card shadow-lg">
-          <h3 className="text-2xl font-semibold mb-3 text-center font-headline tracking-tight">{currentExercise.name}</h3>
-          
+      <div className="p-5 border rounded-xl bg-card shadow-lg relative overflow-hidden">
+          <h3 className="text-2xl md:text-3xl font-semibold mb-3 text-center font-headline tracking-tight relative z-10">
+            {currentExercise.name}
+          </h3>
+          {/* Conic progress ring backdrop */}
+          {initialExerciseDuration > 0 && (
+            <div aria-hidden className="pointer-events-none absolute inset-0 flex items-start justify-center">
+              <div
+                className="mt-6 h-48 w-48 rounded-full opacity-20"
+                style={{
+                  background: `conic-gradient(hsl(var(--primary)) ${Math.max(0, Math.min(100, exerciseTimerProgress))}%, hsl(var(--accent)/.2) 0)`
+                }}
+              />
+            </div>
+          )}
           {currentExercise.duration && currentExercise.duration > 0 && (
-            <div className="my-4 text-center space-y-2">
+            <div className="my-4 text-center space-y-2 relative z-10">
               <p className="text-xs text-muted-foreground uppercase tracking-wider">{dict?.durationLabel || "Time"}</p>
-              <p className="text-5xl font-bold font-mono text-primary tabular-nums" aria-live="polite">
+              <p className="text-5xl md:text-6xl font-bold font-mono text-primary tabular-nums" aria-live="polite">
                 {formatTime(displayTime)}
               </p>
-              <Progress value={exerciseTimerProgress} className="h-2 [&>div]:bg-primary transition-all duration-1000 ease-linear" />
+              <Progress value={exerciseTimerProgress} className="h-2 [&>div]:bg-primary transition-[width] duration-1000 ease-linear" />
               <Button 
                 onClick={onToggleExerciseTimerPause} 
                 variant="ghost" 
                 size="sm"
-                className="text-sm"
+                className="text-sm transition-all duration-200 active:scale-[.98]"
                 disabled={displayTime === 0 && !isExerciseTimerRunning}
               >
                 {isExerciseTimerRunning && !isExerciseTimerPaused ? <PauseCircle className="mr-2 h-4 w-4" /> : <PlayCircle className="mr-2 h-4 w-4" />}
@@ -149,29 +161,29 @@ export function ActiveWorkoutDisplay({
             </div>
           )}
 
-          <div className="flex flex-wrap justify-center gap-2 text-sm mb-4">
-            <Badge variant="outline" className="px-3 py-1">
+          <div className="flex flex-wrap justify-center gap-2 text-sm mb-4 relative z-10">
+            <Badge variant="outline" className="px-3 py-1 bg-primary/5 border-primary/20">
               {dict?.setsLabel || "Sets"}
               <span className="ml-2 font-semibold">{currentExercise.sets}</span>
             </Badge>
-            <Badge variant="outline" className="px-3 py-1">
+            <Badge variant="outline" className="px-3 py-1 bg-primary/5 border-primary/20">
               {dict?.repsLabel || "Reps"}
               <span className="ml-2 font-semibold">{currentExercise.reps}</span>
             </Badge>
             {currentExercise.duration && currentExercise.duration > 0 && (
-              <Badge variant="outline" className="px-3 py-1">
+              <Badge variant="outline" className="px-3 py-1 bg-primary/5 border-primary/20">
                 {dict?.durationLabel || "Duration"}
                 <span className="ml-2 font-semibold">{currentExercise.duration}s</span>
               </Badge>
             )}
-            <Badge variant="outline" className="px-3 py-1">
+            <Badge variant="outline" className="px-3 py-1 bg-primary/5 border-primary/20">
               {dict?.restLabel || "Rest"}
               <span className="ml-2 font-semibold">{currentExercise.rest}s</span>
             </Badge>
           </div>
 
           {currentExercise.description && (
-              <p className="text-xs italic text-muted-foreground flex items-start">
+              <p className="text-xs italic text-muted-foreground flex items-start relative z-10 leading-relaxed">
                   <Info className="mr-1.5 h-3 w-3 mt-0.5 shrink-0"/> 
                   {currentExercise.description}
               </p>
@@ -200,21 +212,21 @@ export function ActiveWorkoutDisplay({
 
       {/* Sticky action bar */}
       <div className="sticky bottom-0 left-0 right-0 mx-auto max-w-xl pb-4">
-        <div className="rounded-xl border bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-2 shadow-sm">
+        <div className="rounded-xl border bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-2 shadow-md">
           <div className="flex flex-col sm:flex-row justify-between gap-2">
-            <Button onClick={onPreviousExercise} disabled={currentExerciseIndex === 0} variant="outline" className="w-full sm:w-auto">
+            <Button onClick={onPreviousExercise} disabled={currentExerciseIndex === 0} variant="outline" className="w-full sm:w-auto transition-all duration-200 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
               <ChevronLeft className="mr-2 h-4 w-4" /> {dict?.previousButton || "Previous"}
             </Button>
             <Button 
                 onClick={onNextExercise} 
-                className="w-full sm:w-auto bg-primary hover:bg-primary/90"
+                className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
                 disabled={isNextButtonDisabled}
             >
               {currentExerciseIndex === workoutPlan.exercises.length - 1 ? (dict?.finishButton || "Finish Workout") : (dict?.nextButton || "Next Exercise")} 
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
-          <Button onClick={onEndWorkout} variant="ghost" size="sm" className="w-full text-destructive hover:bg-destructive/10 mt-2">
+          <Button onClick={onEndWorkout} variant="ghost" size="sm" className="w-full text-destructive hover:bg-destructive/10 mt-2 transition-all duration-200 active:scale-95">
               <FlagOff className="mr-2 h-4 w-4" /> {dict?.endWorkoutEarlyButton || "End Workout Early"}
           </Button>
         </div>

@@ -11,6 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z}from 'genkit';
+import { runWithRetries } from '@/ai/utils';
 
 const AdjustWorkoutDifficultyInputSchema = z.object({
   workoutPlan: z.string().describe('The current workout plan in JSON string format.'),
@@ -58,6 +59,11 @@ const prompt = ai.definePrompt({
 
   Target Language for the output: {{{language}}}
 
+  CRITICAL LANGUAGE REQUIREMENT:
+  - All user-facing text MUST be written exclusively in the Target Language above.
+  - Do NOT use any other language under any circumstance.
+  - If any inputs are in a different language, TRANSLATE names and descriptions into the Target Language.
+
   Based on this feedback, adjust the workout plan.
   
   IMPORTANT: Generate all user-facing text (the 'name' and 'description' of the workout, and the 'name' and 'description' of each exercise) in the specified Target Language. The JSON structure and keys must remain in English.
@@ -91,7 +97,7 @@ const adjustWorkoutDifficultyFlow = ai.defineFlow(
     outputSchema: AdjustWorkoutDifficultyOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const { output } = await runWithRetries(() => prompt(input));
     return output!;
   }
 );

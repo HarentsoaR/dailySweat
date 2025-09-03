@@ -2,6 +2,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { runWithRetries } from '@/ai/utils';
 
 const ParseWorkoutRequestInputSchema = z.object({
   request: z.string().describe('Natural language description of the desired workout'),
@@ -51,7 +52,7 @@ const parseWorkoutRequestFlow = ai.defineFlow(
     outputSchema: ParseWorkoutRequestOutputSchema,
   },
   async (input) => {
-    const { output } = await parsePrompt(input);
+    const { output } = await runWithRetries(() => parsePrompt(input));
     return output!;
   }
 );
