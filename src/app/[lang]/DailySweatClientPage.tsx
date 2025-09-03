@@ -9,6 +9,7 @@ import { WorkoutDisplay } from "@/components/daily-sweat/WorkoutDisplay";
 import { WorkoutGeneratorForm } from "@/components/daily-sweat/WorkoutGeneratorForm";
 import { WorkoutHistoryDisplay } from "@/components/daily-sweat/WorkoutHistoryDisplay";
 import { WorkoutLoadingDisplay } from "@/components/daily-sweat/WorkoutLoadingDisplay";
+import { translateWorkoutPlan, type TranslateWorkoutPlanInput } from "@/ai/flows/translate-workout-plan";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -85,6 +86,26 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
          setError(dict.page.errors.emptyAIPlan || "The AI generated an empty workout plan.");
          setIsLoading(false);
          return;
+      }
+
+      // Language enforcement fallback: if the plan appears in the wrong language, translate
+      const seemsMismatched = () => {
+        const sample = `${parsedPlan.name || ''} ${parsedPlan.description || ''} ${parsedPlan.exercises?.[0]?.name || ''}`.toLowerCase();
+        if (!sample) return false;
+        if (lang === 'fr') return /\b(la|les|des|pour|avec|du|de|le|et)\b/.test(sample) ? false : /\b(di|con|per|gli|una|uno|il|lo)\b/.test(sample);
+        if (lang === 'en') return /\b(the|and|with|for|of)\b/.test(sample) ? false : /\b(di|con|per|gli|una|uno|il|lo)\b/.test(sample);
+        if (lang === 'es') return /\b(el|la|los|las|con|para|de|y)\b/.test(sample) ? false : /\b(di|con|per|gli|una|uno|il|lo)\b/.test(sample);
+        if (lang === 'it') return false; // Italian is expected
+        if (lang === 'zh') return /[\u4e00-\u9fff]/.test(sample) ? false : /\b(di|con|per|gli|una|uno|il|lo)\b/.test(sample);
+        return false;
+      };
+      if (seemsMismatched()) {
+        try {
+          const translated = await translateWorkoutPlan({ workoutPlan: JSON.stringify(parsedPlan), language: lang } as TranslateWorkoutPlanInput);
+          parsedPlan = JSON.parse(translated.translatedWorkoutPlan) as AIParsedWorkoutOutput;
+        } catch (e) {
+          console.warn('Translate fallback failed, proceeding with original plan.', e);
+        }
       }
 
       const newWorkout: WorkoutPlan = {
@@ -298,6 +319,11 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
                           setError(dict?.page?.errors?.invalidAIPlan || "Received an invalid workout plan format from AI.");
                           return;
                         }
+                        // Language enforcement fallback for regeneration
+                        try {
+                          const translated = await translateWorkoutPlan({ workoutPlan: JSON.stringify(parsedPlan), language: lang } as TranslateWorkoutPlanInput);
+                          parsedPlan = JSON.parse(translated.translatedWorkoutPlan) as AIParsedWorkoutOutput;
+                        } catch (e) { /* non-fatal */ }
                         const newWorkout: WorkoutPlan = {
                           id: Date.now().toString(),
                           name: parsedPlan.name || `${currentWorkoutParams.difficulty} ${currentWorkoutParams.muscleGroups} Workout`,
