@@ -43,6 +43,7 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState("workout"); // New state for active tab
+  const [isStarting, setIsStarting] = useState(false); // pre-navigation loading
 
   const { toast } = useToast();
 
@@ -172,11 +173,13 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
     }
   };
 
-  const handleStartWorkout = () => {
+  const handleStartWorkout = async () => {
     if (!dict?.page?.errors || !dict?.page?.toasts) return;
     if (currentWorkout && currentWorkout.exercises.length > 0) {
       const targetPath = `/${lang}/workout/${currentWorkout.id}`;
-      console.log("DEBUG: Attempting to navigate to:", targetPath);
+      setIsStarting(true);
+      const minDelay = 900;
+      await new Promise(resolve => setTimeout(resolve, minDelay));
       router.push(targetPath);
     } else {
       setError(dict.page.errors.cannotStartEmptyWorkout || "Cannot start an empty workout.");
@@ -373,6 +376,52 @@ export default function DailySweatClientPage({ dictionary: dict }: DailySweatCli
         active={selectedTab === "history" ? "history" : "workout"}
         onChange={(tab) => setSelectedTab(tab)}
       />
+
+      {/* Start workout pre-navigation overlay */}
+      {isStarting && !isLoading && (
+        <div className="fixed inset-0 z-[9999] bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-center animate-fade-in">
+          <div className="flex flex-col items-center gap-3 text-primary">
+            <span className="spinner" aria-hidden>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </span>
+            <p className="text-sm text-muted-foreground" aria-live="polite">{dict.page?.workoutLoadingDisplay?.title || 'Starting Workout'}</p>
+          </div>
+          <style jsx>{`
+            .spinner { position: relative; width: var(--size, 10px); height: var(--size, 10px); display: inline-block; }
+            .spinner div { position: absolute; width: 50%; height: 120%; background: currentColor; transform: rotate(calc(var(--rotation) * 1deg)) translate(0, calc(var(--translation) * 1%)); animation: spinner-fzua35 1s calc(var(--delay) * 1s) infinite ease; border-radius: 1px; }
+            .spinner div:nth-child(1)  { --delay: 0.1; --rotation: 36;  --translation: 100; }
+            .spinner div:nth-child(2)  { --delay: 0.2; --rotation: 72;  --translation: 100; }
+            .spinner div:nth-child(3)  { --delay: 0.3; --rotation: 108; --translation: 100; }
+            .spinner div:nth-child(4)  { --delay: 0.4; --rotation: 144; --translation: 100; }
+            .spinner div:nth-child(5)  { --delay: 0.5; --rotation: 180; --translation: 100; }
+            .spinner div:nth-child(6)  { --delay: 0.6; --rotation: 216; --translation: 100; }
+            .spinner div:nth-child(7)  { --delay: 0.7; --rotation: 252; --translation: 100; }
+            .spinner div:nth-child(8)  { --delay: 0.8; --rotation: 288; --translation: 100; }
+            .spinner div:nth-child(9)  { --delay: 0.9; --rotation: 324; --translation: 100; }
+            .spinner div:nth-child(10) { --delay: 1.0; --rotation: 360; --translation: 100; }
+            @keyframes spinner-fzua35 {
+              0%, 10%, 20%, 30%, 50%, 60%, 70%, 80%, 90%, 100% { transform: rotate(calc(var(--rotation) * 1deg)) translate(0, calc(var(--translation) * 1%)); }
+              50% { transform: rotate(calc(var(--rotation) * 1deg)) translate(0, calc(var(--translation) * 1.3%)); }
+            }
+            /* Responsive sizing for spinner (still compact) */
+            @media (min-width: 480px) { .spinner { --size: 11px; } }
+            @media (min-width: 768px) { .spinner { --size: 12px; } }
+            @media (min-width: 1024px){ .spinner { --size: 13px; } }
+            /* Simple fade-in animation */
+            :global(.animate-fade-in) { animation: fadeIn 180ms ease-out; }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 }
