@@ -209,6 +209,17 @@ export function WorkoutGeneratorForm({ onSubmit, isLoading, defaultValues, dict,
                     placeholder={dict?.describePlaceholder || 'e.g., 20‑min beginner HIIT, no equipment, focus legs'}
                     className="w-full min-h-24 resize-y rounded-xl border bg-background px-3 py-2.5 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all duration-200"
                   />
+                  {/* Mobile: quick Fill with AI button */}
+                  <div className="flex md:hidden justify-end">
+                    <Button type="button" variant="secondary" onClick={handleAIAutofill} disabled={isParsing} className="mt-2 transition-all duration-200 active:scale-[.98]">
+                      {isParsing ? (dict?.aiAutofilling || 'Autofilling…') : (
+                        <span className="inline-flex items-center gap-1">
+                          <Sparkles className="h-4 w-4" />
+                          <span>{dict?.aiAutofill || 'Fill'}</span>
+                        </span>
+                      )}
+                    </Button>
+                  </div>
                   {/* Suggestions list (no buttons, non-interactive) */}
                   {isSuggesting && visibleSuggestions.length === 0 ? (
                     <p className="text-xs text-muted-foreground">{dict?.loadingSuggestions || 'Loading suggestions…'}</p>
